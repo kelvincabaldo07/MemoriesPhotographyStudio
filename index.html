@@ -10,9 +10,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class'
-    }
+    tailwind.config = { darkMode: 'class' }
   </script>
   <style>
     body {
@@ -21,16 +19,45 @@
     h1, h2, h3 {
       font-family: 'Playfair Display', serif;
     }
+    .nav-link {
+      position: relative;
+      padding-bottom: 5px;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: #D4AF37;
+      transform-origin: bottom right;
+      transition: transform 0.25s ease-out;
+    }
+    .nav-link:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body class="bg-[#FFFFF0] text-gray-800 dark:bg-gray-900 dark:text-gray-100 relative">
 
-  <!-- Floating Dark Mode Toggle -->
-  <button id="darkModeToggle" class="fixed bottom-6 right-6 z-50 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-700 rounded-full p-3 shadow-md">
-    🌙
-  </button>
+  <!-- Overlay for dark mode toggle click -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
 
-  <!-- Setmore Booking Button -->
+  <!-- Floating Buttons -->
+  <button id="darkModeToggle" class="fixed bottom-6 right-6 z-50 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-700 rounded-full p-3 shadow-md">🌙</button>
+
   <div class="fixed bottom-6 left-6 z-50">
     <script id="setmore_script" type="text/javascript" src="https://assets.setmore.com/integration/static/setmoreIframeLive.js"></script>
     <a id="Setmore_button_iframe" href="https://memoriesphotographystudio.setmore.com" target="_blank">
@@ -38,18 +65,100 @@
     </a>
   </div>
 
-  <!-- Content -->
-  <main class="pt-20 text-center">
-    <h1 class="text-4xl font-bold mb-6">Welcome to Memories Photography Studio</h1>
-    <p class="text-lg max-w-2xl mx-auto">Capture your best moments with us. We offer affordable, high-quality self-shoot sessions for everyone.</p>
-  </main>
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 dark:bg-gray-800">
+    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
+      <div class="flex items-center justify-between w-full md:w-auto">
+        <div class="text-center md:text-left w-full">
+          <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
+        </div>
+        <div class="md:hidden">
+          <button id="menu-btn" class="ml-4 focus:outline-none relative z-50">
+            <svg id="hamburger-icon" class="w-7 h-7 text-gray-700 dark:text-white" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="w-7 h-7 text-gray-700 dark:text-white hidden" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="hidden md:flex space-x-6">
+        <a href="#our-story" class="nav-link text-lg hover:text-yellow-600">Our Story</a>
+        <a href="#our-services" class="nav-link text-lg hover:text-yellow-600">Our Services</a>
+        <a href="#contact-us" class="nav-link text-lg hover:text-yellow-600">Contact Us</a>
+      </div>
+    </div>
+    <div id="mobile-menu" class="hidden transform transition duration-300 ease-out origin-top bg-white dark:bg-gray-800 md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50">
+      <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
+      <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
+      <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('assets/hero.jpg');">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative z-10 px-6">
+      <h1 class="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">Capturing Moments, Creating Memories</h1>
+      <p class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto mb-8">Experience the art of photography with us.</p>
+      <a href="#our-services" class="bg-yellow-500 text-white px-6 py-3 rounded-full text-lg transition hover:bg-yellow-600">Explore Our Services</a>
+    </div>
+  </section>
+
+  <!-- Our Story -->
+  <section id="our-story" class="py-20 bg-gray-100 dark:bg-gray-800 px-6 text-center fade-in">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-4xl font-semibold mb-4">Our Story</h2>
+      <p class="text-lg">We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.</p>
+    </div>
+  </section>
+
+  <!-- Our Services -->
+  <section id="our-services" class="py-20 px-6 text-center fade-in">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-4xl font-semibold mb-4">Our Services</h2>
+      <p class="text-lg mb-8">We offer self-shoot sessions perfect for any occasion.</p>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <img src="assets/service1.jpg" class="w-full h-48 object-cover rounded mb-4" alt="Solo Session">
+          <h3 class="text-xl font-bold">Solo / Duo</h3>
+          <p>For individuals or couples who want to create timeless portraits together.</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <img src="assets/service2.jpg" class="w-full h-48 object-cover rounded mb-4" alt="Group Session">
+          <h3 class="text-xl font-bold">Group</h3>
+          <p>Celebrate friendships or family time with group portraits everyone will love.</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <img src="assets/service3.jpg" class="w-full h-48 object-cover rounded mb-4" alt="Event Session">
+          <h3 class="text-xl font-bold">Events</h3>
+          <p>Mark birthdays, milestones, and more with a custom session in our studio.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Us -->
+  <section id="contact-us" class="py-20 bg-gray-100 dark:bg-gray-800 px-6 text-center fade-in">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-4xl font-semibold mb-4">Contact Us</h2>
+      <p class="text-lg mb-8">Have questions or want to book a session? Reach out to us anytime!</p>
+      <p><strong>Email:</strong> smile@memories-studio.com</p>
+      <p><strong>Phone:</strong> +63 906 469 4122</p>
+      <p><strong>Facebook:</strong> <a href="#" class="text-blue-500 underline">fb.com/memoriesphotographystudio</a></p>
+      <p><strong>Location:</strong> Green Valley Field Subdivision, Buna Cerca, Indang, Cavite</p>
+    </div>
+  </section>
 
   <!-- Footer -->
-  <footer class="mt-20 text-center py-10 border-t dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
+  <footer class="bg-white dark:bg-gray-900 text-center py-10 border-t dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
 
-  <!-- Messenger Chat Plugin -->
+  <!-- Facebook Messenger -->
   <div id="fb-root"></div>
   <div id="fb-customer-chat" class="fb-customerchat"></div>
   <script>
@@ -59,10 +168,15 @@
   </script>
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js"></script>
 
-  <!-- Dark Mode JS -->
+  <!-- JS -->
   <script>
     const toggle = document.getElementById('darkModeToggle');
     const html = document.documentElement;
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('overlay');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+    const closeIcon = document.getElementById('close-icon');
 
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       html.classList.add('dark');
@@ -70,12 +184,40 @@
 
     toggle.addEventListener('click', () => {
       html.classList.toggle('dark');
-      if (html.classList.contains('dark')) {
-        localStorage.setItem('theme', 'dark');
-      } else {
-        localStorage.setItem('theme', 'light');
-      }
+      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
+
+    menuBtn.addEventListener('click', () => {
+      const open = mobileMenu.classList.contains('scale-y-100');
+      mobileMenu.classList.toggle('hidden');
+      setTimeout(() => {
+        mobileMenu.classList.toggle('opacity-0');
+        mobileMenu.classList.toggle('scale-y-0');
+        mobileMenu.classList.toggle('opacity-100');
+        mobileMenu.classList.toggle('scale-y-100');
+      }, 10);
+      overlay.classList.toggle('hidden');
+      hamburgerIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      mobileMenu.classList.add('hidden', 'opacity-0', 'scale-y-0');
+      mobileMenu.classList.remove('opacity-100', 'scale-y-100');
+      overlay.classList.add('hidden');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    });
+
+    const faders = document.querySelectorAll('.fade-in');
+    const appearOnScroll = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.1 });
+    faders.forEach(el => appearOnScroll.observe(el));
   </script>
 
 </body>
