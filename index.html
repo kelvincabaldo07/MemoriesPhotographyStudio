@@ -4,10 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Memories Photography Studio</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    html {
-      scroll-behavior: smooth;
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Lato', sans-serif;
+      background-color: #FFFFF0;
+      color: #333;
+    }
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
     }
     .nav-link {
       position: relative;
@@ -21,7 +30,7 @@
       height: 2px;
       bottom: 0;
       left: 0;
-      background-color: #000;
+      background-color: #D4AF37;
       transform-origin: bottom right;
       transition: transform 0.25s ease-out;
     }
@@ -40,68 +49,60 @@
     }
   </style>
 </head>
-<body class="bg-white text-gray-800 font-sans">
+<body class="text-gray-800">
 
   <!-- Navigation -->
   <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
       <a href="#" class="text-2xl font-bold">
-        <img src="https://your-image-host.com/logo.png" alt="Memories Photography Studio Logo" class="h-10">
+        <img src="assets/logo.png" alt="Memories Logo" class="h-10">
       </a>
       <div class="space-x-6">
-        <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-black">Our Story</a>
-        <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-black">Our Services</a>
-        <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-black">Contact Us</a>
+        <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Story</a>
+        <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Services</a>
+        <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Contact Us</a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('https://your-image-host.com/hero-image.jpg');">
+  <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('assets/hero.jpg');">
     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
     <div class="relative z-10 px-6">
       <h1 class="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">Capturing Moments, Creating Memories</h1>
-      <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">Experience the art of photography with us.</p>
-      <a href="#our-services" class="bg-white text-black px-6 py-3 rounded-full text-lg transition hover:bg-gray-200">Explore Our Services</a>
+      <p class="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto mb-8">Experience the art of photography with us.</p>
+      <a href="#our-services" class="bg-yellow-500 text-white px-6 py-3 rounded-full text-lg transition hover:bg-yellow-600">Explore Our Services</a>
     </div>
   </section>
 
   <!-- Our Story Section -->
   <section id="our-story" class="py-20 bg-gray-100 px-6 text-center fade-in">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl md:text-4xl font-semibold mb-4">Our Story</h2>
-      <p class="text-gray-600 text-lg">
-        At Memories Photography Studio, we believe every moment deserves to be captured. Our journey began with a love for photographing our kids, celebrating their milestones, and cherishing life’s special moments. We noticed that self-shoot studios in our area were not affordable for many, so we decided to create our own. With a passion for photography and a camera at home, we set out to offer an accessible and affordable self-shoot experience.
-      </p>
-      <p class="text-gray-600 text-lg mt-4">
-        Our goal is simple: to make photography fun and available to everyone who, like us, loves taking photos but is sometimes held back by cost. Whether it’s a special occasion or just a moment you want to remember, we’re here to help you create beautiful memories.
-      </p>
+      <h2 class="text-4xl font-semibold mb-4">Our Story</h2>
+      <p class="text-gray-700 text-lg">We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.</p>
     </div>
   </section>
 
   <!-- Our Services Section -->
   <section id="our-services" class="py-20 px-6 text-center fade-in">
     <div class="max-w-4xl mx-auto">
-      <h2 class="text-3xl md:text-4xl font-semibold mb-4">Our Services</h2>
-      <p class="text-gray-600 text-lg mb-8">We offer a range of self-shoot experiences tailored to your needs.</p>
+      <h2 class="text-4xl font-semibold mb-4">Our Services</h2>
+      <p class="text-gray-600 text-lg mb-8">We offer self-shoot sessions perfect for any occasion.</p>
       <div class="grid md:grid-cols-3 gap-6">
-        <!-- Service 1 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <img src="https://your-image-host.com/service1.jpg" alt="Solo Sessions" class="w-full h-48 object-cover rounded-t-lg mb-4">
-          <h3 class="text-xl font-semibold mb-2">Solo/Duo Sessions</h3>
-          <p class="text-gray-600">Perfect for individuals or couples looking to capture special moments.</p>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <img src="assets/service1.jpg" class="w-full h-48 object-cover rounded mb-4" alt="Solo Session">
+          <h3 class="text-xl font-bold">Solo / Duo</h3>
+          <p>For individuals or couples who want to create timeless portraits together.</p>
         </div>
-        <!-- Service 2 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <img src="https://your-image-host.com/service2.jpg" alt="Group Sessions" class="w-full h-48 object-cover rounded-t-lg mb-4">
-          <h3 class="text-xl font-semibold mb-2">Group Sessions</h3>
-          <p class="text-gray-600">Ideal for families and friends to create lasting memories together.</p>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <img src="assets/service2.jpg" class="w-full h-48 object-cover rounded mb-4" alt="Group Session">
+          <h3 class="text-xl font-bold">Group</h3>
+          <p>Celebrate friendships or family time with group portraits everyone will love.</p>
         </div>
-        <!-- Service 3 -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <img src="https://your-image-host.com/service3.jpg" alt="Special Events" class="w-full h-48 object-cover rounded-t-lg mb-4">
-          <h3 class="text-xl font-semibold mb-2">Special Events</h3>
-          <p class="text-gray-600">Capture the essence of your special occasions with our tailored packages.</p>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <img src="assets/service3.jpg" class="w-full h-48 object-cover rounded mb-4" alt="Event Session">
+          <h3 class="text-xl font-bold">Events</h3>
+          <p>Mark birthdays, milestones, and more with a custom session in our studio.</p>
         </div>
       </div>
     </div>
@@ -110,23 +111,20 @@
   <!-- Contact Us Section -->
   <section id="contact-us" class="py-20 bg-gray-100 px-6 text-center fade-in">
     <div class="max-w-3xl mx-auto">
-      <h2 class="text-3xl md:text-4xl font-semibold mb-4">Contact Us</h2>
-      <p class="text-gray-600 text-lg mb-8">We’d love to hear from you! Whether it’s questions, bookings, or feedback — we’re just a message away.</p>
-      <div class="space-y-4 text-lg text-gray-700">
-        <p><strong>Email:</strong> <a href="mailto:memoriesstudio@example.com" class="text-blue-600 hover:underline">memoriesstudio@example.com</a></p>
-        <p><strong>Facebook:</strong> <a href="https://facebook.com/memoriesphotographystudio" class="text-blue-600 hover:underline" target="_blank">Memories Photography Studio</a></p>
-        <p><strong>Address:</strong> Indang, Cavite, Philippines</p>
-      </div>
+      <h2 class="text-4xl font-semibold mb-4">Contact Us</h2>
+      <p class="text-lg text-gray-700 mb-8">Have questions or want to book a session? Reach out to us anytime!</p>
+      <p><strong>Email:</strong> memoriesstudio@example.com</p>
+      <p><strong>Facebook:</strong> <a href="#" class="text-blue-600 underline">fb.com/memoriesphotographystudio</a></p>
+      <p><strong>Location:</strong> Indang, Cavite</p>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-white text-center py-10 border-t text-sm text-gray-500">
+  <footer class="bg-white text-center py-10 border-t text-sm text-gray-600">
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
-    <p>Made with ❤️ by Kelvin & May</p>
   </footer>
 
-  <!-- Fade-in on Scroll Script -->
+  <!-- Scroll animation script -->
   <script>
     const faders = document.querySelectorAll('.fade-in');
     const appearOnScroll = new IntersectionObserver((entries, observer) => {
@@ -135,12 +133,8 @@
         entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       });
-    }, {
-      threshold: 0.15,
-    });
-    faders.forEach(fade => {
-      appearOnScroll.observe(fade);
-    });
+    }, { threshold: 0.1 });
+    faders.forEach(el => appearOnScroll.observe(el));
   </script>
 
 </body>
