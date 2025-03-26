@@ -153,36 +153,37 @@
     </div>
   </section>
 
-<!-- Testimonials Carousel (Autoplay + Fancy Transition) -->
+<!-- Testimonials Carousel with Swipe + Modern Buttons -->
 <section id="testimonials" class="py-20 px-6 bg-gray-50 dark:bg-gray-800 text-center fade-in">
   <div class="max-w-3xl mx-auto">
     <h2 class="text-4xl font-semibold mb-10">What Our Clients Say</h2>
+
     <div class="relative overflow-hidden">
-      <div id="testimonial-track" class="flex transition-transform duration-1000 ease-out will-change-transform">
+      <div id="testimonial-track" class="flex transition-transform duration-700 ease-out will-change-transform touch-pan-x">
         <!-- Slide 1 -->
         <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow text-left">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
             <p class="italic mb-4">"The studio was in a convenient location, easily accessible, and offered flexible booking hours... Highly recommended❤️"</p>
             <p class="font-semibold">– Ruzzeth H.</p>
           </div>
         </div>
         <!-- Slide 2 -->
         <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow text-left">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
             <p class="italic mb-4">"My fam had a great experience at this self-shoot studio! The place is much bigger than other studios... Thanks, Kevin and May!"</p>
             <p class="font-semibold">– Katrina J.</p>
           </div>
         </div>
         <!-- Slide 3 -->
         <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow text-left">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
             <p class="italic mb-4">"This studio exceeded my expectations! Modern equipment, clean and relaxing environment... Will definitely return! :)"</p>
             <p class="font-semibold">– Penne E.</p>
           </div>
         </div>
         <!-- Slide 4 -->
         <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow text-left">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
             <p class="italic mb-4">"We kept thinking about how we could come back... The high-quality photos captured the essence of the moment perfectly."</p>
             <p class="font-semibold">– Anna R.</p>
           </div>
@@ -190,9 +191,17 @@
       </div>
 
       <!-- Controls -->
-      <div class="mt-8 flex justify-center space-x-4">
-        <button id="prevBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full">◀</button>
-        <button id="nextBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full">▶</button>
+      <div class="mt-10 flex justify-center space-x-6">
+        <button id="prevBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button id="nextBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       <!-- See more reviews -->
@@ -246,6 +255,23 @@
     clearInterval(autoPlayTimer);
     startAutoplay();
   }
+
+  // Swipe Support
+  let startX = 0;
+  track.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+  });
+
+  track.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    if (startX - endX > 50) {
+      nextSlide();
+      resetAutoplay();
+    } else if (endX - startX > 50) {
+      prevSlide();
+      resetAutoplay();
+    }
+  });
 
   updateSlide();
   startAutoplay();
