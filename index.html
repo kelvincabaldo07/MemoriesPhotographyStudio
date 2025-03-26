@@ -118,41 +118,32 @@
 
 <!-- Our Services -->
 <section id="our-services" class="py-20 px-6 text-center bg-[#FAF3E0] dark:bg-[#2C2C2C]">
-  <div class="max-w-6xl mx-auto">
+  <div class="max-w-5xl mx-auto">
     <h2 class="text-4xl font-semibold mb-12 text-[#2C2C2C] dark:text-white">Our Services</h2>
 
     <div class="grid md:grid-cols-2 gap-8 text-left">
-      
       <!-- Self-Shoot Card -->
-      <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg fade-in">
-        <div class="flex items-center mb-4 text-[#B76E79]">
+      <div onclick="toggleService('selfshoot')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in group">
+        <div class="flex items-center mb-2 text-[#B76E79]">
           <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
-          </svg>
+               viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"/></svg>
           <h3 class="text-2xl font-bold">Self-Shoot</h3>
         </div>
-
-        <div class="mb-4">
-          <h4 class="text-xl font-semibold mb-1">Solo / Duo</h4>
+        <p class="text-[#2C2C2C] dark:text-white">Solo, Group, or Big Group packages — take control of your shoot!</p>
+        <div id="selfshoot" class="mt-4 hidden">
+          <h4 class="text-xl font-semibold mt-4">Solo / Duo</h4>
           <ul class="list-disc list-inside text-lg">
             <li>Self-Shoot Solo/Duo 15</li>
             <li>Self-Shoot Solo/Duo 30</li>
             <li>Self-Shoot Solo/Duo 60</li>
           </ul>
-        </div>
-
-        <div class="mb-4">
-          <h4 class="text-xl font-semibold mb-1">Small Group</h4>
+          <h4 class="text-xl font-semibold mt-4">Small Group</h4>
           <ul class="list-disc list-inside text-lg">
             <li>Self-Shoot Small Group 15</li>
             <li>Self-Shoot Small Group 30</li>
             <li>Self-Shoot Small Group 60</li>
           </ul>
-        </div>
-
-        <div>
-          <h4 class="text-xl font-semibold mb-1">Big Group</h4>
+          <h4 class="text-xl font-semibold mt-4">Big Group</h4>
           <ul class="list-disc list-inside text-lg">
             <li>Self-Shoot Big Group 30</li>
             <li>Self-Shoot Big Group 60</li>
@@ -161,17 +152,15 @@
       </div>
 
       <!-- With Photographer Card -->
-      <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg fade-in">
-        <div class="flex items-center mb-4 text-[#B76E79]">
+      <div onclick="toggleService('withphotographer')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in group">
+        <div class="flex items-center mb-2 text-[#B76E79]">
           <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 6.75l4.5 4.5-4.5 4.5" />
-          </svg>
+               viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
           <h3 class="text-2xl font-bold">With Photographer</h3>
         </div>
-
-        <div class="mb-4">
-          <h4 class="text-xl font-semibold mb-1">Kids / Toddler Pre-birthday Shoot</h4>
+        <p class="text-[#2C2C2C] dark:text-white">Guided shoots for little ones and special milestones.</p>
+        <div id="withphotographer" class="mt-4 hidden">
+          <h4 class="text-xl font-semibold mt-4">Kids / Toddler Pre-birthday</h4>
           <ul class="list-disc list-inside text-lg">
             <li>Safari Theme</li>
             <li>Under the Sea / Mermaid Theme</li>
@@ -180,10 +169,7 @@
             <li>Pastel Daisy Theme</li>
             <li>Racing Theme</li>
           </ul>
-        </div>
-
-        <div>
-          <h4 class="text-xl font-semibold mb-1">Adult Photoshoot</h4>
+          <h4 class="text-xl font-semibold mt-4">Adult Photoshoot</h4>
           <ul class="list-disc list-inside text-lg">
             <li>Maternity Shoot</li>
             <li>Gender Reveal Shoot</li>
@@ -194,6 +180,7 @@
     </div>
   </div>
 </section>
+
 
 
 
@@ -343,6 +330,10 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 fadeIns.forEach(el => observer.observe(el));
 
+function toggleService(id) {
+    const section = document.getElementById(id);
+    section.classList.toggle('hidden');
+  }
 
 </script>
 
