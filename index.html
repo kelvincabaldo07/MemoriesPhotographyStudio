@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Memories Photography Studio</title>
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -53,15 +53,33 @@
 
   <!-- Navigation -->
   <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-    <div class="container mx-auto flex justify-between items-center py-4 px-6">
-      <a href="#" class="text-2xl font-bold">
-        <img src="assets/logo.png" alt="Memories Logo" class="h-10">
-      </a>
-      <div class="space-x-6">
+    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
+      <!-- Logo (centered on mobile, normal on desktop) -->
+      <div class="w-full text-center md:text-left md:w-auto">
+        <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
+      </div>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex space-x-6">
         <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Story</a>
         <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Services</a>
         <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Contact Us</a>
       </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="menu-btn" class="block md:hidden absolute right-4 top-4 focus:outline-none">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden bg-white border-t border-gray-200 md:hidden text-center py-4">
+      <a href="#our-story" class="block py-2 text-lg nav-link">Our Story</a>
+      <a href="#our-services" class="block py-2 text-lg nav-link">Our Services</a>
+      <a href="#contact-us" class="block py-2 text-lg nav-link">Contact Us</a>
     </div>
   </nav>
 
@@ -124,8 +142,16 @@
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
 
-  <!-- Scroll animation script -->
+  <!-- JS: Fade-in on scroll + Mobile Menu Toggle -->
   <script>
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Fade-in animation
     const faders = document.querySelectorAll('.fade-in');
     const appearOnScroll = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
