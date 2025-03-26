@@ -1,43 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kelvin's Modern Site</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet" />
-    <style>
-      html {
-        scroll-behavior: smooth;
-      }
-    </style>
-  </head>
-  <body class="bg-white text-gray-800 font-sans">
-    <!-- Hero Section -->
-    <section class="min-h-screen flex flex-col justify-center items-center text-center px-6">
-      <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6 tracking-tight">
-        Create Stunning Experiences
-      </h1>
-      <p class="text-lg md:text-xl text-gray-600 max-w-2xl mb-8">
-        Build beautiful, fast, and interactive websites just like Vev — hosted with GitHub Pages.
-      </p>
-      <a href="#about" class="inline-block bg-black text-white px-6 py-3 rounded-full text-lg transition hover:bg-gray-800">
-        Learn More
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memories Photography Studio</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    .nav-link {
+      position: relative;
+      padding-bottom: 5px;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: #000;
+      transform-origin: bottom right;
+      transition: transform 0.25s ease-out;
+    }
+    .nav-link:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease-out, transform 1s ease-out;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+    <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <a href="#" class="text-2xl font-bold">
+        <img src="https://your-image-host.com/logo.png" alt="Memories Photography Studio Logo" class="h-10">
       </a>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-gray-100 px-6 text-center">
-      <div class="max-w-3xl mx-auto">
-        <h2 class="text-3xl md:text-4xl font-semibold mb-4">Why This Site Rocks</h2>
-        <p class="text-gray-600 text-lg">
-          Fast to load. Easy to maintain. Elegant by design. Tailwind gives you total control over spacing, layout, and typography.
-        </p>
+      <div class="space-x-6">
+        <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-black">Our Story</a>
+        <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-black">Our Services</a>
+        <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-black">Contact Us</a>
       </div>
-    </section>
+    </div>
+  </nav>
 
-    <!-- Footer -->
-    <footer class="py-10 text-center text-gray-500 text-sm">
-      © 2025 Kelvin. Made with ❤️ using GitHub Pages & Tailwind.
-    </footer>
-  </body>
-</html>
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('https://your-image-host.com/hero-image.jpg');">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative z-10 px-6">
+      <h1 class="text-5xl md:text-6xl font-bold text-white leading-tight mb-6">Capturing Moments, Creating Memories</h1>
+      <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8">Experience the art of photography with us.</p>
+      <a href="#our-services" class="bg-white text-black px-6 py-3 rounded-full text-lg transition hover:bg-gray-200">Explore Our Services</a>
+    </div>
+  </section>
+
+  <!-- Our Story Section -->
+  <section id="our-story" class="py-20 bg-gray-100 px-6 text-center fade-in">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-4">Our Story</h2>
+      <p class="text-gray-600 text-lg">At Memories Photography Studio, we believe every moment deserves to be captured. Our journey began with a love for photographing our kids, celebrating their milestones, and cherishing life’s special moments. We noticed that self-shoot studios in our area were not affordable for many, so we decided to create our own. With a passion for photography and a camera at home, we set out to offer an accessible and affordable self-shoot experience. Our goal is simple: to make photography fun and available to everyone who, like us, loves taking photos but is sometimes held back by cost. Whether it’s a special occasion or just a moment you want to remember, we’re here to help you create beautiful memories.</p>
+    </div>
+  </section>
+
+  <!-- Our Services Section -->
+  <section id="our-services" class="py-20 px-6 text-center fade-in">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-semibold mb-4">Our Services</h2>
+      <p class="text-gray-600 text-lg mb-8">We offer a range of self-shoot experiences tailored to your needs.</p>
+      <div class="grid md:grid-cols-3 gap-6">
+        <!-- Service 1 -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <img src="https://your-image-host.com/service1.jpg" alt="Service 1" class="w-full h-48 object-cover rounded-t-lg mb-4">
+          <h3 class="text-xl font-semibold mb-2">Solo/Duo Sessions</h3>
+          <p class="text-gray-600">Perfect for individuals or couples looking to capture special moments.</p>
+        </div>
+        <!-- Service 2 -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <img src="https://your-image-host.com/service2.jpg" alt="Service 2" class="w-full h-48 object-cover rounded-t-lg mb-4">
+          <h3 class="text-xl font-semibold mb-2">Group Sessions</h3>
+          <p class="text-gray-600">Ideal for families and friends to create lasting memories together.</p>
+        </div>
+        <!-- Service 3 -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <img src="https://your-image-host.com/service3.jpg" alt="Service 3" class="w-full h-48 object-cover rounded-t-lg mb-4">
+          <h3 class="text-xl font-semibold mb-2">Special Events</h3>
+          <p class="text-gray-600">Capture the essence of your special occasions with our tailored packages.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Us Section -->
+  <section id="contact-us" class="py-20 bg-gray-100 px-6 text-center fade-in">
+    <div class="max-w-3xl mx-auto">
+     
+::contentReference[oaicite:0]{index=0}
+ 
