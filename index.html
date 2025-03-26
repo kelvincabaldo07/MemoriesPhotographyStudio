@@ -142,23 +142,22 @@
   <div id="story-card" class="relative w-full h-80 transition-transform duration-700 transform-style preserve-3d rounded-xl shadow-lg">
     
     <!-- Front -->
-    <div class="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl p-6 flex items-center justify-center backface-hidden z-10">
+    <div class="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl p-6 flex items-center justify-center backface-hidden"
+         style="z-index: 2;">
       <p class="text-lg text-[#2C2C2C] dark:text-white">
         We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
       </p>
     </div>
 
     <!-- Back -->
-    <div class="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden transform rotate-y-180 backface-hidden z-0">
-      <img src="assets/our-photo.jpg" alt="Our Photo" class="w-full h-full object-cover rounded-xl">
+    <div class="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden backface-hidden transform rotate-y-180"
+         style="z-index: 1;">
+      <img src="assets/our-story.jpg" alt="Our Photo" class="w-full h-full object-cover rounded-xl">
     </div>
 
   </div>
 </div>
 
-
-  <!-- Fade Transition to Next Section -->
-  <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-b from-transparent to-[#FAF3E0] dark:to-[#2C2C2C] z-10"></div>
 </section>
 
 
