@@ -147,24 +147,13 @@
     <h2 class="text-4xl font-semibold text-white">Our Story</h2>
   </div>
 
-<!-- Flippable Card -->
-<div class="perspective w-full mx-auto" onclick="flipCard()">
-  <div id="story-card" class="relative w-full h-80 transition-transform duration-700 transform-style preserve-3d rounded-xl shadow-lg">
-    
-    <!-- Front -->
-    <div class="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl p-6 flex items-center justify-center backface-hidden"
-         style="z-index: 2;">
-      <p class="text-lg text-[#2C2C2C] dark:text-white">
-        We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
-      </p>
-    </div>
-
-    <!-- Back -->
-    <div class="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl overflow-hidden backface-hidden transform rotate-y-180"
-         style="z-index: 1;">
-      <img src="assets/our-story.jpg" alt="Our Photo" class="w-full h-full object-cover rounded-xl">
-    </div>
-
+<!-- Our Story Card Style -->
+<div onclick="toggleService('ourStoryDetails')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in max-w-3xl mx-auto">
+  <p class="text-lg text-[#2C2C2C] dark:text-white">
+    We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
+  </p>
+  <div id="ourStoryDetails" class="mt-4 hidden">
+    <img src="assets/our-story.jpg" alt="Our Story" class="w-full rounded-lg shadow mt-4">
   </div>
 </div>
 
@@ -524,10 +513,7 @@ function toggleService(id) {
       closeIcon.classList.add('hidden');
     });
 
-    function flipCard() {
-  const card = document.getElementById('story-card');
-  card.classList.toggle('flipped');
-}
+    
 
 
   </script>
