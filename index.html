@@ -188,24 +188,13 @@
 </section>
 
 
-
-
-  <!-- Contact Us -->
-  <section id="contact-us" class="py-20 bg-gray-100 dark:bg-gray-800 px-6 text-center fade-in">
-    <div class="max-w-3xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-4">Contact Us</h2>
-      <p class="text-lg mb-8">Have questions or want to book a session? Reach out to us anytime!</p>
-      <p><strong>Email:</strong> smile@memories-studio.com</p>
-      <p><strong>Phone:</strong> +63 906 469 4122</p>
-      <p><strong>Facebook:</strong> <a href="#" class="text-blue-500 underline">fb.com/memoriesphotographystudio</a></p>
-      <p><strong>Location:</strong> Green Valley Field Subdivision, Buna Cerca, Indang, Cavite</p>
-    </div>
-  </section>
-
 <!-- Testimonials Carousel with Swipe + Modern Buttons -->
-<section id="testimonials" class="py-20 px-6 bg-gray-50 dark:bg-gray-800 text-center fade-in">
-  <div class="max-w-3xl mx-auto">
-    <h2 class="text-4xl font-semibold mb-10">What Our Clients Say</h2>
+<section id="testimonials" class="py-20 px-6 text-center fade-in relative overflow-hidden rounded-t-3xl rounded-b-3xl"
+         style="background-color: #DB9E04; background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
+  <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
+
+  <div class="max-w-3xl mx-auto relative z-10">
+    <h2 class="text-4xl font-semibold mb-10 text-white">What Our Clients Say</h2>
 
     <div class="relative overflow-hidden">
       <div id="testimonial-track" class="flex transition-transform duration-700 ease-out will-change-transform touch-pan-x">
@@ -241,12 +230,12 @@
 
       <!-- Controls -->
       <div class="mt-10 flex justify-center space-x-6">
-        <button id="prevBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
+        <button id="prevBtn" class="bg-[#B76E79] hover:bg-[#a75e6b] text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <button id="nextBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
+        <button id="nextBtn" class="bg-[#B76E79] hover:bg-[#a75e6b] text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
@@ -255,13 +244,72 @@
 
       <!-- See more reviews -->
       <div class="mt-8">
-        <a href="https://go.setmore.com/settings/reviews" target="_blank" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white text-lg px-6 py-3 rounded-full transition">
+        <a href="https://go.setmore.com/settings/reviews" target="_blank"
+           class="inline-block bg-[#B76E79] hover:bg-[#a75e6b] text-white text-lg px-6 py-3 rounded-full transition">
           See More Reviews
         </a>
       </div>
     </div>
   </div>
 </section>
+
+
+
+<!-- Contact Us -->
+<section id="contact-us" class="py-20 px-6 text-center fade-in" style="background-color: #FAF3E0;">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-4xl font-semibold mb-6 text-[#2C2C2C]">Contact Us</h2>
+    <p class="text-lg mb-8 text-[#2C2C2C]">Have questions or want to book a session? Reach out to us anytime!</p>
+
+    <div class="grid md:grid-cols-2 gap-8 text-left">
+      <!-- Contact Info -->
+      <div class="space-y-4 text-[#2C2C2C]">
+        <p><strong>Email:</strong> smile@memories-studio.com</p>
+        <p><strong>Phone:</strong> +63 906 469 4122</p>
+        <p><strong>Facebook:</strong> <a href="https://facebook.com/memoriesphotographystudio" target="_blank" class="text-[#B76E79] underline">fb.com/memoriesphotographystudio</a></p>
+        <p><strong>Location:</strong><br>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</p>
+
+        <!-- Opening Hours -->
+        <div class="mt-6">
+          <h3 class="text-xl font-semibold mb-2">Opening Hours</h3>
+          <ul class="text-lg">
+            <li>Mon – Fri: 9:00 AM – 6:00 PM</li>
+            <li>Sat – Sun: 10:00 AM – 5:00 PM</li>
+          </ul>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="mt-6 flex space-x-4">
+          <a href="https://facebook.com/memoriesphotographystudio" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Facebook">
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+              <path d="M22 12a10 10 0 10-11.5 9.88v-7H8v-2.88h2.5V9.5a3.5 3.5 0 013.75-3.88 15.1 15.1 0 012.25.19v2.5h-1.27c-1.25 0-1.48.6-1.48 1.46v1.92h2.84l-.45 2.88h-2.39v7A10 10 0 0022 12z"/>
+            </svg>
+          </a>
+          <a href="https://instagram.com" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Instagram">
+            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+              <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65 1.35-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Google Map -->
+      <div class="w-full h-64 rounded-lg overflow-hidden shadow-md">
+        <iframe
+          class="w-full h-full"
+          frameborder="0"
+          style="border:0"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.610472071385!2d120.86830341537584!3d14.194036790139303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd84f5479acaa3%3A0x84eab92cc53aa5d0!2sIndang%2C%20Cavite!5e0!3m2!1sen!2sph!4v1713960308583!5m2!1sen!2sph"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 
 <script>
   const track = document.getElementById('testimonial-track');
