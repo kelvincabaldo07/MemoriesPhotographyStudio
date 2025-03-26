@@ -49,45 +49,52 @@
     }
   </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 relative">
+
+  <!-- Overlay for mobile menu (click outside to close) -->
+  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
 
   <!-- Navigation -->
-<nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-  <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
-    <!-- Logo and hamburger wrapper -->
-    <div class="flex items-center justify-between w-full md:w-auto">
-      <!-- Logo (centered on mobile, normal on desktop) -->
-      <div class="text-center md:text-left w-full">
-        <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
+  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
+      <div class="flex items-center justify-between w-full md:w-auto">
+        <!-- Logo -->
+        <div class="text-center md:text-left w-full">
+          <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
+        </div>
+
+        <!-- Hamburger/X Icon -->
+        <div class="md:hidden">
+          <button id="menu-btn" class="ml-4 focus:outline-none relative z-50">
+            <svg id="hamburger-icon" class="w-7 h-7 text-gray-700 transition-transform duration-300"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" class="w-7 h-7 text-gray-700 hidden transition-transform duration-300"
+                 fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Mobile Menu Button -->
-      <div class="md:hidden">
-        <button id="menu-btn" class="ml-4 focus:outline-none">
-          <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
-               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex space-x-6">
+        <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Story</a>
+        <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Services</a>
+        <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Contact Us</a>
       </div>
     </div>
 
-    <!-- Desktop Menu -->
-    <div class="hidden md:flex space-x-6">
-      <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Story</a>
-      <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Services</a>
-      <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Contact Us</a>
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="hidden transform transition duration-300 ease-out origin-top bg-white md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50">
+      <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
+      <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
+      <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
     </div>
-  </div>
-
-  <!-- Mobile Dropdown Menu -->
-  <div id="mobile-menu" class="hidden bg-white border-t border-gray-200 md:hidden text-center py-4">
-    <a href="#our-story" class="block py-2 text-lg nav-link">Our Story</a>
-    <a href="#our-services" class="block py-2 text-lg nav-link">Our Services</a>
-    <a href="#contact-us" class="block py-2 text-lg nav-link">Contact Us</a>
-  </div>
-</nav>
-
+  </nav>
 
   <!-- Hero Section -->
   <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('assets/hero.jpg');">
@@ -99,7 +106,7 @@
     </div>
   </section>
 
-  <!-- Our Story Section -->
+  <!-- Our Story -->
   <section id="our-story" class="py-20 bg-gray-100 px-6 text-center fade-in">
     <div class="max-w-3xl mx-auto">
       <h2 class="text-4xl font-semibold mb-4">Our Story</h2>
@@ -107,7 +114,7 @@
     </div>
   </section>
 
-  <!-- Our Services Section -->
+  <!-- Our Services -->
   <section id="our-services" class="py-20 px-6 text-center fade-in">
     <div class="max-w-4xl mx-auto">
       <h2 class="text-4xl font-semibold mb-4">Our Services</h2>
@@ -132,7 +139,7 @@
     </div>
   </section>
 
-  <!-- Contact Us Section -->
+  <!-- Contact Us -->
   <section id="contact-us" class="py-20 bg-gray-100 px-6 text-center fade-in">
     <div class="max-w-3xl mx-auto">
       <h2 class="text-4xl font-semibold mb-4">Contact Us</h2>
@@ -149,16 +156,38 @@
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
 
-  <!-- JS: Fade-in on scroll + Mobile Menu Toggle -->
+  <!-- JS -->
   <script>
-    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('overlay');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+    const closeIcon = document.getElementById('close-icon');
+
     menuBtn.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
       mobileMenu.classList.toggle('hidden');
+      setTimeout(() => {
+        mobileMenu.classList.toggle('opacity-0');
+        mobileMenu.classList.toggle('scale-y-0');
+        mobileMenu.classList.toggle('opacity-100');
+        mobileMenu.classList.toggle('scale-y-100');
+      }, 10);
+
+      overlay.classList.toggle('hidden');
+      hamburgerIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
     });
 
-    // Fade-in animation
+    overlay.addEventListener('click', () => {
+      mobileMenu.classList.add('hidden', 'opacity-0', 'scale-y-0');
+      mobileMenu.classList.remove('opacity-100', 'scale-y-100');
+      overlay.classList.add('hidden');
+      hamburgerIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    });
+
+    // Fade-in animation on scroll
     const faders = document.querySelectorAll('.fade-in');
     const appearOnScroll = new IntersectionObserver((entries, observer) => {
       entries.forEach(entry => {
