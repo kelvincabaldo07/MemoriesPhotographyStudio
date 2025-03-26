@@ -48,6 +48,20 @@
       opacity: 1;
       transform: translateY(0);
     }
+    .perspective {
+  perspective: 1000px;
+}
+#story-card {
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+#story-card.flipped {
+  transform: rotateY(180deg);
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
   </style>
 </head>
 <body class="bg-[#FFFFF0] text-gray-800 dark:bg-gray-900 dark:text-gray-100 relative">
@@ -111,23 +125,42 @@
 
 <!-- Our Story -->
 <section id="our-story"
-         class="py-20 px-6 text-center fade-in relative overflow-hidden scroll-fade"
+         class="py-20 px-6 text-center fade-in relative overflow-hidden"
          style="background-color: #DB9E04; background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
-  
-  <!-- Subtle Texture Overlay -->
+
+  <!-- Texture Overlay -->
   <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
 
-  <!-- Content -->
-  <div class="max-w-3xl mx-auto relative z-10">
-    <h2 class="text-4xl font-semibold mb-4 text-white">Our Story</h2>
-    <p class="text-lg text-white">
-      We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
-    </p>
+  <!-- Heading -->
+  <div class="max-w-3xl mx-auto relative z-10 mb-10">
+    <h2 class="text-4xl font-semibold text-white">Our Story</h2>
+  </div>
+
+  <!-- Flip Card Container -->
+  <div class="flex justify-center z-10 relative">
+    <div class="w-full max-w-md h-96 perspective" onclick="flipCard(this)">
+      <div class="relative w-full h-full transition-transform duration-700 transform-style preserve-3d" id="story-card">
+        
+        <!-- Front Side (Text) -->
+        <div class="absolute inset-0 bg-white rounded-xl p-6 shadow-xl backface-hidden flex items-center justify-center text-left">
+          <p class="text-[#2C2C2C] text-lg leading-relaxed">
+            We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
+          </p>
+        </div>
+
+        <!-- Back Side (Photo) -->
+        <div class="absolute inset-0 bg-white rounded-xl shadow-xl backface-hidden transform rotate-y-180 flex items-center justify-center overflow-hidden">
+          <img src="assets/our-story.jpg" alt="Kelvin and May" class="object-cover w-full h-full rounded-xl">
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- Fade Transition to Next Section -->
   <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-b from-transparent to-[#FAF3E0] dark:to-[#2C2C2C] z-10"></div>
 </section>
+
 
 
 
@@ -481,6 +514,11 @@ function toggleService(id) {
       hamburgerIcon.classList.remove('hidden');
       closeIcon.classList.add('hidden');
     });
+
+    function flipCard() {
+  const card = document.getElementById('story-card');
+  card.classList.toggle('flipped');
+}
 
 
   </script>
