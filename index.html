@@ -308,18 +308,39 @@
         </div>
       </div>
 
-      <!-- Google Map -->
-      <div class="w-full h-64 rounded-lg overflow-hidden shadow-md">
-        <iframe
-          class="w-full h-full"
-          frameborder="0"
-          style="border:0"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.610472071385!2d120.86830341537584!3d14.194036790139303!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd84f5479acaa3%3A0x84eab92cc53aa5d0!2sIndang%2C%20Cavite!5e0!3m2!1sen!2sph!4v1713960308583!5m2!1sen!2sph"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
-      </div>
+<!-- Google Map with Toggle + Directions -->
+<div class="w-full h-64 rounded-lg overflow-hidden shadow-md fade-in relative">
+  <!-- Map iframe -->
+  <iframe
+    id="googleMap"
+    class="w-full h-full rounded-lg"
+    frameborder="0"
+    style="border:0"
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.588113300907!2d120.8749!3d14.1953!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd852f38e41ae5%3A0xe18c1c16dff89637!2sMemories%20Photography%20Studio!5e0!3m2!1sen!2sph!4v1714175700000!5m2!1sen!2sph"
+    allowfullscreen=""
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+
+  <!-- Dark Mode Overlay (optional) -->
+  <div id="mapOverlay" class="absolute inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-500 rounded-lg"></div>
+
+  <!-- Buttons -->
+  <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
+    <!-- Map Style Toggle -->
+    <button onclick="toggleMapTheme()" class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-3 py-1 rounded-full text-sm shadow">
+      Toggle Map Theme
+    </button>
+
+    <!-- Directions Button -->
+    <a href="https://www.google.com/maps/dir/?api=1&destination=Memories+Photography+Studio,+Indang+Cavite"
+       target="_blank"
+       class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-4 py-2 rounded-full text-sm shadow inline-block">
+      Get Directions
+    </a>
+  </div>
+</div>
+
     </div>
   </div>
 </section>
@@ -327,6 +348,15 @@
 
 
 <script>
+
+
+  function toggleMapTheme() {
+    const overlay = document.getElementById('mapOverlay');
+    overlay.classList.toggle('opacity-0');
+    overlay.classList.toggle('opacity-40');
+  }
+
+
   const track = document.getElementById('testimonial-track');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
