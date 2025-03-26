@@ -337,23 +337,33 @@
 
   <!-- Contact Us -->
   <section id="contact-us" class="py-20 px-6 text-center bg-[#FAF3E0] dark:bg-[#2C2C2C] fade-in">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-12 text-[#2C2C2C] dark:text-white">Contact Us</h2>
-      <p class="text-lg mb-8 text-[#2C2C2C]">Have questions or want to book a session? Reach out to us anytime!</p>
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl font-semibold mb-4 text-[#2C2C2C] dark:text-white">Contact Us</h2>
+      <p class="text-lg mb-12 text-[#2C2C2C] dark:text-[#FAF3E0]">Have questions or want to book a session? Reach out to
+        us anytime!</p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
         <!-- Contact Info -->
-        <div class="space-y-4 text-[#2C2C2C]">
+        <div class="space-y-4 text-[#2C2C2C] dark:text-[#FAF3E0]">
           <p><strong>Email:</strong> smile@memories-studio.com</p>
           <p><strong>Phone:</strong> +63 906 469 4122</p>
-          <p><strong>Facebook:</strong> <a href="https://facebook.com/memoriesphotographystudio" target="_blank"
-              class="text-[#B76E79] underline">fb.com/memoriesphotographystudio</a></p>
-          <p><strong>Location:</strong><br>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</p>
+          <p>
+            <strong>Facebook:</strong>
+            <a href="https://facebook.com/memoriesphotographystudio" target="_blank"
+              class="text-[#B76E79] hover:text-[#a75e6b] underline">
+              fb.com/memoriesphotographystudio
+            </a>
+          </p>
+          <p>
+            <strong>Location:</strong><br>
+            Green Valley Field Subdivision,<br>
+            Buna Cerca, Indang, Cavite
+          </p>
 
           <!-- Opening Hours -->
           <div class="mt-6">
             <h3 class="text-xl font-semibold mb-2">Opening Hours</h3>
-            <ul class="text-lg">
+            <ul class="text-lg space-y-1">
               <li>Mon – Sat: 8:00 AM – 8:00 PM</li>
               <li>Sun: 1:00 PM – 8:00 PM</li>
             </ul>
@@ -361,6 +371,7 @@
 
           <!-- Social Icons -->
           <div class="mt-6 flex space-x-4">
+            <!-- Facebook Icon -->
             <a href="https://facebook.com/memoriesphotographystudio" target="_blank"
               class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Facebook">
               <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
@@ -368,6 +379,7 @@
                   d="M22 12a10 10 0 10-11.5 9.88v-7H8v-2.88h2.5V9.5a3.5 3.5 0 013.75-3.88 15.1 15.1 0 012.25.19v2.5h-1.27c-1.25 0-1.48.6-1.48 1.46v1.92h2.84l-.45 2.88h-2.39v7A10 10 0 0022 12z" />
               </svg>
             </a>
+            <!-- Instagram Icon -->
             <a href="https://instagram.com" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]"
               aria-label="Instagram">
               <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
@@ -378,28 +390,24 @@
           </div>
         </div>
 
-        <!-- Google Map with Toggle + Directions -->
+        <!-- Google Map -->
         <div class="w-full h-64 rounded-lg overflow-hidden shadow-md fade-in relative">
-          <!-- Map iframe -->
           <iframe id="googleMap" class="w-full h-full rounded-lg" frameborder="0" style="border:0"
             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d595.5716892297081!2d120.8824963!3d14.1907874!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd83b509678963%3A0xc0b4d56ba848e15a!2sMemories%20Photography%20Studio!5e1!3m2!1sen!2sph!4v1742986835330!5m2!1sen!2sph"
             allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
           </iframe>
 
-          <!-- Dark Mode Overlay (optional) -->
+          <!-- Dark Mode Overlay -->
           <div id="mapOverlay"
             class="absolute inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-500 rounded-lg">
           </div>
 
-          <!-- Buttons -->
+          <!-- Map Buttons -->
           <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
-            <!-- Map Style Toggle -->
             <button onclick="toggleMapTheme()"
               class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-3 py-1 rounded-full text-sm shadow">
               Toggle Map Theme
             </button>
-
-            <!-- Directions Button -->
             <a href="https://www.google.com/maps/dir/?api=1&destination=Memories+Photography+Studio,+Indang+Cavite"
               target="_blank"
               class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-4 py-2 rounded-full text-sm shadow inline-block">
@@ -407,7 +415,6 @@
             </a>
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -417,12 +424,13 @@
   <script>
 
 
+    // Toggle dark overlay for the map
     function toggleMapTheme() {
       const overlay = document.getElementById('mapOverlay');
       overlay.classList.toggle('opacity-0');
-      overlay.classList.toggle('opacity-40');
+      overlay.classList.toggle('opacity-60');
+      overlay.classList.toggle('pointer-events-none');
     }
-
 
     const track = document.getElementById('testimonial-track');
     const prevBtn = document.getElementById('prevBtn');
