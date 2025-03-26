@@ -109,16 +109,25 @@
   </section>
 
 <!-- Our Story -->
-<section id="our-story" class="py-20 px-6 text-center fade-in relative overflow-hidden rounded-t-3xl rounded-b-3xl"
+<section id="our-story"
+         class="py-20 px-6 text-center fade-in relative overflow-hidden scroll-fade"
          style="background-color: #DB9E04; background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
+  
+  <!-- Subtle Texture Overlay -->
   <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
+
+  <!-- Content -->
   <div class="max-w-3xl mx-auto relative z-10">
     <h2 class="text-4xl font-semibold mb-4 text-white">Our Story</h2>
     <p class="text-lg text-white">
       We started with a love for documenting life’s special moments—especially our children’s. Noticing that many families in our community couldn’t afford professional photography, we launched Memories Photography Studio to offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
     </p>
   </div>
+
+  <!-- Fade Transition to Next Section -->
+  <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-b from-transparent to-[#FAF3E0] dark:to-[#2C2C2C] z-10"></div>
 </section>
+
 
 
 
@@ -388,6 +397,19 @@ function toggleService(id) {
     const section = document.getElementById(id);
     section.classList.toggle('hidden');
   }
+// Fade-in and scroll-up on intersection
+const faders = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+faders.forEach(el => observer.observe(el));
+
 
 </script>
 
