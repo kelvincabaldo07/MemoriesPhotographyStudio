@@ -1,44 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Memories Photography Studio</title>
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { darkMode: 'class' }
-  </script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
   <style>
-    body {
-      font-family: 'Lato', sans-serif;
-    }
-    h1, h2, h3 {
-      font-family: 'Playfair Display', serif;
-    }
-    .nav-link {
-      position: relative;
-      padding-bottom: 5px;
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      transform: scaleX(0);
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background-color: #D4AF37;
-      transform-origin: bottom right;
-      transition: transform 0.25s ease-out;
-    }
-    .nav-link:hover::after {
-      transform: scaleX(1);
-      transform-origin: bottom left;
-    }
+    body { font-family: 'Lato', sans-serif; }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
     .fade-in {
       opacity: 0;
       transform: translateY(20px);
@@ -52,12 +23,10 @@
 </head>
 <body class="bg-[#FFFFF0] text-gray-800 dark:bg-gray-900 dark:text-gray-100 relative">
 
-  <!-- Overlay for dark mode toggle click -->
-  <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
-
-  <!-- Floating Buttons -->
+  <!-- Dark Mode Toggle -->
   <button id="darkModeToggle" class="fixed bottom-6 right-6 z-50 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-700 rounded-full p-3 shadow-md">🌙</button>
 
+  <!-- Setmore Booking Button -->
   <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
     <script id="setmore_script" type="text/javascript" src="https://assets.setmore.com/integration/static/setmoreIframeLive.js"></script>
     <a id="Setmore_button_iframe" href="https://memoriesphotographystudio.setmore.com" target="_blank">
@@ -65,40 +34,21 @@
     </a>
   </div>
 
-  <!-- Navigation -->
-  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 dark:bg-gray-800">
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md z-50">
     <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
-      <div class="flex items-center justify-between w-full md:w-auto">
-        <div class="absolute left-1/2 transform -translate-x-1/2 md:static md:left-0 md:transform-none">
-          <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
-        </div>
-        <div class="md:hidden">
-          <button id="menu-btn" class="ml-4 focus:outline-none relative z-50">
-            <svg id="hamburger-icon" class="w-7 h-7 text-gray-700 dark:text-white" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            <svg id="close-icon" class="w-7 h-7 text-gray-700 dark:text-white hidden" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+      <div class="absolute left-1/2 transform -translate-x-1/2 md:static md:left-0 md:transform-none">
+        <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
       </div>
       <div class="hidden md:flex space-x-6">
-        <a href="#our-story" class="nav-link text-lg hover:text-yellow-600">Our Story</a>
-        <a href="#our-services" class="nav-link text-lg hover:text-yellow-600">Our Services</a>
-        <a href="#contact-us" class="nav-link text-lg hover:text-yellow-600">Contact Us</a>
+        <a href="#our-story" class="text-lg hover:text-yellow-600">Our Story</a>
+        <a href="#our-services" class="text-lg hover:text-yellow-600">Our Services</a>
+        <a href="#contact-us" class="text-lg hover:text-yellow-600">Contact Us</a>
       </div>
-    </div>
-    <div id="mobile-menu" class="hidden transform transition duration-300 ease-out origin-top bg-white dark:bg-gray-800 md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50">
-      <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
-      <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
-      <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
     </div>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('assets/hero.jpg');">
     <div class="absolute inset-0 bg-black bg-opacity-50"></div>
     <div class="relative z-10 px-6">
@@ -141,6 +91,36 @@
     </div>
   </section>
 
+  <!-- Testimonials -->
+  <section id="testimonials" class="py-20 px-6 bg-gray-50 dark:bg-gray-800 text-center fade-in">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-4xl font-semibold mb-10">What Our Clients Say</h2>
+      <div class="grid md:grid-cols-2 gap-8 text-left">
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <p class="italic">"The studio was in a convenient location, easily accessible, and offered flexible booking hours... Highly recommended❤️"</p>
+          <p class="mt-4 font-semibold">– Ruzzeth Hermoso</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <p class="italic">"My fam had a great experience at this self-shoot studio! The place is much bigger than other studios... Thanks, Kevin and May!"</p>
+          <p class="mt-4 font-semibold">– Katrina Joyce Romera</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <p class="italic">"This studio exceeded my expectations! Modern equipment, clean and relaxing environment... Will definitely return! :)"</p>
+          <p class="mt-4 font-semibold">– Penne Estacion</p>
+        </div>
+        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow">
+          <p class="italic">"We kept thinking about how we could come back, and now the day has finally come... The high-quality photos captured the essence of the moment perfectly, something I'll treasure forever."</p>
+          <p class="mt-4 font-semibold">– Anna Carmela Romero</p>
+        </div>
+      </div>
+      <div class="mt-10">
+        <a href="https://go.setmore.com/settings/reviews" target="_blank" class="inline-block bg-yellow-500 hover:bg-yellow-600 text-white text-lg px-6 py-3 rounded-full transition">
+          See More Reviews
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Contact Us -->
   <section id="contact-us" class="py-20 bg-gray-100 dark:bg-gray-800 px-6 text-center fade-in">
     <div class="max-w-3xl mx-auto">
@@ -154,7 +134,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="bg-white dark:bg-gray-900 text-center py-10 border-t dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
+  <footer class="mt-20 text-center py-10 border-t dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
 
@@ -162,21 +142,15 @@
   <div id="fb-root"></div>
   <div id="fb-customer-chat" class="fb-customerchat"></div>
   <script>
-    var chatbox = document.getElementById('fb-customer-chat');
-    chatbox.setAttribute("page_id", "380140688505189");
-    chatbox.setAttribute("attribution", "biz_inbox");
+    document.getElementById('fb-customer-chat').setAttribute("page_id", "380140688505189");
+    document.getElementById('fb-customer-chat').setAttribute("attribution", "biz_inbox");
   </script>
   <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js"></script>
 
-  <!-- JS -->
+  <!-- Scroll & Dark Mode Script -->
   <script>
     const toggle = document.getElementById('darkModeToggle');
     const html = document.documentElement;
-    const menuBtn = document.getElementById('menu-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const overlay = document.getElementById('overlay');
-    const hamburgerIcon = document.getElementById('hamburger-icon');
-    const closeIcon = document.getElementById('close-icon');
 
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       html.classList.add('dark');
@@ -187,37 +161,15 @@
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
     });
 
-    menuBtn.addEventListener('click', () => {
-      const open = mobileMenu.classList.contains('scale-y-100');
-      mobileMenu.classList.toggle('hidden');
-      setTimeout(() => {
-        mobileMenu.classList.toggle('opacity-0');
-        mobileMenu.classList.toggle('scale-y-0');
-        mobileMenu.classList.toggle('opacity-100');
-        mobileMenu.classList.toggle('scale-y-100');
-      }, 10);
-      overlay.classList.toggle('hidden');
-      hamburgerIcon.classList.toggle('hidden');
-      closeIcon.classList.toggle('hidden');
-    });
-
-    overlay.addEventListener('click', () => {
-      mobileMenu.classList.add('hidden', 'opacity-0', 'scale-y-0');
-      mobileMenu.classList.remove('opacity-100', 'scale-y-100');
-      overlay.classList.add('hidden');
-      hamburgerIcon.classList.remove('hidden');
-      closeIcon.classList.add('hidden');
-    });
-
     const faders = document.querySelectorAll('.fade-in');
-    const appearOnScroll = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       });
     }, { threshold: 0.1 });
-    faders.forEach(el => appearOnScroll.observe(el));
+    faders.forEach(el => observer.observe(el));
   </script>
 
 </body>
