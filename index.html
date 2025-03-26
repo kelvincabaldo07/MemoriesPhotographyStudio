@@ -52,36 +52,42 @@
 <body class="text-gray-800">
 
   <!-- Navigation -->
-  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
+<nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50">
+  <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
+    <!-- Logo and hamburger wrapper -->
+    <div class="flex items-center justify-between w-full md:w-auto">
       <!-- Logo (centered on mobile, normal on desktop) -->
-      <div class="w-full text-center md:text-left md:w-auto">
+      <div class="text-center md:text-left w-full">
         <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
       </div>
 
-      <!-- Desktop Menu -->
-      <div class="hidden md:flex space-x-6">
-        <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Story</a>
-        <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Services</a>
-        <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Contact Us</a>
-      </div>
-
       <!-- Mobile Menu Button -->
-      <button id="menu-btn" class="block md:hidden absolute right-4 top-4 focus:outline-none">
-        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
-             viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button>
+      <div class="md:hidden">
+        <button id="menu-btn" class="ml-4 focus:outline-none">
+          <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
     </div>
 
-    <!-- Mobile Dropdown Menu -->
-    <div id="mobile-menu" class="hidden bg-white border-t border-gray-200 md:hidden text-center py-4">
-      <a href="#our-story" class="block py-2 text-lg nav-link">Our Story</a>
-      <a href="#our-services" class="block py-2 text-lg nav-link">Our Services</a>
-      <a href="#contact-us" class="block py-2 text-lg nav-link">Contact Us</a>
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex space-x-6">
+      <a href="#our-story" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Story</a>
+      <a href="#our-services" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Our Services</a>
+      <a href="#contact-us" class="nav-link text-lg text-gray-700 hover:text-yellow-600">Contact Us</a>
     </div>
-  </nav>
+  </div>
+
+  <!-- Mobile Dropdown Menu -->
+  <div id="mobile-menu" class="hidden bg-white border-t border-gray-200 md:hidden text-center py-4">
+    <a href="#our-story" class="block py-2 text-lg nav-link">Our Story</a>
+    <a href="#our-services" class="block py-2 text-lg nav-link">Our Services</a>
+    <a href="#contact-us" class="block py-2 text-lg nav-link">Contact Us</a>
+  </div>
+</nav>
+
 
   <!-- Hero Section -->
   <section class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-image: url('assets/hero.jpg');">
