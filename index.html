@@ -66,11 +66,12 @@
   </div>
 
   <!-- Navigation -->
-  <nav class="fixed top-0 left-0 w-full bg-white shadow-md z-50 dark:bg-gray-800">
+  <nav class="fixed top-0 left-0 w-full bg-[#FAF3E0] shadow-md z-50 dark:bg-[#2C2C2C]">
     <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
       <div class="flex items-center justify-between w-full md:w-auto">
         <div class="absolute left-1/2 transform -translate-x-1/2 md:static md:left-0 md:transform-none">
-          <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12">
+          <img src="assets/logo.png" alt="Memories Logo" class="h-14 mx-auto md:mx-0 md:h-12 block dark:hidden">
+<img src="assets/logo-black.png" alt="Memories Logo Dark" class="h-14 mx-auto md:mx-0 md:h-12 hidden dark:block">
         </div>
         <div class="md:hidden">
           <button id="menu-btn" class="ml-4 focus:outline-none relative z-50">
@@ -136,7 +137,7 @@
   <div class="max-w-5xl mx-auto">
     <h2 class="text-4xl font-semibold mb-12 text-[#2C2C2C] dark:text-white">Our Services</h2>
 
-    <div class="grid md:grid-cols-2 gap-8 text-left">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
       <!-- Self-Shoot Card -->
       <div onclick="toggleService('selfshoot')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in group">
         <div class="flex items-center mb-2 text-[#B76E79]">
@@ -276,7 +277,7 @@
     <h2 class="text-4xl font-semibold mb-6 text-[#2C2C2C]">Contact Us</h2>
     <p class="text-lg mb-8 text-[#2C2C2C]">Have questions or want to book a session? Reach out to us anytime!</p>
 
-    <div class="grid md:grid-cols-2 gap-8 text-left">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
       <!-- Contact Info -->
       <div class="space-y-4 text-[#2C2C2C]">
         <p><strong>Email:</strong> smile@memories-studio.com</p>
@@ -454,16 +455,6 @@ faders.forEach(el => observer.observe(el));
   <footer class="bg-white dark:bg-gray-900 text-center py-10 border-t dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
-
-  <!-- Facebook Messenger -->
-  <div id="fb-root"></div>
-  <div id="fb-customer-chat" class="fb-customerchat"></div>
-  <script>
-    var chatbox = document.getElementById('fb-customer-chat');
-    chatbox.setAttribute("page_id", "380140688505189");
-    chatbox.setAttribute("attribution", "biz_inbox");
-  </script>
-  <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js"></script>
 
   <!-- JS -->
   <script>
