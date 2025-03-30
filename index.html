@@ -96,7 +96,8 @@
       z-index: 1;
     }
 
-    .slideshow-container {
+
+  .slideshow-container {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -105,8 +106,12 @@
   .slideshow img {
     width: 100vw;
     height: 100vh;
-    object-fit: cover;
+    object-fit: contain;
     flex-shrink: 0;
+  }
+
+  .active-dot {
+    background-color: #B76E79;
   }
   </style>
 </head>
@@ -184,6 +189,15 @@
     <a href="#our-services"
       class="bg-yellow-500 text-white px-6 py-3 rounded-full text-lg transition hover:bg-yellow-600">Explore Our
       Services</a>
+  </div>
+
+  <!-- Dots Navigation -->
+  <div class="absolute bottom-8 z-10 flex space-x-2">
+    <div class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" onclick="showSlide(0)"></div>
+    <div class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" onclick="showSlide(1)"></div>
+    <div class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" onclick="showSlide(2)"></div>
+    <div class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" onclick="showSlide(3)"></div>
+    <div class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" onclick="showSlide(4)"></div>
   </div>
 </section>
 
@@ -595,7 +609,9 @@
   ];
 
   const slideshowDiv = document.querySelector('.slideshow');
+  const dots = document.querySelectorAll('.dot');
   let currentIndex = 0;
+  let interval;
 
   // Load all images into the slideshow container
   images.forEach(src => {
@@ -604,16 +620,37 @@
     slideshowDiv.appendChild(img);
   });
 
-  function slideImages() {
-    currentIndex++;
-    if (currentIndex >= images.length) currentIndex = 0;
-
-    // Move the slideshow to show the next image
-    slideshowDiv.style.transform = `translateX(-${currentIndex * 100}vw)`;
+  function updateDots() {
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active-dot', index === currentIndex);
+    });
   }
 
-  // Change slide every 3 seconds
-  setInterval(slideImages, 3000);
+  function slideImages() {
+    currentIndex = (currentIndex + 1) % images.length;
+    updateSlideshow();
+  }
+
+  function updateSlideshow() {
+    slideshowDiv.style.transform = `translateX(-${currentIndex * 100}vw)`;
+    updateDots();
+  }
+
+  function showSlide(index) {
+    currentIndex = index;
+    updateSlideshow();
+    resetInterval(); // Reset the interval when manually controlled
+  }
+
+  function resetInterval() {
+    clearInterval(interval);
+    interval = setInterval(slideImages, 3000);
+  }
+
+  // Initial setup
+  updateDots();
+  updateSlideshow();
+  resetInterval();
 
   </script>
 
