@@ -165,32 +165,32 @@
   </section>
 
 
-  <!-- Our Story -->
-  <section id="our-story" class="py-20 px-6 text-center fade-in relative overflow-hidden"
-    style="background-color: #DB9E04; background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
+<!-- Our Story -->
+<section id="our-story" class="py-20 px-6 text-center fade-in relative overflow-hidden bg-[#DB9E04] dark:bg-gray-600"
+  style="background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
 
-    <!-- Texture Overlay -->
-    <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
+  <!-- Texture Overlay -->
+  <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
 
-    <!-- Heading -->
-    <div class="max-w-3xl mx-auto relative z-10 mb-10">
-      <h2 class="text-4xl font-semibold text-white">Our Story</h2>
+  <!-- Heading -->
+  <div class="max-w-3xl mx-auto relative z-10 mb-10">
+    <h2 class="text-4xl font-semibold text-white">Our Story</h2>
+  </div>
+
+  <!-- Our Story Card Style -->
+  <div onclick="toggleService('ourStoryDetails')"
+    class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in max-w-3xl mx-auto">
+    <p class="text-lg text-[#2C2C2C] dark:text-white">
+      We started with a love for documenting life’s special moments—especially our children’s. Noticing that many
+      families in our community couldn’t afford professional photography, we launched Memories Photography Studio to
+      offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
+    </p>
+    <div id="ourStoryDetails" class="mt-4 hidden">
+      <img src="assets/our-story.jpg" alt="Our Story" class="w-full rounded-lg shadow mt-4">
     </div>
+  </div>
 
-    <!-- Our Story Card Style -->
-    <div onclick="toggleService('ourStoryDetails')"
-      class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in max-w-3xl mx-auto">
-      <p class="text-lg text-[#2C2C2C] dark:text-white">
-        We started with a love for documenting life’s special moments—especially our children’s. Noticing that many
-        families in our community couldn’t afford professional photography, we launched Memories Photography Studio to
-        offer beautiful self-shoot experiences that are fun, easy, and affordable for everyone.
-      </p>
-      <div id="ourStoryDetails" class="mt-4 hidden">
-        <img src="assets/our-story.jpg" alt="Our Story" class="w-full rounded-lg shadow mt-4">
-      </div>
-    </div>
-
-  </section>
+</section>
 
   
   <!-- Our Services -->
@@ -263,81 +263,75 @@
   </section>
 
 
-  <!-- Testimonials Carousel with Scroll Animation (No Gradient Fade) -->
-  <section id="testimonials" class="py-20 px-6 text-center fade-in relative overflow-hidden"
-    style="background-color: #DB9E04; background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
+<!-- Testimonials Carousel with Scroll Animation (No Gradient Fade) -->
+<section id="testimonials" class="py-20 px-6 text-center fade-in relative overflow-hidden bg-[#DB9E04] dark:bg-[#A9A9A9]"
+  style="background-image: url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size: 200px;">
 
-    <!-- Texture Overlay -->
-    <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
+  <!-- Texture Overlay -->
+  <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
 
-    <div class="max-w-3xl mx-auto relative z-10">
-      <h2 class="text-4xl font-semibold mb-10 text-white">What Our Clients Say</h2>
+  <div class="max-w-3xl mx-auto relative z-10">
+    <h2 class="text-4xl font-semibold mb-10 text-white dark:text-black">What Our Clients Say</h2>
 
-      <div class="relative overflow-hidden">
-        <div id="testimonial-track"
-          class="flex transition-transform duration-700 ease-out will-change-transform touch-pan-x">
-          <!-- Slide 1 -->
-          <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-              <p class="italic mb-4">"The studio was in a convenient location, easily accessible, and offered flexible
-                booking hours... Highly recommended❤️"</p>
-              <p class="font-semibold">– Ruzzeth H.</p>
-            </div>
-          </div>
-          <!-- Slide 2 -->
-          <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-              <p class="italic mb-4">"My fam had a great experience at this self-shoot studio! The place is much bigger
-                than other studios... Thanks, Kevin and May!"</p>
-              <p class="font-semibold">– Katrina J.</p>
-            </div>
-          </div>
-          <!-- Slide 3 -->
-          <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-              <p class="italic mb-4">"This studio exceeded my expectations! Modern equipment, clean and relaxing
-                environment... Will definitely return! :)"</p>
-              <p class="font-semibold">– Penne E.</p>
-            </div>
-          </div>
-          <!-- Slide 4 -->
-          <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
-            <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-              <p class="italic mb-4">"We kept thinking about how we could come back... The high-quality photos captured
-                the essence of the moment perfectly."</p>
-              <p class="font-semibold">– Anna R.</p>
-            </div>
+    <div class="relative overflow-hidden">
+      <div id="testimonial-track"
+        class="flex transition-transform duration-700 ease-out will-change-transform touch-pan-x">
+        <!-- Slide 1 -->
+        <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
+            <p class="italic mb-4 text-[#2C2C2C] dark:text-white">"The studio was in a convenient location, easily accessible, and offered flexible booking hours... Highly recommended❤️"</p>
+            <p class="font-semibold text-[#2C2C2C] dark:text-white">– Ruzzeth H.</p>
           </div>
         </div>
-
-        <!-- Controls -->
-        <div class="mt-10 flex justify-center space-x-6">
-          <button id="prevBtn"
-            class="bg-[#B76E79] hover:bg-[#a75e6b] text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <button id="nextBtn"
-            class="bg-[#B76E79] hover:bg-[#a75e6b] text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+        <!-- Slide 2 -->
+        <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
+            <p class="italic mb-4 text-[#2C2C2C] dark:text-white">"My fam had a great experience at this self-shoot studio! The place is much bigger than other studios... Thanks, Kevin and May!"</p>
+            <p class="font-semibold text-[#2C2C2C] dark:text-white">– Katrina J.</p>
+          </div>
         </div>
-
-        <!-- See more reviews -->
-        <div class="mt-8">
-          <a href="https://memoriesphotographystudio.setmore.com/#reviews" target="_blank"
-            class="inline-block bg-[#B76E79] hover:bg-[#a75e6b] text-white text-lg px-6 py-3 rounded-full transition">
-            See More Reviews
-          </a>
+        <!-- Slide 3 -->
+        <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
+            <p class="italic mb-4 text-[#2C2C2C] dark:text-white">"This studio exceeded my expectations! Modern equipment, clean and relaxing environment... Will definitely return! :)"</p>
+            <p class="font-semibold text-[#2C2C2C] dark:text-white">– Penne E.</p>
+          </div>
+        </div>
+        <!-- Slide 4 -->
+        <div class="min-w-full px-4 transition-transform duration-500 transform scale-100">
+          <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
+            <p class="italic mb-4 text-[#2C2C2C] dark:text-white">"We kept thinking about how we could come back... The high-quality photos captured the essence of the moment perfectly."</p>
+            <p class="font-semibold text-[#2C2C2C] dark:text-white">– Anna R.</p>
+          </div>
         </div>
       </div>
+
+      <!-- Controls -->
+      <div class="mt-10 flex justify-center space-x-6">
+        <button id="prevBtn"
+          class="bg-[#B76E79] hover:bg-[#a75e6b] text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <button id="nextBtn"
+          class="bg-[#B76E79] hover:bg-[#a75e6b] text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- See more reviews -->
+      <div class="mt-8">
+        <a href="https://memoriesphotographystudio.setmore.com/#reviews" target="_blank"
+          class="inline-block bg-[#B76E79] hover:bg-[#a75e6b] text-white text-lg px-6 py-3 rounded-full transition">
+          See More Reviews
+        </a>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
 
   <!-- Contact Us -->
