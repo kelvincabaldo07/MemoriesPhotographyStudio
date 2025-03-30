@@ -96,21 +96,17 @@
       z-index: 1;
     }
 
-    .slideshow {
+    .slideshow-container {
     position: absolute;
     width: 100%;
     height: 100%;
-    display: flex;
-    overflow: hidden;
   }
 
   .slideshow img {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     object-fit: cover;
-    opacity: 0;
-    transition: opacity 1s ease;
+    flex-shrink: 0;
   }
   </style>
 </head>
@@ -173,8 +169,8 @@
 <!-- Hero Section -->
 <section class="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
   <!-- Slideshow Container -->
-  <div class="absolute inset-0 z-0">
-    <div class="slideshow w-full h-full absolute top-0 left-0"></div>
+  <div class="absolute inset-0 z-0 slideshow-container overflow-hidden">
+    <div class="slideshow flex w-full h-full transition-transform duration-1000"></div>
   </div>
 
   <!-- Text Container with Transparent Box -->
@@ -427,11 +423,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
         <!-- Contact Info -->
         <div class="space-y-3 text-[#2C2C2C] dark:text-[#FAF3E0] text-base">
-          <p><strong>Email:</strong> smile@memories-studio.com</p>
+          <p><strong>Booking Page:</strong> smile@memories-studio.com</p>
           <p><strong>Phone:</strong> +63 906 469 4122</p>
           <p>
             <strong>Facebook:</strong>
-            <a href="https://facebook.com/memoriesphotographystudio" target="_blank"
+            <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank"
               class="text-[#B76E79] hover:text-[#a75e6b] underline">
               fb.com/memoriesphotographystudio
             </a>
@@ -454,7 +450,7 @@
           <!-- Social Icons -->
           <div class="mt-4 flex space-x-4">
             <!-- Facebook Icon -->
-            <a href="https://facebook.com/memoriesphotographystudio" target="_blank"
+            <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank"
               class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Facebook">
               <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                 <path
@@ -598,32 +594,26 @@
     'assets/Our Services - Maternity Shoot.png'
   ];
 
+  const slideshowDiv = document.querySelector('.slideshow');
   let currentIndex = 0;
 
-  function showNextImage() {
-    const slideshowDiv = document.querySelector('.slideshow');
-
-    // Remove existing images
-    slideshowDiv.innerHTML = '';
-
-    // Create the new image
+  // Load all images into the slideshow container
+  images.forEach(src => {
     const img = document.createElement('img');
-    img.src = images[currentIndex];
-    img.classList.add('fade-in');
+    img.src = src;
     slideshowDiv.appendChild(img);
+  });
 
-    // Animate fade-in
-    setTimeout(() => {
-      img.style.opacity = '1';
-    }, 10);
+  function slideImages() {
+    currentIndex++;
+    if (currentIndex >= images.length) currentIndex = 0;
 
-    // Move to the next image index
-    currentIndex = (currentIndex + 1) % images.length;
+    // Move the slideshow to show the next image
+    slideshowDiv.style.transform = `translateX(-${currentIndex * 100}vw)`;
   }
 
-  // Start slideshow
-  showNextImage();
-  setInterval(showNextImage, 5000); // Change image every 5 seconds
+  // Change slide every 3 seconds
+  setInterval(slideImages, 3000);
 
   </script>
 
