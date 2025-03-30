@@ -201,36 +201,75 @@
     <!-- Self-Shoot Section -->
     <div class="mb-12">
       <h3 class="text-3xl font-bold mb-6 text-[#2C2C2C] dark:text-white">Self-Shoot</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Solo/Duo -->
-        <img src="assets/Our Services - SoloDuo.png" alt="Solo/Duo" class="rounded-lg shadow-md">
-        
-        <!-- Small Group -->
-        <img src="assets/Our Services - Small Group.png" alt="Small Group" class="rounded-lg shadow-md">
+      <div class="text-left space-y-4">
+        <div>
+          <button onclick="toggleService('soloDuo')" class="text-xl font-bold text-[#B76E79]">Solo/Duo (1-2 Persons)</button>
+          <div id="soloDuo" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - SoloDuo.png" alt="Solo/Duo" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
 
-        <!-- Big Group -->
-        <img src="assets/Our Services - Big Group.png" alt="Big Group" class="rounded-lg shadow-md">
+        <div>
+          <button onclick="toggleService('smallGroup')" class="text-xl font-bold text-[#B76E79]">Small Group (3-5 Persons)</button>
+          <div id="smallGroup" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Small Group.png" alt="Small Group" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
 
-        <!-- Valentine's Package -->
-        <img src="assets/Our Services - Valentine Package.png" alt="Valentine's Package" class="rounded-lg shadow-md">
+        <div>
+          <button onclick="toggleService('bigGroup')" class="text-xl font-bold text-[#B76E79]">Big Group (6-16 Persons)</button>
+          <div id="bigGroup" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Big Group.png" alt="Big Group" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- With Photographer Section -->
     <div>
       <h3 class="text-3xl font-bold mb-6 text-[#2C2C2C] dark:text-white">With Photographer</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Adult's Pre-Birthday Shoot -->
-        <img src="assets/Our Services - Adult Prebirthday.png" alt="Adult's Pre-Birthday Shoot" class="rounded-lg shadow-md">
+      <div class="text-left space-y-4">
+        <div>
+          <button onclick="toggleService('adultPreBirthday')" class="text-xl font-bold text-[#B76E79]">Adult's Pre-Birthday Shoot</button>
+          <div id="adultPreBirthday" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Adult Prebirthday.png" alt="Adult's Pre-Birthday Shoot" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
 
-        <!-- Family Portraits -->
-        <img src="assets/Our Services - Family Portraits.png" alt="Family Portraits" class="rounded-lg shadow-md">
+        <div>
+          <button onclick="toggleService('familyPortraits')" class="text-xl font-bold text-[#B76E79]">Family Portraits</button>
+          <div id="familyPortraits" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Family Portraits.png" alt="Family Portraits" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
 
-        <!-- Kid's Pre-Birthday Shoot -->
-        <img src="assets/Our Services - Kids Pre-birthday.png" alt="Kid's Pre-Birthday Shoot" class="rounded-lg shadow-md">
+        <div>
+          <button onclick="toggleService('kidsPreBirthday')" class="text-xl font-bold text-[#B76E79]">Kid's Pre-Birthday Shoot</button>
+          <div id="kidsPreBirthday" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Kids Pre-birthday.png" alt="Kid's Pre-Birthday Shoot" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
 
-        <!-- Maternity Shoot -->
-        <img src="assets/Our Services - Maternity Shoot.png" alt="Maternity Shoot" class="rounded-lg shadow-md">
+        <div>
+          <button onclick="toggleService('maternityShoot')" class="text-xl font-bold text-[#B76E79]">Maternity Shoot</button>
+          <div id="maternityShoot" class="hidden">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Maternity Shoot.png" alt="Maternity Shoot" class="rounded-lg shadow-md mt-4 cursor-pointer">
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
