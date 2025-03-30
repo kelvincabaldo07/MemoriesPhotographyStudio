@@ -196,44 +196,53 @@
 <!-- Our Services -->
 <section id="our-services" class="py-20 px-6 text-center bg-[#FAF3E0] dark:bg-[#2C2C2C]">
   <div class="max-w-5xl mx-auto">
-    <h2 class="text-4xl font-semibold mb-12 text-[#2C2C2C] dark:text-white">Our Services</h2>
+    <h2 class="text-4xl font-semibold mb-4 text-[#2C2C2C] dark:text-white">Our Services</h2>
+    <p class="mb-12 text-lg text-gray-700 dark:text-gray-300">Explore our services designed to suit every occasion, whether you prefer a fun, self-shoot experience or a professional photoshoot with one of our talented photographers.</p>
 
     <!-- Self-Shoot Section -->
     <div class="mb-12">
-      <h3 class="text-3xl font-bold mb-6 text-[#2C2C2C] dark:text-white">Self-Shoot</h3>
+      <h3 class="text-3xl font-bold mb-2 text-[#2C2C2C] dark:text-white">Self-Shoot</h3>
+      <p class="mb-6 text-gray-700 dark:text-gray-300">Enjoy a private, self-guided photoshoot experience where you control the shots and have fun creating memorable moments.</p>
+      
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
+        
         <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
+        <div class="relative group cursor-pointer transition transform" onclick="toggleService('soloDuo')">
+          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition group-hover:brightness-110">
             <h4 class="text-xl font-bold text-[#B76E79] mb-2">Solo/Duo (1-2 Persons)</h4>
             <p class="text-gray-600 dark:text-gray-400">Perfect for individuals or couples.</p>
           </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - SoloDuo.png" alt="Solo/Duo" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
+          <div id="soloDuo" class="hidden mt-4">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - SoloDuo.png" alt="Solo/Duo" class="rounded-lg shadow-md">
+            </a>
+          </div>
         </div>
 
         <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
+        <div class="relative group cursor-pointer transition transform" onclick="toggleService('smallGroup')">
+          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition group-hover:brightness-110">
             <h4 class="text-xl font-bold text-[#B76E79] mb-2">Small Group (3-5 Persons)</h4>
             <p class="text-gray-600 dark:text-gray-400">Ideal for friends or small families.</p>
           </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - Small Group.png" alt="Small Group" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
+          <div id="smallGroup" class="hidden mt-4">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Small Group.png" alt="Small Group" class="rounded-lg shadow-md">
+            </a>
+          </div>
         </div>
 
         <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
+        <div class="relative group cursor-pointer transition transform" onclick="toggleService('bigGroup')">
+          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition group-hover:brightness-110">
             <h4 class="text-xl font-bold text-[#B76E79] mb-2">Big Group (6-16 Persons)</h4>
             <p class="text-gray-600 dark:text-gray-400">Perfect for large gatherings and events.</p>
           </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - Big Group.png" alt="Big Group" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
+          <div id="bigGroup" class="hidden mt-4">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Big Group.png" alt="Big Group" class="rounded-lg shadow-md">
+            </a>
+          </div>
         </div>
 
       </div>
@@ -241,58 +250,30 @@
 
     <!-- With Photographer Section -->
     <div>
-      <h3 class="text-3xl font-bold mb-6 text-[#2C2C2C] dark:text-white">With Photographer</h3>
+      <h3 class="text-3xl font-bold mb-2 text-[#2C2C2C] dark:text-white">With Photographer</h3>
+      <p class="mb-6 text-gray-700 dark:text-gray-300">Get professionally taken photographs guided by our skilled photographers, capturing every special moment flawlessly.</p>
+      
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
         <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
+        <div class="relative group cursor-pointer transition transform" onclick="toggleService('adultPreBirthday')">
+          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition group-hover:brightness-110">
             <h4 class="text-xl font-bold text-[#B76E79] mb-2">Adult's Pre-Birthday Shoot</h4>
             <p class="text-gray-600 dark:text-gray-400">Capture memorable milestones.</p>
           </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - Adult Prebirthday.png" alt="Adult Pre-birthday" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
+          <div id="adultPreBirthday" class="hidden mt-4">
+            <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
+              <img src="assets/Our Services - Adult Prebirthday.png" alt="Adult's Pre-Birthday Shoot" class="rounded-lg shadow-md">
+            </a>
+          </div>
         </div>
 
-        <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
-            <h4 class="text-xl font-bold text-[#B76E79] mb-2">Family Portraits</h4>
-            <p class="text-gray-600 dark:text-gray-400">Cherish family moments forever.</p>
-          </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - Family Portraits.png" alt="Family Portraits" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
-        </div>
-
-        <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
-            <h4 class="text-xl font-bold text-[#B76E79] mb-2">Kid's Pre-Birthday Shoot</h4>
-            <p class="text-gray-600 dark:text-gray-400">Capture precious childhood moments.</p>
-          </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - Kids Pre-birthday.png" alt="Kids Pre-birthday" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
-        </div>
-
-        <!-- Service Card -->
-        <div class="relative group cursor-pointer">
-          <div class="bg-white dark:bg-[#2C2C2C] rounded-2xl shadow-md p-6 transition transform group-hover:scale-105">
-            <h4 class="text-xl font-bold text-[#B76E79] mb-2">Maternity Shoot</h4>
-            <p class="text-gray-600 dark:text-gray-400">Document the beauty of motherhood.</p>
-          </div>
-          <a href="https://memoriesphotographystudio.setmore.com" target="_blank">
-            <img src="assets/Our Services - Maternity Shoot.png" alt="Maternity Shoot" class="rounded-lg shadow-md mt-4 hidden group-hover:block">
-          </a>
-        </div>
+        <!-- More Service Cards Here... -->
 
       </div>
     </div>
   </div>
 </section>
-
 
 
 <!-- Testimonials Carousel with Scroll Animation (No Gradient Fade) -->
