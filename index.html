@@ -5,6 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Memories Photography Studio</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
   <!-- Fonts -->
   <link
     href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Gloock&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Yesteryear&display=swap"
@@ -426,18 +429,18 @@
     </div>
   </section>
 
-<!-- Add Font Awesome CSS & AOS CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
-
 <!-- Contact Us -->
 <section id="contact-us" class="py-20 px-6 text-center bg-[#FAF3E0] dark:bg-[#2C2C2C] fade-in">
   <div class="max-w-5xl mx-auto">
     <h2 class="text-4xl font-semibold mb-6 text-[#2C2C2C] dark:text-white">Contact Us</h2>
-    <p class="text-base mb-10 text-[#2C2C2C] dark:text-[#FAF3E0]">Have questions or want to book a session? Reach out
-      to us anytime!</p>
+    <p class="text-base mb-10 text-[#2C2C2C] dark:text-[#FAF3E0]">Have questions or want to book a session? Reach out to us anytime!</p>
 
+    <!-- Add Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Make Contact Info & Map Side-by-Side on Desktop -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
+
       <!-- Contact Info -->
       <div class="space-y-5 text-[#2C2C2C] dark:text-[#FAF3E0] text-base" data-aos="fade-up">
         
@@ -463,16 +466,52 @@
             <li>Sun: 1:00 PM – 8:00 PM</li>
           </ul>
         </div>
+
+        <!-- Social Icons -->
+        <div class="mt-4 flex space-x-4">
+          <!-- Facebook Icon -->
+          <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank"
+            class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+          <!-- Instagram Icon -->
+          <a href="https://instagram.com" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <!-- TikTok Icon -->
+          <a href="https://www.tiktok.com" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="TikTok">
+            <i class="fa-brands fa-tiktok"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Google Map -->
+      <div class="w-full h-64 rounded-lg overflow-hidden shadow-md fade-in relative" data-aos="fade-up">
+        <iframe id="googleMap" class="w-full h-full rounded-lg" frameborder="0" style="border:0"
+          src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10940.17740584192!2d120.87527823000491!3d14.198477978831317!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd83b509678963%3A0xc0b4d56ba848e15a!2sMemories%20Photography%20Studio!5e0!3m2!1sen!2sph!4v1743138966372!5m2!1sen!2sph"
+          allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+
+        <!-- Map Buttons -->
+        <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
+          <button onclick="toggleMapTheme()"
+            class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-3 py-1 rounded-full text-sm shadow">
+            Toggle Map Theme
+          </button>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=Memories+Photography+Studio,+Indang+Cavite"
+            target="_blank"
+            class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-4 py-2 rounded-full text-sm shadow inline-block">
+            Get Directions
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 
+
   <script>
-<!-- Include AOS JS -->
-src="https://unpkg.com/aos@2.3.1/dist/aos.js">
-AOS.init();
 
     // Toggle dark overlay for the map
     function toggleMapTheme() {
