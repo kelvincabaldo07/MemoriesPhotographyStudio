@@ -426,6 +426,10 @@
     </div>
   </section>
 
+<!-- Add Font Awesome CSS & AOS CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+
 <!-- Contact Us -->
 <section id="contact-us" class="py-20 px-6 text-center bg-[#FAF3E0] dark:bg-[#2C2C2C] fade-in">
   <div class="max-w-5xl mx-auto">
@@ -433,12 +437,9 @@
     <p class="text-base mb-10 text-[#2C2C2C] dark:text-[#FAF3E0]">Have questions or want to book a session? Reach out
       to us anytime!</p>
 
-    <!-- Add Font Awesome CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
       <!-- Contact Info -->
-      <div class="space-y-5 text-[#2C2C2C] dark:text-[#FAF3E0] text-base">
+      <div class="space-y-5 text-[#2C2C2C] dark:text-[#FAF3E0] text-base" data-aos="fade-up">
         
         <!-- Phone -->
         <div class="flex items-center space-x-3">
@@ -468,61 +469,10 @@
 </section>
 
 
-<!-- Social Icons -->
-<div class="mt-4 flex space-x-4">
-  <!-- Facebook Icon -->
-  <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank"
-    class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Facebook">
-    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-      <path d="M22 12a10 10 0 10-11.5 9.88v-7H8v-2.88h2.5V9.5a3.5 3.5 0 013.75-3.88 15.1 15.1 0 012.25.19v2.5h-1.27c-1.25 0-1.48.6-1.48 1.46v1.92h2.84l-.45 2.88h-2.39v7A10 10 0 0022 12z" />
-    </svg>
-  </a>
-  <!-- Instagram Icon -->
-  <a href="https://instagram.com" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="Instagram">
-    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-      <path d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm10 2c1.65 0 3 1.35 3 3v10c0 1.65-1.35 3-3 3H7c-1.65 0-3-1.35-3-3V7c0-1.65-1.35-3 3-3h10zm-5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm4.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z" />
-    </svg>
-  </a>
-  <!-- TikTok Icon -->
-  <a href="https://www.tiktok.com" target="_blank" class="text-[#B76E79] hover:text-[#a75e6b]" aria-label="TikTok">
-    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-      <path d="M12 2v3.25c1.438.007 2.813.564 3.75 1.5a6.25 6.25 0 004.125 1.625v3.25a8.75 8.75 0 01-7.875-4.25v8.25a4.5 4.5 0 11-3-4.125v-3.25a7.25 7.25 0 106.75 7.25v-7.75a6.25 6.25 0 01-3.75-1.5A6.25 6.25 0 0112 2z" />
-    </svg>
-  </a>
-</div>
-
-        <!-- Google Map -->
-        <div class="w-full h-64 rounded-lg overflow-hidden shadow-md fade-in relative">
-          <iframe id="googleMap" class="w-full h-full rounded-lg" frameborder="0" style="border:0"
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10940.17740584192!2d120.87527823000491!3d14.198477978831317!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd83b509678963%3A0xc0b4d56ba848e15a!2sMemories%20Photography%20Studio!5e0!3m2!1sen!2sph!4v1743138966372!5m2!1sen!2sph"
-            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-          </iframe>
-
-          <!-- Dark Mode Overlay -->
-          <div id="mapOverlay"
-            class="absolute inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-500 rounded-lg">
-          </div>
-
-          <!-- Map Buttons -->
-          <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
-            <button onclick="toggleMapTheme()"
-              class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-3 py-1 rounded-full text-sm shadow">
-              Toggle Map Theme
-            </button>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=Memories+Photography+Studio,+Indang+Cavite"
-              target="_blank"
-              class="bg-[#B76E79] hover:bg-[#a75e6b] text-white px-4 py-2 rounded-full text-sm shadow inline-block">
-              Get Directions
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
   <script>
-
+<!-- Include AOS JS -->
+src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+AOS.init();
 
     // Toggle dark overlay for the map
     function toggleMapTheme() {
