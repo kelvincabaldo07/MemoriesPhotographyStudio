@@ -21,7 +21,7 @@
   <meta name="color-scheme" content="light dark">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="icon" type="image/png" href="assets/2025_new_logo.png">
 
   <!-- Fonts: Montserrat (headings) & Open Sans (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +41,7 @@
       --charcoal:#2C2C2C;      /* text */
       --cream:#FAF3E0;         /* bg alt */
       --white:#FFFFFF;
-      --mauve:#B76E79;         /* accent */
+      --terracotta:#A62F20;    /* accent */
       --card:#ffffff;          /* surfaces */
       --forest-900:#0B3D2E;    /* dark page */
       --forest-800:#115542;    /* dark surface */
@@ -55,7 +55,7 @@
     h1,h2,h3,h4 { font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
 
     .nav-link{ position:relative; padding-bottom:4px; }
-    .nav-link::after{ content:''; position:absolute; left:0; bottom:0; height:2px; width:100%; background-color:var(--mauve); transform:scaleX(0); transform-origin:bottom right; transition:transform .25s ease-out; }
+  .nav-link::after{ content:''; position:absolute; left:0; bottom:0; height:2px; width:100%; background-color:var(--terracotta); transform:scaleX(0); transform-origin:bottom right; transition:transform .25s ease-out; }
     .nav-link:hover::after{ transform:scaleX(1); transform-origin:bottom left; }
 
     .fade-in{ opacity:0; transform: translateY(20px); transition: opacity .8s ease, transform .8s ease; }
@@ -95,6 +95,18 @@
   /* Hero title color by theme */
   .hero-title{ color: var(--forest-900); }
   .dark .hero-title{ color: var(--clay); }
+
+  /* Section title color by theme */
+  .section-title{ color: var(--forest-900); }
+  .dark .section-title{ color: var(--terracotta); }
+
+  /* Simple fade-up animation */
+  @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform:none; } }
+  .animate-fade-up { opacity:0; animation: fadeUp .8s ease forwards; }
+  .delay-100{ animation-delay: .1s; }
+  .delay-200{ animation-delay: .2s; }
+  .delay-300{ animation-delay: .3s; }
+  .delay-400{ animation-delay: .4s; }
   </style>
 
   <!-- Schema.org -->
@@ -171,9 +183,9 @@
           </div>
         </div>
         <div class="hidden md:flex space-x-6">
-          <a href="#our-story" class="nav-link text-lg hover:text-[var(--mauve)]">Our Story</a>
-          <a href="#our-services" class="nav-link text-lg hover:text-[var(--mauve)]">Our Services</a>
-          <a href="#contact-us" class="nav-link text-lg hover:text-[var(--mauve)]">Contact Us</a>
+          <a href="#our-story" class="nav-link text-lg hover:text-[var(--terracotta)]">Our Story</a>
+          <a href="#our-services" class="nav-link text-lg hover:text-[var(--terracotta)]">Our Services</a>
+          <a href="#contact-us" class="nav-link text-lg hover:text-[var(--terracotta)]">Contact Us</a>
         </div>
       </div>
     </div>
@@ -188,9 +200,10 @@
   <!-- Hero (no slideshow) -->
   <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center">
     <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/85 dark:bg-[var(--forest-800)]/85 border dark:border-on-dark">
-  <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4">Capture with Purpose. Create Change.</h1>
-      <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-8">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
-      <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener" id="heroBookBtn" class="btn-primary light">
+      <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-up">Capture with Purpose. Create Change.</h1>
+      <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-4 animate-fade-up delay-100">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
+      <p class="text-sm md:text-base max-w-2xl mx-auto mb-8 text-[var(--terracotta)] animate-fade-up delay-200">₱5 from every booking is donated to a local cause in Indang.</p>
+      <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener" id="heroBookBtn" class="btn-primary light animate-fade-up delay-300">
         <i class="fa-regular fa-calendar-check"></i>
         Book a Session
       </a>
@@ -200,7 +213,7 @@
   <!-- Our Story & Rebranding -->
   <section id="our-story" class="py-20 px-6 section-light-2 section-dark-2">
     <div class="max-w-4xl mx-auto mb-10 text-center">
-      <h2 class="text-4xl font-semibold">Our Story</h2>
+  <h2 class="text-4xl font-semibold section-title">Our Story</h2>
       <p class="mt-3 text-[color:var(--charcoal)]/80 dark:text-[color:var(--forest-text)]/80">Tap the cards below to read more.</p>
     </div>
 
@@ -224,8 +237,29 @@
           <span class="expand-indicator"><i class="fa-solid fa-chevron-right chev rot-90"></i> Tap to expand</span>
         </header>
         <div id="storyRebrand" class="hidden mt-4">
-          <p>In 2025, we refreshed our brand to reflect our mission: <strong>Capture with Purpose. Create Change.</strong> The new look introduces a forest‑inspired dark mode, clay accents, and refined typography (Montserrat & Open Sans). We’re also pledging <strong>₱5 from every booking</strong> to local community causes in Indang. Same heart, elevated experience.</p>
-          <p class="mt-3">You’ll see clearer navigation, faster pages, and accessibility improvements — so booking your session is smoother than ever.</p>
+          <h4 class="text-xl font-semibold mb-2">🌱 What Our New Logo Means</h4>
+          <p class="mb-3">Our new logo for Memories Photography Studio is more than just a fresh design—it’s a reflection of our values and our love for community and sustainability.</p>
+          <ul class="list-disc pl-6 space-y-2">
+            <li><strong>The Circular Frame</strong><br>
+              <span class="text-sm">Symbolizes the unbroken cycle of memories and community—how every moment we capture continues to inspire and connect us all.</span>
+            </li>
+            <li><strong>The Leaf Motif</strong><br>
+              <span class="text-sm">Stands for growth, sustainability, and our promise to care for the environment. It represents our eco-friendly choices, from reusable props to LED lighting and digital-first services.</span>
+            </li>
+            <li><strong>The Heart Icon</strong><br>
+              <span class="text-sm">Nestled within our logo, the heart represents the love and passion behind every photo we take—whether it’s for your family, your milestones, or for giving back to the community. It’s a reminder that every session is filled with care, empathy, and joy shared with others.</span>
+            </li>
+            <li><strong>Warm, Earthy Colors</strong><br>
+              <span class="text-sm">Inspired by nature, our new palette reflects our Filipino roots and our commitment to stay grounded, accessible, and eco-conscious.</span>
+            </li>
+            <li><strong>Handwritten Script</strong><br>
+              <span class="text-sm">This adds warmth and a personal touch, making every interaction with our studio feel special and genuine.</span>
+            </li>
+            <li><strong>Modern Simplicity</strong><br>
+              <span class="text-sm">Clean lines and a minimalist look reinforce our mission of making high-quality, affordable photography available for everyone.</span>
+            </li>
+          </ul>
+          <img src="assets/2025_new_logo.png" alt="Memories Photography Studio new logo" class="w-48 md:w-56 mt-5 rounded-md mx-auto" loading="lazy">
         </div>
       </article>
     </div>
@@ -234,7 +268,7 @@
   <!-- Our Services -->
   <section id="our-services" class="py-20 px-6 section-light-1 section-dark-1 text-center">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-4">Our Services</h2>
+  <h2 class="text-4xl font-semibold mb-4 section-title">Our Services</h2>
       <p class="mb-12 text-[color:var(--charcoal)]/80 dark:text-[color:var(--forest-text)]/80">Self-shoot freedom or professional guidance — pick what suits your moment.</p>
 
       <!-- Self-Shoot -->
@@ -245,7 +279,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Solo/Duo -->
           <div onclick="toggleService('soloDuo')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Solo/Duo (1–2)</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Solo/Duo (1–2)</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="soloDuo" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - SoloDuo.png" alt="Self-shoot Solo/Duo" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -255,7 +289,7 @@
 
           <!-- Small Group -->
           <div onclick="toggleService('smallGroup')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Small Group (3–5)</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Small Group (3–5)</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="smallGroup" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Small Group.png" alt="Self-shoot Small Group" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -265,7 +299,7 @@
 
           <!-- Big Group -->
           <div onclick="toggleService('bigGroup')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Big Group (6–16)</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Big Group (6–16)</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="bigGroup" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Big Group.png" alt="Self-shoot Big Group" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -277,13 +311,13 @@
 
       <!-- With Photographer -->
       <div>
-        <h3 class="text-3xl font-bold mb-2">With Photographer</h3>
+  <h3 class="text-3xl font-bold mb-2">With Photographer</h3>
         <p class="mb-6 text-[color:var(--charcoal)]/80 dark:text-[color:var(--forest-text)]/80">Professionally guided sessions to capture every detail.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left md:text-left">
           <!-- Adult Pre-Birthday -->
           <div onclick="toggleService('adultPreBirthday')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Adult’s Pre‑Birthday</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Adult’s Pre‑Birthday</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="adultPreBirthday" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Adult Prebirthday.png" alt="Adult pre-birthday shoot" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -293,7 +327,7 @@
 
           <!-- Family Portraits -->
           <div onclick="toggleService('familyPortraits')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Family Portraits</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Family Portraits</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="familyPortraits" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Family Portraits.png" alt="Family portraits" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -303,7 +337,7 @@
 
           <!-- Kid’s Pre-Birthday -->
           <div onclick="toggleService('kidsPreBirthday')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Kid’s Pre‑Birthday</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Kid’s Pre‑Birthday</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="kidsPreBirthday" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Kids Pre-birthday.png" alt="Kids pre-birthday shoot" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -313,7 +347,7 @@
 
           <!-- Maternity -->
           <div onclick="toggleService('maternityShoot')" class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
-            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--mauve)]">Maternity Shoot</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
+            <div class="flex items-center justify-between"><h4 class="text-xl font-bold text-[var(--terracotta)]">Maternity Shoot</h4><span class="expand-indicator"><i class="fa-solid fa-chevron-right rot-90"></i> View</span></div>
             <div id="maternityShoot" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Maternity Shoot.png" alt="Maternity shoot" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -330,22 +364,22 @@
   <!-- Contact -->
   <section id="contact-us" class="py-20 px-6 section-light-2 section-dark-2 text-center">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-6">Contact Us</h2>
+      <h2 class="text-4xl font-semibold mb-6 section-title">Contact Us</h2>
       <p class="text-base mb-10">Have questions or want to book a session? Reach out anytime!</p>
 
       <!-- Socials -->
       <div class="mb-10 flex justify-center space-x-8 text-4xl">
-        <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank" rel="noopener" class="text-[var(--mauve)] hover:opacity-80" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="https://m.me/380140688505189" target="_blank" rel="noopener" class="text-[var(--mauve)] hover:opacity-80" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
-        <a href="https://www.instagram.com/creatingmemoriesphotostudio/" target="_blank" rel="noopener" class="text-[var(--mauve)] hover:opacity-80" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://www.tiktok.com/@memoriesphotogstudio" target="_blank" rel="noopener" class="text-[var(--mauve)] hover:opacity-80" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://m.me/380140688505189" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
+        <a href="https://www.instagram.com/creatingmemoriesphotostudio/" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.tiktok.com/@memoriesphotogstudio" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
         <!-- Info -->
         <div class="space-y-5 text-base">
-          <div class="flex items-center space-x-3"><i class="fa-solid fa-phone text-[var(--mauve)] text-lg"></i><span>+63 906 469 4122</span></div>
-          <div class="flex items-start space-x-3"><i class="fa-solid fa-location-dot text-[var(--mauve)] mt-1 text-lg"></i><div>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</div></div>
+          <div class="flex items-center space-x-3"><i class="fa-solid fa-phone text-[var(--terracotta)] text-lg"></i><span>+63 906 469 4122</span></div>
+          <div class="flex items-start space-x-3"><i class="fa-solid fa-location-dot text-[var(--terracotta)] mt-1 text-lg"></i><div>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</div></div>
           <div class="mt-4"><h3 class="text-lg font-semibold">Opening Hours</h3><ul class="space-y-1"><li>Mon – Sat: 8:00 AM – 8:00 PM</li><li>Sun: 1:00 PM – 8:00 PM</li></ul></div>
         </div>
 
