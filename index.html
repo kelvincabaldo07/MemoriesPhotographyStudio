@@ -91,6 +91,10 @@
     .expand-indicator{ display:inline-flex; align-items:center; gap:.4rem; font-size:.875rem; opacity:.75 }
     .rot-90{ transform: rotate(90deg); transition: transform .2s ease; }
     .rot-90.open{ transform: rotate(-90deg); }
+
+  /* Hero title color by theme */
+  .hero-title{ color: var(--forest-900); }
+  .dark .hero-title{ color: var(--clay); }
   </style>
 
   <!-- Schema.org -->
@@ -111,9 +115,22 @@
 </head>
 
 <body class="text-[var(--charcoal)] dark:text-[var(--forest-text)] relative">
-  <!-- Top ribbon: donation note -->
-  <div class="ribbon text-center text-sm py-2 px-4 font-medium">
-    <span class="inline-block bg-white/80 px-3 py-1 rounded-full">₱5 from every booking is donated to a local cause in Indang.</span>
+  <!-- Donation popup modal -->
+  <div id="donationModalOverlay" class="fixed inset-0 bg-black/50 z-[60] hidden" aria-hidden="true"></div>
+  <div id="donationModal" role="dialog" aria-modal="true" aria-labelledby="donationTitle"
+       class="fixed inset-0 z-[60] hidden grid place-items-center p-4">
+    <div class="bg-white dark:bg-[var(--forest-800)] text-[var(--charcoal)] dark:text-[var(--forest-text)] border dark:border-on-dark rounded-xl shadow-xl max-w-md w-full mx-auto p-6 relative">
+      <button id="donationClose" aria-label="Close" class="absolute top-3 right-3 text-xl leading-none text-[var(--charcoal)]/70 dark:text-[var(--forest-text)]/80 hover:opacity-80">×</button>
+      <h2 id="donationTitle" class="text-2xl font-semibold mb-2">Thank you for creating change</h2>
+      <p class="mb-4">₱5 from every booking is donated to a local cause in Indang. Your photos make a difference.</p>
+      <div class="flex items-center justify-end gap-3">
+        <button id="donationDismiss" class="px-4 py-2 rounded-full border dark:border-on-dark">Not now</button>
+        <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener" class="btn-primary light" id="donationBookCta">
+          <i class="fa-regular fa-calendar-check"></i>
+          Book now
+        </a>
+      </div>
+    </div>
   </div>
 
   <!-- Overlay for mobile menu -->
@@ -134,8 +151,8 @@
   </div>
 
   <!-- Nav -->
-  <nav class="fixed top-0 left-0 w-full z-50 border-b dark:border-on-dark">
-    <div class="bg-white dark:bg-[var(--clay)]">
+  <nav class="fixed top-0 left-0 w-full z-50 border-b dark:border-on-dark text-[var(--cream)]">
+    <div class="bg-[var(--forest-900)] dark:bg-[var(--clay)]">
       <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
         <div class="flex items-center justify-between w-full md:w-auto">
           <div class="absolute left-1/2 -translate-x-1/2 md:static md:left-0 md:transform-none">
@@ -144,10 +161,10 @@
           </div>
           <div class="md:hidden">
             <button id="menu-btn" class="ml-4 relative z-50" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
-              <svg id="hamburger-icon" class="w-7 h-7 text-[var(--charcoal)] dark:text-[var(--white)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <svg id="hamburger-icon" class="w-7 h-7 text-[var(--white)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
-              <svg id="close-icon" class="w-7 h-7 text-[var(--charcoal)] dark:text-[var(--white)] hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <svg id="close-icon" class="w-7 h-7 text-[var(--white)] hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -156,16 +173,14 @@
         <div class="hidden md:flex space-x-6">
           <a href="#our-story" class="nav-link text-lg hover:text-[var(--mauve)]">Our Story</a>
           <a href="#our-services" class="nav-link text-lg hover:text-[var(--mauve)]">Our Services</a>
-          <a href="pricing.html" class="nav-link text-lg hover:text-[var(--mauve)]">Pricing</a>
           <a href="#contact-us" class="nav-link text-lg hover:text-[var(--mauve)]">Contact Us</a>
         </div>
       </div>
     </div>
     <div id="mobile-menu"
-      class="hidden transform transition duration-300 ease-out origin-top bg-white dark:bg-[var(--clay)] md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50">
+      class="hidden transform transition duration-300 ease-out origin-top bg-[var(--forest-900)] dark:bg-[var(--clay)] md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50 text-[var(--cream)]">
       <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
       <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
-      <a href="pricing.html" class="block py-3 text-lg nav-link">Pricing</a>
       <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
     </div>
   </nav>
@@ -173,7 +188,7 @@
   <!-- Hero (no slideshow) -->
   <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center">
     <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/85 dark:bg-[var(--forest-800)]/85 border dark:border-on-dark">
-      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">Capture with Purpose. Create Change.</h1>
+  <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4">Capture with Purpose. Create Change.</h1>
       <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-8">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
       <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener" id="heroBookBtn" class="btn-primary light">
         <i class="fa-regular fa-calendar-check"></i>
@@ -308,9 +323,7 @@
         </div>
       </div>
 
-      <div class="mt-12">
-        <a href="pricing.html" class="btn-primary light" id="servicesPricingCta"><i class="fa-solid fa-tags"></i> See Pricing</a>
-      </div>
+      
     </div>
   </section>
 
@@ -435,6 +448,21 @@
     // Toggle service sections
     function toggleService(id){ const el = document.getElementById(id); el.classList.toggle('hidden'); }
     window.toggleService = toggleService;
+
+  // Donation modal logic (show once per session)
+  const donationModal = document.getElementById('donationModal');
+  const donationOverlay = document.getElementById('donationModalOverlay');
+  const donationClose = document.getElementById('donationClose');
+  const donationDismiss = document.getElementById('donationDismiss');
+  function openDonation(){ donationModal.classList.remove('hidden'); donationOverlay.classList.remove('hidden'); }
+  function closeDonation(){ donationModal.classList.add('hidden'); donationOverlay.classList.add('hidden'); sessionStorage.setItem('donationSeen','1'); }
+  // Show on first load per session
+  if (!sessionStorage.getItem('donationSeen')) { setTimeout(openDonation, 600); }
+  // Wire up events
+  donationOverlay?.addEventListener('click', closeDonation);
+  donationClose?.addEventListener('click', closeDonation);
+  donationDismiss?.addEventListener('click', closeDonation);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !donationModal.classList.contains('hidden')) closeDonation(); });
   </script>
 </body>
 </html>
