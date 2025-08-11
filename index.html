@@ -16,14 +16,15 @@
   <meta property="og:url" content="https://www.memories-studio.com/" />
   <meta property="og:image" content="https://www.memories-studio.com/assets/og-cover.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="color-scheme" content="light dark">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/favicon.png">
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts: Montserrat (headings) & Open Sans (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Gloock&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Yesteryear&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -32,23 +33,27 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script> tailwind.config = { darkMode: 'class' } </script>
 
-  <!-- Color scheme -->
-  <meta name="color-scheme" content="light dark">
-
   <style>
     :root{
-      --charcoal:#2C2C2C;
-      --cream:#FAF3E0;
-      --mauve:#B76E79;
+      /* Light mode */
+      --charcoal:#2C2C2C;      /* text */
+      --cream:#FAF3E0;         /* bg */
+      --mauve:#B76E79;         /* accent */
+      --card:#ffffff;          /* surfaces */
+      /* Dark mode (Forest theme) */
+      --forest-900:#0B3D2E;    /* page bg */
+      --forest-800:#115542;    /* surface */
+      --forest-700:#1A6B56;    /* hover */
+      --forest-text:#EAF7F1;   /* text on dark */
+      --forest-accent:#C9E4D9; /* subtle lines/icons */
     }
-    body { font-family: 'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    h1,h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: .02em; }
-    h2 { font-family: 'Gloock', serif; }
+
+    body { font-family: 'Open Sans', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    h1,h2,h3,h4 { font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
 
     .nav-link{ position:relative; padding-bottom:4px; }
     .nav-link::after{
-      content:'';
-      position:absolute; left:0; bottom:0; height:2px; width:100%;
+      content:''; position:absolute; left:0; bottom:0; height:2px; width:100%;
       background-color:var(--mauve); transform:scaleX(0); transform-origin:bottom right;
       transition:transform .25s ease-out;
     }
@@ -57,49 +62,38 @@
     .fade-in{ opacity:0; transform: translateY(20px); transition: opacity .8s ease, transform .8s ease; }
     .fade-in.visible{ opacity:1; transform:none; }
 
-    .slideshow-container{ position:absolute; inset:0; }
-    .slideshow img{ width:100vw; height:100vh; object-fit:contain; flex:0 0 100vw; }
-    .active-dot{ background-color:var(--mauve); }
-  </style>
+    /* Dark theme overrides using CSS variables so inline Tailwind stays simple */
+    .dark body,
+    body.dark-theme { background-color: var(--forest-900); color: var(--forest-text); }
 
-  <!-- Schema.org -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"LocalBusiness",
-    "name":"Memories Photography Studio",
-    "image":"https://www.memories-studio.com/assets/og-cover.jpg",
-    "url":"https://www.memories-studio.com/",
-    "telephone":"+63 906 469 4122",
-    "address":{
-      "@type":"PostalAddress",
-      "streetAddress":"Green Valley Field Subdivision, Buna Cerca",
-      "addressLocality":"Indang",
-      "addressRegion":"Cavite",
-      "addressCountry":"PH"
-    },
-    "openingHoursSpecification":[
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"08:00","closes":"20:00"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Sunday"],"opens":"13:00","closes":"20:00"}
-    ],
-    "sameAs":[
-      "https://www.facebook.com/profile.php?id=61560764924957",
-      "https://m.me/380140688505189",
-      "https://www.instagram.com/creatingmemoriesphotostudio/",
-      "https://www.tiktok.com/@memoriesphotogstudio"
-    ]
-  }
-  </script>
+    .dark .surface { background-color: var(--forest-800) !important; }
+    .dark .surface-hover:hover { background-color: var(--forest-700) !important; }
+    .dark .text-on-dark { color: var(--forest-text) !important; }
+    .dark .accent { color: var(--forest-accent) !important; }
+    .dark .border-on-dark { border-color: rgba(233, 247, 241, 0.18) !important; }
+
+    .btn-primary { background-color: var(--mauve); color: #fff; }
+    .btn-primary:hover { filter: brightness(.95); }
+
+    /* Remove slideshow: hero uses a simple graphic or solid bg */
+    .hero {
+      background: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.7)), url('assets/hero-texture.png');
+      background-size: cover;
+    }
+    .dark .hero {
+      background: linear-gradient(180deg, rgba(11,61,46,.7), rgba(11,61,46,.7)), url('assets/hero-texture.png');
+      background-size: cover;
+    }
+  </style>
 </head>
 
-<body class="bg-[var(--cream)] text-gray-800 dark:bg-gray-900 dark:text-gray-100 relative">
-
+<body class="bg-[var(--cream)] text-[var(--charcoal)] dark:bg-[var(--forest-900)] dark:text-[var(--forest-text)] relative">
   <!-- Overlay for mobile menu -->
   <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden" aria-hidden="true"></div>
 
   <!-- Dark mode toggle -->
   <button id="darkModeToggle" aria-label="Toggle dark mode"
-    class="fixed bottom-6 right-6 z-50 bg-white dark:bg-gray-800 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-700 rounded-full p-3 shadow-md">🌙</button>
+    class="fixed bottom-6 right-6 z-50 bg-white dark:surface text-[var(--charcoal)] dark:text-[var(--forest-text)] border border-gray-300 dark:border-on-dark rounded-full p-3 shadow-md">🌙</button>
 
   <!-- Setmore Floating CTA -->
   <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
@@ -110,19 +104,19 @@
   </div>
 
   <!-- Nav -->
-  <nav class="fixed top-0 left-0 w-full bg-[var(--cream)] shadow-md z-50 dark:bg-[var(--charcoal)]">
+  <nav class="fixed top-0 left-0 w-full bg-[var(--cream)] shadow-md z-50 dark:surface border-b dark:border-on-dark">
     <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:py-5">
       <div class="flex items-center justify-between w-full md:w-auto">
         <div class="absolute left-1/2 -translate-x-1/2 md:static md:left-0 md:transform-none">
-          <img src="assets/2025_new_logo.png.png" alt="Memories Photography Studio logo" class="h-14 mx-auto md:mx-0 md:h-12 block dark:hidden" loading="eager">
+          <img src="assets/2025_new_logo.png" alt="Memories Photography Studio logo" class="h-14 mx-auto md:mx-0 md:h-12 block dark:hidden" loading="eager">
           <img src="assets/2025_new_logo.png" alt="Memories Photography Studio logo (dark)" class="h-14 mx-auto md:mx-0 md:h-12 hidden dark:block" loading="eager">
         </div>
         <div class="md:hidden">
           <button id="menu-btn" class="ml-4 relative z-50" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
-            <svg id="hamburger-icon" class="w-7 h-7 text-gray-700 dark:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <svg id="hamburger-icon" class="w-7 h-7 text-[var(--charcoal)] dark:text-[var(--forest-text)]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <svg id="close-icon" class="w-7 h-7 text-gray-700 dark:text-white hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <svg id="close-icon" class="w-7 h-7 text-[var(--charcoal)] dark:text-[var(--forest-text)] hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -135,52 +129,35 @@
       </div>
     </div>
     <div id="mobile-menu"
-      class="hidden transform transition duration-300 ease-out origin-top bg-white dark:bg-gray-800 md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50">
+      class="hidden transform transition duration-300 ease-out origin-top bg-white dark:surface md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50">
       <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
       <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
       <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
     </div>
   </nav>
 
-  <!-- Hero -->
-  <section class="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
-    <!-- Slideshow -->
-    <div class="absolute inset-0 z-0 slideshow-container overflow-hidden">
-      <div class="slideshow flex w-full h-full transition-transform duration-1000 will-change-transform"></div>
-    </div>
-
-    <!-- Content box -->
-    <div class="relative z-10 p-8 rounded-lg shadow-lg max-w-3xl mx-auto bg-white/70 dark:bg-gray-800/80">
-      <h1 class="text-4xl md:text-6xl font-bold text-[var(--charcoal)] dark:text-white leading-tight mb-6">
+  <!-- Hero (no slideshow) -->
+  <section class="hero relative min-h-[80vh] flex items-center justify-center text-center pt-28 pb-16">
+    <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/80 dark:bg-[var(--forest-800)]/80 border dark:border-on-dark">
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-6 text-[var(--charcoal)] dark:text-[var(--forest-text)]">
         Capturing Moments, Creating Memories
       </h1>
-      <p class="text-base md:text-lg lg:text-xl text-[var(--charcoal)] dark:text-gray-300 max-w-2xl mx-auto mb-8">
-        Nestled in Indang, Cavite, we deliver high-quality self-shoot and photographer-led sessions that are both priceless and pocket‑friendly.
+      <p class="text-base md:text-lg lg:text-xl text-[var(--charcoal)] dark:text-[var(--forest-text)]/90 max-w-2xl mx-auto mb-8">
+        Nestled in Indang, Cavite, we deliver high‑quality self‑shoot and photographer‑led sessions that are both priceless and pocket‑friendly.
       </p>
-      <a href="#our-services" class="bg-[var(--mauve)] text-white px-6 py-3 rounded-full text-sm md:text-lg transition hover:opacity-90">Explore Our Services</a>
-    </div>
-
-    <!-- Dots -->
-    <div class="absolute bottom-8 z-10 flex space-x-2" aria-label="Slideshow navigation">
-      <button class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" aria-label="Show slide 1"></button>
-      <button class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" aria-label="Show slide 2"></button>
-      <button class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" aria-label="Show slide 3"></button>
-      <button class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" aria-label="Show slide 4"></button>
-      <button class="dot w-4 h-4 rounded-full bg-gray-400 cursor-pointer transition-all" aria-label="Show slide 5"></button>
+      <a href="#our-services" class="btn-primary px-6 py-3 rounded-full text-sm md:text-lg inline-block">Explore Our Services</a>
     </div>
   </section>
 
   <!-- Our Story -->
-  <section id="our-story" class="py-20 px-6 text-center fade-in relative overflow-hidden bg-[var(--cream)] dark:bg-gray-800"
-    style="background-image:url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size:200px;">
-    <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
-    <div class="max-w-3xl mx-auto relative z-10 mb-10">
-      <h2 class="text-4xl font-semibold text-[var(--charcoal)] dark:text-white">Our Story</h2>
+  <section id="our-story" class="py-20 px-6 text-center fade-in relative overflow-hidden bg-[var(--cream)] dark:bg-[var(--forest-900)]">
+    <div class="max-w-3xl mx-auto mb-10">
+      <h2 class="text-4xl font-semibold text-[var(--charcoal)] dark:text-[var(--forest-text)]">Our Story</h2>
     </div>
 
     <div onclick="toggleService('ourStoryDetails')"
-      class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md fade-in max-w-3xl mx-auto">
-      <p class="text-lg text-[var(--charcoal)] dark:text-white">
+      class="cursor-pointer transform transition hover:scale-[1.01] hover:shadow-xl bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md max-w-3xl mx-auto border dark:border-on-dark">
+      <p class="text-lg text-[var(--charcoal)] dark:text-[var(--forest-text)]">
         We started with a love for documenting life’s special moments—especially our children’s. Noticing the need for accessible, quality photos, we launched a fun, affordable self‑shoot studio for everyone.
       </p>
       <div id="ourStoryDetails" class="mt-4 hidden">
@@ -190,21 +167,21 @@
   </section>
 
   <!-- Our Services -->
-  <section id="our-services" class="py-20 px-6 text-center bg-[var(--cream)] dark:bg-[var(--charcoal)]">
+  <section id="our-services" class="py-20 px-6 text-center bg-[var(--cream)] dark:bg-[var(--forest-900)]">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-4 text-[var(--charcoal)] dark:text-white">Our Services</h2>
-      <p class="mb-12 text-lg text-gray-700 dark:text-gray-300">Self-shoot freedom or professional guidance — pick what suits your moment.</p>
+      <h2 class="text-4xl font-semibold mb-4 text-[var(--charcoal)] dark:text-[var(--forest-text)]">Our Services</h2>
+      <p class="mb-12 text-lg text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Self-shoot freedom or professional guidance — pick what suits your moment.</p>
 
       <!-- Self-Shoot -->
       <div class="mb-12">
-        <h3 class="text-3xl font-bold mb-2 text-[var(--charcoal)] dark:text-white">Self-Shoot</h3>
-        <p class="mb-6 text-gray-700 dark:text-gray-300">Private, self-guided sessions where you control the shots.</p>
+        <h3 class="text-3xl font-bold mb-2 text-[var(--charcoal)] dark:text-[var(--forest-text)]">Self-Shoot</h3>
+        <p class="mb-6 text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Private, self-guided sessions where you control the shots.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Solo/Duo -->
-          <div onclick="toggleService('soloDuo')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('soloDuo')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Solo/Duo (1–2)</h4>
-            <p class="text-gray-600 dark:text-gray-300">Perfect for individuals or couples.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Perfect for individuals or couples.</p>
             <div id="soloDuo" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - SoloDuo.png" alt="Self-shoot Solo/Duo" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -213,9 +190,9 @@
           </div>
 
           <!-- Small Group -->
-          <div onclick="toggleService('smallGroup')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('smallGroup')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Small Group (3–5)</h4>
-            <p class="text-gray-600 dark:text-gray-300">Ideal for friends or small families.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Ideal for friends or small families.</p>
             <div id="smallGroup" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Small Group.png" alt="Self-shoot Small Group" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -224,9 +201,9 @@
           </div>
 
           <!-- Big Group -->
-          <div onclick="toggleService('bigGroup')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('bigGroup')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Big Group (6–16)</h4>
-            <p class="text-gray-600 dark:text-gray-300">Great for bigger gatherings.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Great for bigger gatherings.</p>
             <div id="bigGroup" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Big Group.png" alt="Self-shoot Big Group" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -238,14 +215,14 @@
 
       <!-- With Photographer -->
       <div>
-        <h3 class="text-3xl font-bold mb-2 text-[var(--charcoal)] dark:text-white">With Photographer</h3>
-        <p class="mb-6 text-gray-700 dark:text-gray-300">Professionally guided sessions to capture every detail.</p>
+        <h3 class="text-3xl font-bold mb-2 text-[var(--charcoal)] dark:text-[var(--forest-text)]">With Photographer</h3>
+        <p class="mb-6 text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Professionally guided sessions to capture every detail.</p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Adult Pre-Birthday -->
-          <div onclick="toggleService('adultPreBirthday')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('adultPreBirthday')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Adult’s Pre‑Birthday</h4>
-            <p class="text-gray-600 dark:text-gray-300">Celebrate your milestone in style.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Celebrate your milestone in style.</p>
             <div id="adultPreBirthday" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Adult Prebirthday.png" alt="Adult pre-birthday shoot" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -254,9 +231,9 @@
           </div>
 
           <!-- Family Portraits -->
-          <div onclick="toggleService('familyPortraits')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('familyPortraits')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Family Portraits</h4>
-            <p class="text-gray-600 dark:text-gray-300">Cherish moments together.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Cherish moments together.</p>
             <div id="familyPortraits" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Family Portraits.png" alt="Family portraits" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -265,9 +242,9 @@
           </div>
 
           <!-- Kid’s Pre-Birthday -->
-          <div onclick="toggleService('kidsPreBirthday')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('kidsPreBirthday')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Kid’s Pre‑Birthday</h4>
-            <p class="text-gray-600 dark:text-gray-300">Precious childhood moments.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">Precious childhood moments.</p>
             <div id="kidsPreBirthday" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Kids Pre-birthday.png" alt="Kids pre-birthday shoot" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -276,9 +253,9 @@
           </div>
 
           <!-- Maternity -->
-          <div onclick="toggleService('maternityShoot')" class="cursor-pointer transform transition hover:scale-105 hover:shadow-xl bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
+          <div onclick="toggleService('maternityShoot')" class="cursor-pointer transform transition surface-hover bg-[var(--card)] dark:surface p-6 rounded-xl shadow-md border dark:border-on-dark">
             <h4 class="text-xl font-bold text-[var(--mauve)] mb-2">Maternity Shoot</h4>
-            <p class="text-gray-600 dark:text-gray-300">The beauty of motherhood.</p>
+            <p class="text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">The beauty of motherhood.</p>
             <div id="maternityShoot" class="mt-4 hidden">
               <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener">
                 <img src="assets/Our Services - Maternity Shoot.png" alt="Maternity shoot" class="w-full rounded-lg shadow mt-4" loading="lazy">
@@ -292,19 +269,18 @@
   </section>
 
   <!-- Gallery -->
-  <section id="gallery" class="py-20 px-6 text-center bg-[var(--cream)] dark:bg-gray-800"
-    style="background-image:url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size:200px;">
+  <section id="gallery" class="py-20 px-6 text-center bg-[var(--cream)] dark:bg-[var(--forest-900)]">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-4 text-[var(--charcoal)] dark:text-white">Gallery</h2>
-      <p class="mb-12 text-lg text-gray-700 dark:text-gray-300">A peek at favorite captured moments.</p>
+      <h2 class="text-4xl font-semibold mb-4 text-[var(--charcoal)] dark:text-[var(--forest-text)]">Gallery</h2>
+      <p class="mb-12 text-lg text-[var(--charcoal)]/80 dark:text-[var(--forest-text)]/80">A peek at favorite captured moments.</p>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="overflow-hidden rounded-lg shadow-lg">
+        <div class="overflow-hidden rounded-lg shadow-lg bg-[var(--card)] dark:surface border dark:border-on-dark">
           <img src="assets/gallery1.jpg" alt="Portrait sample 1" class="w-full h-auto transition-transform duration-300 hover:scale-110" loading="lazy">
         </div>
-        <div class="overflow-hidden rounded-lg shadow-lg">
+        <div class="overflow-hidden rounded-lg shadow-lg bg-[var(--card)] dark:surface border dark:border-on-dark">
           <img src="assets/gallery2.jpg" alt="Portrait sample 2" class="w-full h-auto transition-transform duration-300 hover:scale-110" loading="lazy">
         </div>
-        <div class="overflow-hidden rounded-lg shadow-lg">
+        <div class="overflow-hidden rounded-lg shadow-lg bg-[var(--card)] dark:surface border dark:border-on-dark">
           <img src="assets/gallery3.jpg" alt="Portrait sample 3" class="w-full h-auto transition-transform duration-300 hover:scale-110" loading="lazy">
         </div>
       </div>
@@ -312,74 +288,35 @@
   </section>
 
   <!-- Testimonials -->
-  <section id="testimonials" class="py-20 px-6 text-center fade-in relative overflow-hidden bg-[var(--cream)] dark:bg-gray-800"
-    style="background-image:url('https://www.transparenttextures.com/patterns/white-wall-3.png'); background-size:200px;">
-    <div class="absolute inset-0 opacity-10 pointer-events-none"></div>
-
-    <div class="max-w-3xl mx-auto relative z-10">
-      <h2 class="text-4xl font-semibold text-[var(--charcoal)] dark:text-white">What Our Clients Say</h2>
-      <div class="text-left space-y-6">
-        <div class="relative overflow-hidden">
-          <div id="testimonial-track" class="flex transition-transform duration-700 ease-out will-change-transform touch-pan-x">
-            <!-- Slide 1 -->
-            <div class="min-w-full px-4">
-              <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-                <p class="italic mb-4 text-[var(--charcoal)] dark:text-white">"The studio was in a convenient location, easily accessible, and offered flexible booking hours... Highly recommended❤️"</p>
-                <p class="font-semibold text-[var(--charcoal)] dark:text-white">– Ruzzeth H.</p>
-              </div>
-            </div>
-            <!-- Slide 2 -->
-            <div class="min-w-full px-4">
-              <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-                <p class="italic mb-4 text-[var(--charcoal)] dark:text-white">"Much bigger than other studios... Friendly owners. Great photos!"</p>
-                <p class="font-semibold text-[var(--charcoal)] dark:text-white">– Katrina J.</p>
-              </div>
-            </div>
-            <!-- Slide 3 -->
-            <div class="min-w-full px-4">
-              <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-                <p class="italic mb-4 text-[var(--charcoal)] dark:text-white">"Modern equipment, clean and relaxing environment... Will definitely return!"</p>
-                <p class="font-semibold text-[var(--charcoal)] dark:text-white">– Penne E.</p>
-              </div>
-            </div>
-            <!-- Slide 4 -->
-            <div class="min-w-full px-4">
-              <div class="bg-white dark:bg-gray-700 p-6 rounded-xl shadow text-left">
-                <p class="italic mb-4 text-[var(--charcoal)] dark:text-white">"We kept thinking about how we could come back... The photos captured the essence perfectly."</p>
-                <p class="font-semibold text-[var(--charcoal)] dark:text-white">– Anna R.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Controls -->
-          <div class="mt-10 flex justify-center space-x-6">
-            <button id="prevBtn" aria-label="Previous testimonial"
-              class="bg-[var(--mauve)] hover:opacity-90 text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <button id="nextBtn" aria-label="Next testimonial"
-              class="bg-[var(--mauve)] hover:opacity-90 text-white p-3 rounded-full shadow-md transition transform hover:scale-110 focus:outline-none">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-          </div>
-
-          <!-- See more reviews -->
-          <div class="mt-8 text-center">
-            <a href="https://memoriesphotographystudio.setmore.com/#reviews" target="_blank" rel="noopener"
-              class="inline-block bg-[var(--mauve)] hover:opacity-90 text-white text-lg px-6 py-3 rounded-full transition">
-              See More Reviews
-            </a>
-          </div>
+  <section id="testimonials" class="py-20 px-6 text-center fade-in relative overflow-hidden bg-[var(--cream)] dark:bg-[var(--forest-900)]">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-4xl font-semibold text-[var(--charcoal)] dark:text-[var(--forest-text)]">What Our Clients Say</h2>
+      <div class="text-left space-y-6 mt-6">
+        <div class="bg-[var(--card)] dark:surface p-6 rounded-xl shadow border dark:border-on-dark">
+          <p class="italic mb-4 text-[var(--charcoal)] dark:text-[var(--forest-text)]">"The studio was in a convenient location, easily accessible, and offered flexible booking hours... Highly recommended❤️"</p>
+          <p class="font-semibold text-[var(--charcoal)] dark:text-[var(--forest-text)]">– Ruzzeth H.</p>
         </div>
+        <div class="bg-[var(--card)] dark:surface p-6 rounded-xl shadow border dark:border-on-dark">
+          <p class="italic mb-4 text-[var(--charcoal)] dark:text-[var(--forest-text)]">"Much bigger than other studios... Friendly owners. Great photos!"</p>
+          <p class="font-semibold text-[var(--charcoal)] dark:text-[var(--forest-text)]">– Katrina J.</p>
+        </div>
+        <div class="bg-[var(--card)] dark:surface p-6 rounded-xl shadow border dark:border-on-dark">
+          <p class="italic mb-4 text-[var(--charcoal)] dark:text-[var(--forest-text)]">"Modern equipment, clean and relaxing environment... Will definitely return!"</p>
+          <p class="font-semibold text-[var(--charcoal)] dark:text-[var(--forest-text)]">– Penne E.</p>
+        </div>
+      </div>
+      <div class="mt-8 text-center">
+        <a href="https://memoriesphotographystudio.setmore.com/#reviews" target="_blank" rel="noopener"
+          class="inline-block btn-primary text-lg px-6 py-3 rounded-full">See More Reviews</a>
       </div>
     </div>
   </section>
 
   <!-- Contact -->
-  <section id="contact-us" class="py-20 px-6 text-center bg-[var(--cream)] dark:bg-[var(--charcoal)] fade-in">
+  <section id="contact-us" class="py-20 px-6 text-center bg-[var(--cream)] dark:bg-[var(--forest-900)] fade-in">
     <div class="max-w-5xl mx-auto">
-      <h2 class="text-4xl font-semibold mb-6 text-[var(--charcoal)] dark:text-white">Contact Us</h2>
-      <p class="text-base mb-10 text-[var(--charcoal)] dark:text-[var(--cream)]">Have questions or want to book a session? Reach out anytime!</p>
+      <h2 class="text-4xl font-semibold mb-6 text-[var(--charcoal)] dark:text-[var(--forest-text)]">Contact Us</h2>
+      <p class="text-base mb-10 text-[var(--charcoal)]/90 dark:text-[var(--forest-text)]/90">Have questions or want to book a session? Reach out anytime!</p>
 
       <!-- Socials -->
       <div class="mb-10 flex justify-center space-x-8 text-4xl">
@@ -391,7 +328,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
         <!-- Info -->
-        <div class="space-y-5 text-[var(--charcoal)] dark:text-[var(--cream)] text-base">
+        <div class="space-y-5 text-[var(--charcoal)] dark:text-[var(--forest-text)] text-base">
           <div class="flex items-center space-x-3">
             <i class="fa-solid fa-phone text-[var(--mauve)] text-lg"></i>
             <span>+63 906 469 4122</span>
@@ -401,7 +338,7 @@
             <div>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</div>
           </div>
           <div class="mt-4">
-            <h3 class="text-lg font-semibold mb-2">Opening Hours</h3>
+            <h3 class="text-lg font-semibold">Opening Hours</h3>
             <ul class="space-y-1">
               <li>Mon – Sat: 8:00 AM – 8:00 PM</li>
               <li>Sun: 1:00 PM – 8:00 PM</li>
@@ -410,21 +347,21 @@
         </div>
 
         <!-- Map -->
-        <div class="w-full h-64 rounded-lg overflow-hidden shadow-md fade-in relative">
+        <div class="w-full h-64 rounded-lg overflow-hidden shadow-md relative bg-[var(--card)] dark:surface border dark:border-on-dark">
           <iframe id="googleMap" class="w-full h-full rounded-lg" frameborder="0" style="border:0"
             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10940.17740584192!2d120.87527823000491!3d14.198477978831317!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd83b509678963%3A0xc0b4d56ba848e15a!2sMemories%20Photography%20Studio!5e0!3m2!1sen!2sph!4v1743138966372!5m2!1sen!2sph"
             allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 
-          <!-- Map overlay for theme -->
+          <!-- Map overlay to darken on demand -->
           <div id="mapOverlay" class="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 pointer-events-none"></div>
 
           <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
-            <button onclick="toggleMapTheme()" class="bg-[var(--mauve)] hover:opacity-90 text-white px-3 py-1 rounded-full text-sm shadow">
+            <button onclick="toggleMapTheme()" class="btn-primary px-3 py-1 rounded-full text-sm shadow">
               Toggle Map Theme
             </button>
             <a href="https://www.google.com/maps/dir/?api=1&destination=Memories+Photography+Studio,+Indang+Cavite"
               target="_blank" rel="noopener"
-              class="bg-[var(--mauve)] hover:opacity-90 text-white px-4 py-2 rounded-full text-sm shadow inline-block">
+              class="btn-primary px-4 py-2 rounded-full text-sm shadow inline-block">
               Get Directions
             </a>
           </div>
@@ -434,7 +371,7 @@
   </section>
 
   <!-- Footer -->
-  <footer class="bg-white dark:bg-gray-900 text-center py-10 border-t dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
+  <footer class="bg-white dark:surface text-center py-10 border-t dark:border-on-dark text-sm text-[var(--charcoal)] dark:text-[var(--forest-text)]">
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
 
@@ -507,71 +444,6 @@
       section.classList.toggle('hidden');
     }
     window.toggleService = toggleService;
-
-    // Hero slideshow
-    const images = [
-      'assets/elizahero.jpg',
-      'assets/Our Services - SoloDuo.png',
-      'assets/Our Services - Small Group.png',
-      'assets/Our Services - Big Group.png',
-      'assets/Our Services - Maternity Shoot.png'
-    ];
-    const slideshowDiv = document.querySelector('.slideshow');
-    const dots = document.querySelectorAll('.dot');
-    let currentIndex = 0;
-    let intervalId;
-
-    // Preload and append
-    images.forEach(src => {
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = 'Studio sample';
-      img.loading = 'eager';
-      slideshowDiv.appendChild(img);
-    });
-
-    function updateDots(){
-      dots.forEach((dot, i) => dot.classList.toggle('active-dot', i === currentIndex));
-    }
-    function updateSlideshow(){
-      slideshowDiv.style.transform = `translateX(-${currentIndex * 100}vw)`;
-      updateDots();
-    }
-    function nextSlide(){ currentIndex = (currentIndex + 1) % images.length; updateSlideshow(); }
-    function showSlide(i){ currentIndex = i; updateSlideshow(); resetInterval(); }
-    window.showSlide = showSlide;
-
-    dots.forEach((dot,i) => dot.addEventListener('click', () => showSlide(i)));
-
-    function resetInterval(){ clearInterval(intervalId); intervalId = setInterval(nextSlide, 3000); }
-
-    updateDots(); updateSlideshow(); resetInterval();
-
-    // Testimonials carousel
-    const track = document.getElementById('testimonial-track');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const totalSlides = track.children.length;
-    let currentSlide = 0, autoPlayTimer;
-
-    function renderTestimonial(){ track.style.transform = `translateX(${-currentSlide * 100}%)`; }
-    function nextT(){ currentSlide = (currentSlide + 1) % totalSlides; renderTestimonial(); }
-    function prevT(){ currentSlide = (currentSlide - 1 + totalSlides) % totalSlides; renderTestimonial(); }
-    function startT(){ autoPlayTimer = setInterval(nextT, 6000); }
-    function resetT(){ clearInterval(autoPlayTimer); startT(); }
-
-    prevBtn.addEventListener('click', () => { prevT(); resetT(); });
-    nextBtn.addEventListener('click', () => { nextT(); resetT(); });
-
-    let startX = 0;
-    track.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-    track.addEventListener('touchend', e => {
-      const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) { nextT(); resetT(); }
-      else if (endX - startX > 50) { prevT(); resetT(); }
-    });
-
-    renderTestimonial(); startT();
   </script>
 </body>
 </html>
