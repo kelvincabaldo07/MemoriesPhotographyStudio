@@ -107,6 +107,14 @@
   .delay-200{ animation-delay: .2s; }
   .delay-300{ animation-delay: .3s; }
   .delay-400{ animation-delay: .4s; }
+  
+  /* Plant grow background animation */
+  @keyframes plantDraw { to { stroke-dashoffset: 0; } }
+  .plant-anim { position:absolute; inset:0; }
+  .plant-anim path { fill:none; stroke: var(--forest-900); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; opacity:.2; stroke-dasharray:1000; stroke-dashoffset:1000; animation: plantDraw 3.5s ease forwards; }
+  .dark .plant-anim path { stroke: var(--terracotta); }
+  .plant-delay-1{ animation-delay: .6s; }
+  .plant-delay-2{ animation-delay: 1s; }
   </style>
 
   <!-- Schema.org -->
@@ -197,8 +205,25 @@
     </div>
   </nav>
 
-  <!-- Hero (no slideshow) -->
-  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center">
+  <!-- Hero (with subtle plant animation background) -->
+  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden">
+    <!-- Subtle plant growing animation background (~80% transparent) -->
+    <svg class="plant-anim pointer-events-none" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- stem -->
+      <path d="M300 400 C300 360 290 320 300 280 C310 240 330 200 320 160" />
+      <!-- leaves -->
+      <path class="plant-delay-1" d="M298 300 C276 290 268 268 287 256" />
+      <path class="plant-delay-2" d="M312 240 C334 230 344 210 330 198" />
+    </svg>
+  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden">
+    <!-- Subtle plant growing animation background -->
+    <svg class="plant-anim pointer-events-none" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <!-- stem -->
+      <path d="M300 400 C300 360 290 320 300 280 C310 240 330 200 320 160" />
+      <!-- leaves -->
+      <path class="plant-delay-1" d="M298 300 C276 290 268 268 287 256" />
+      <path class="plant-delay-2" d="M312 240 C334 230 344 210 330 198" />
+    </svg>
     <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/85 dark:bg-[var(--forest-800)]/85 border dark:border-on-dark">
       <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-up">Capture with Purpose. Create Change.</h1>
       <p class="text-sm md:text-base max-w-2xl mx-auto mb-8 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-200">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
@@ -219,7 +244,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
       <!-- Origins card -->
-      <article class="cursor-pointer surface card border dark:border-on-dark rounded-xl p-6 shadow" onclick="toggleService('storyOrigins');this.querySelector('.chev').classList.toggle('open')">
+  <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('storyOrigins');this.querySelector('.chev').classList.toggle('open')">
         <header class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">How We Started</h3>
           <span class="expand-indicator"><i class="fa-solid fa-chevron-right chev rot-90"></i> Tap to expand</span>
@@ -238,7 +263,7 @@ Our goal is simple: to make photography fun and available to everyone who, like 
       </article>
 
       <!-- Rebrand card -->
-      <article class="cursor-pointer surface card border dark:border-on-dark rounded-xl p-6 shadow" onclick="toggleService('storyRebrand');this.querySelector('.chev').classList.toggle('open')">
+  <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('storyRebrand');this.querySelector('.chev').classList.toggle('open')">
         <header class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">Our 2025 Rebrand</h3>
           <span class="expand-indicator"><i class="fa-solid fa-chevron-right chev rot-90"></i> Tap to expand</span>
