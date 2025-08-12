@@ -387,6 +387,26 @@ Our goal is simple: to make photography fun and available to everyone who, like 
     </div>
   </section>
 
+  <!-- Gallery -->
+  <section id="gallery" class="py-20 px-6 section-light-2 section-dark-2 text-center">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-4xl font-semibold mb-4 section-title">Gallery</h2>
+      <p class="mb-8 text-[color:var(--charcoal)]/80 dark:text-[color:var(--forest-text)]/80">A peek into recent sessions. Tap any photo to view larger.</p>
+
+      <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
+
+      <div class="mt-8">
+        <button id="loadMoreGallery" class="btn-primary light"><i class="fa-solid fa-images"></i> Load more</button>
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightboxOverlay" class="fixed inset-0 bg-black/70 hidden z-[70]"></div>
+    <div id="lightbox" class="fixed inset-0 hidden z-[75] grid place-items-center p-4">
+      <img id="lightboxImg" src="" alt="Gallery preview" class="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl" />
+    </div>
+  </section>
+
   <!-- Contact -->
   <section id="contact-us" class="py-20 px-6 section-light-2 section-dark-2 text-center">
     <div class="max-w-5xl mx-auto">
@@ -523,6 +543,70 @@ Our goal is simple: to make photography fun and available to everyone who, like 
   donationClose?.addEventListener('click', closeDonation);
   donationDismiss?.addEventListener('click', closeDonation);
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !donationModal.classList.contains('hidden')) closeDonation(); });
+
+  // Gallery logic
+  const galleryGrid = document.getElementById('galleryGrid');
+  const loadBtn = document.getElementById('loadMoreGallery');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxOverlay = document.getElementById('lightboxOverlay');
+  const lightboxImg = document.getElementById('lightboxImg');
+  let nextIndex = 2874; // lower bound observed
+  const maxIndex = 3035; // upper bound observed
+  const batchSize = 24;
+
+  function createImgEl(src){
+    const wrapper = document.createElement('button');
+    wrapper.type = 'button';
+    wrapper.className = 'block relative group rounded-md overflow-hidden bg-white dark:surface border dark:border-on-dark shadow-sm';
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.src = src;
+    img.alt = 'Gallery image';
+    img.className = 'w-full h-full object-cover aspect-square group-hover:opacity-90 transition-opacity';
+    img.onerror = () => wrapper.remove();
+    wrapper.appendChild(img);
+    wrapper.addEventListener('click', () => openLightbox(src));
+    return wrapper;
+  }
+
+  function openLightbox(src){
+    lightboxImg.src = src;
+    lightbox.classList.remove('hidden');
+    lightboxOverlay.classList.remove('hidden');
+  }
+  function closeLightbox(){
+    lightbox.classList.add('hidden');
+    lightboxOverlay.classList.add('hidden');
+    lightboxImg.src = '';
+  }
+  lightboxOverlay?.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !lightbox.classList.contains('hidden')) closeLightbox(); });
+
+  function pad(n){ return String(n); }
+  function buildSrc(n){ return `assets/gallery/IMG_${pad(n)}.JPG`; }
+
+  function loadBatch(){
+    let added = 0;
+    while(nextIndex <= maxIndex && added < batchSize){
+      const src = buildSrc(nextIndex);
+      const el = createImgEl(src);
+      galleryGrid.appendChild(el);
+      nextIndex++;
+      added++;
+    }
+    if(nextIndex > maxIndex){ loadBtn?.setAttribute('disabled','true'); loadBtn?.classList.add('opacity-60','cursor-not-allowed'); }
+  }
+
+  // Initial load when the section comes into view
+  const galleryObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ loadBatch(); galleryObserver.unobserve(e.target); }
+    });
+  }, { threshold: 0.1 });
+  const gallerySection = document.getElementById('gallery');
+  if(gallerySection) galleryObserver.observe(gallerySection);
+  loadBtn?.addEventListener('click', loadBatch);
   </script>
 </body>
 </html>
