@@ -115,6 +115,9 @@
   .dark .plant-anim path { stroke: var(--terracotta); }
   .plant-delay-1{ animation-delay: .6s; }
   .plant-delay-2{ animation-delay: 1s; }
+
+  /* Hero collage background (50% opacity) */
+  .hero-collage::before{ content:''; position:absolute; inset:0; background-image:url('assets/collage001.jpeg'); background-size:cover; background-position:center; opacity:.5; pointer-events:none; }
   </style>
 
   <!-- Schema.org -->
@@ -206,17 +209,8 @@
   </nav>
 
   <!-- Hero (with subtle plant animation background) -->
-  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden">
+  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden hero-collage">
     <!-- Subtle plant growing animation background (~80% transparent) -->
-    <svg class="plant-anim pointer-events-none" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <!-- stem -->
-      <path d="M300 400 C300 360 290 320 300 280 C310 240 330 200 320 160" />
-      <!-- leaves -->
-      <path class="plant-delay-1" d="M298 300 C276 290 268 268 287 256" />
-      <path class="plant-delay-2" d="M312 240 C334 230 344 210 330 198" />
-    </svg>
-  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden">
-    <!-- Subtle plant growing animation background -->
     <svg class="plant-anim pointer-events-none" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <!-- stem -->
       <path d="M300 400 C300 360 290 320 300 280 C310 240 330 200 320 160" />
@@ -226,8 +220,8 @@
     </svg>
     <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/85 dark:bg-[var(--forest-800)]/85 border dark:border-on-dark">
       <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-up">Capture with Purpose. Create Change.</h1>
-      <p class="text-sm md:text-base max-w-2xl mx-auto mb-8 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-200">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
-  <p class="text-sm md:text-base max-w-2xl mx-auto mb-8 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-200">₱5 from every booking is donated to a local cause in Indang.</p>
+      <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-4 animate-fade-up delay-100">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
+      <p class="text-sm md:text-base max-w-2xl mx-auto mb-8 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-200">₱5 from every booking is donated to a local cause in Indang.</p>
       <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener" id="heroBookBtn" class="btn-primary light animate-fade-up delay-300">
         <i class="fa-regular fa-calendar-check"></i>
         Book a Session
