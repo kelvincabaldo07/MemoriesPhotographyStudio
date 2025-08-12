@@ -196,6 +196,7 @@
         <div class="hidden md:flex space-x-6">
           <a href="#our-story" class="nav-link text-lg hover:text-[var(--terracotta)]">Our Story</a>
           <a href="#our-services" class="nav-link text-lg hover:text-[var(--terracotta)]">Our Services</a>
+          <a href="#gallery" class="nav-link text-lg hover:text-[var(--terracotta)]">Gallery</a>
           <a href="#contact-us" class="nav-link text-lg hover:text-[var(--terracotta)]">Contact Us</a>
         </div>
       </div>
@@ -204,6 +205,7 @@
       class="hidden transform transition duration-300 ease-out origin-top bg-[var(--forest-900)] dark:bg-[var(--clay)] md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50 text-[var(--cream)]">
       <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
       <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
+  <a href="#gallery" class="block py-3 text-lg nav-link">Gallery</a>
       <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
     </div>
   </nav>
@@ -220,7 +222,7 @@
     </svg>
     <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/85 dark:bg-[var(--forest-800)]/85 border dark:border-on-dark">
       <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-up">Capture with Purpose. Create Change.</h1>
-      <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-4 animate-fade-up delay-100">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
+  <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-4 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-100">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
       <p class="text-sm md:text-base max-w-2xl mx-auto mb-8 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-200">₱5 from every booking is donated to a local cause in Indang.</p>
       <a href="https://memoriesphotographystudio.setmore.com" target="_blank" rel="noopener" id="heroBookBtn" class="btn-primary light animate-fade-up delay-300">
         <i class="fa-regular fa-calendar-check"></i>
@@ -403,6 +405,7 @@ Our goal is simple: to make photography fun and available to everyone who, like 
     <!-- Lightbox -->
     <div id="lightboxOverlay" class="fixed inset-0 bg-black/70 hidden z-[70]"></div>
     <div id="lightbox" class="fixed inset-0 hidden z-[75] grid place-items-center p-4">
+      <button id="lightboxClose" aria-label="Close" class="absolute top-4 right-4 text-white/90 bg-black/40 hover:bg-black/60 rounded-full w-10 h-10 grid place-items-center text-xl">×</button>
       <img id="lightboxImg" src="" alt="Gallery preview" class="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl" />
     </div>
   </section>
@@ -415,17 +418,17 @@ Our goal is simple: to make photography fun and available to everyone who, like 
 
       <!-- Socials -->
       <div class="mb-10 flex justify-center space-x-8 text-4xl">
-        <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="https://m.me/380140688505189" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
-        <a href="https://www.instagram.com/creatingmemoriesphotostudio/" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://www.tiktok.com/@memoriesphotogstudio" target="_blank" rel="noopener" class="text-[var(--terracotta)] hover:opacity-80" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.facebook.com/profile.php?id=61560764924957" target="_blank" rel="noopener" class="text-[var(--forest-900)] dark:text-[var(--terracotta)] hover:opacity-80" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://m.me/380140688505189" target="_blank" rel="noopener" class="text-[var(--forest-900)] dark:text-[var(--terracotta)] hover:opacity-80" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i></a>
+        <a href="https://www.instagram.com/creatingmemoriesphotostudio/" target="_blank" rel="noopener" class="text-[var(--forest-900)] dark:text-[var(--terracotta)] hover:opacity-80" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.tiktok.com/@memoriesphotogstudio" target="_blank" rel="noopener" class="text-[var(--forest-900)] dark:text-[var(--terracotta)] hover:opacity-80" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-10 text-left">
         <!-- Info -->
         <div class="space-y-5 text-base">
-          <div class="flex items-center space-x-3"><i class="fa-solid fa-phone text-[var(--terracotta)] text-lg"></i><span>+63 906 469 4122</span></div>
-          <div class="flex items-start space-x-3"><i class="fa-solid fa-location-dot text-[var(--terracotta)] mt-1 text-lg"></i><div>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</div></div>
+          <div class="flex items-center space-x-3"><i class="fa-solid fa-phone text-[var(--forest-900)] dark:text-[var(--terracotta)] text-lg"></i><span>+63 906 469 4122</span></div>
+          <div class="flex items-start space-x-3"><i class="fa-solid fa-location-dot text-[var(--forest-900)] dark:text-[var(--terracotta)] mt-1 text-lg"></i><div>Green Valley Field Subdivision,<br>Buna Cerca, Indang, Cavite</div></div>
           <div class="mt-4"><h3 class="text-lg font-semibold">Opening Hours</h3><ul class="space-y-1"><li>Mon – Sat: 8:00 AM – 8:00 PM</li><li>Sun: 1:00 PM – 8:00 PM</li></ul></div>
         </div>
 
@@ -550,6 +553,7 @@ Our goal is simple: to make photography fun and available to everyone who, like 
   const lightbox = document.getElementById('lightbox');
   const lightboxOverlay = document.getElementById('lightboxOverlay');
   const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxClose = document.getElementById('lightboxClose');
   let nextIndex = 2874; // lower bound observed
   const maxIndex = 3035; // upper bound observed
   const batchSize = 24;
@@ -581,6 +585,7 @@ Our goal is simple: to make photography fun and available to everyone who, like 
     lightboxImg.src = '';
   }
   lightboxOverlay?.addEventListener('click', closeLightbox);
+  lightboxClose?.addEventListener('click', closeLightbox);
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && !lightbox.classList.contains('hidden')) closeLightbox(); });
 
   function pad(n){ return String(n); }
