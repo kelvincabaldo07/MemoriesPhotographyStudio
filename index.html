@@ -108,16 +108,26 @@
   .delay-300{ animation-delay: .3s; }
   .delay-400{ animation-delay: .4s; }
   
-  /* Plant grow background animation */
-  @keyframes plantDraw { to { stroke-dashoffset: 0; } }
-  .plant-anim { position:absolute; inset:0; }
-  .plant-anim path { fill:none; stroke: var(--forest-900); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; opacity:.2; stroke-dasharray:1000; stroke-dashoffset:1000; animation: plantDraw 3.5s ease forwards; }
-  .dark .plant-anim path { stroke: var(--terracotta); }
-  .plant-delay-1{ animation-delay: .6s; }
-  .plant-delay-2{ animation-delay: 1s; }
+  /* (removed) Plant grow background animation */
 
-  /* Hero collage background (50% opacity) */
-  .hero-collage::before{ content:''; position:absolute; inset:0; background-image:url('assets/collage001.jpeg'); background-size:cover; background-position:center; opacity:.5; pointer-events:none; }
+  /* Hero animated collage grid */
+  .hero-grid{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(15,1fr); grid-template-rows:repeat(3,1fr); gap:2px; opacity:.5; pointer-events:none; z-index:0; }
+  .hero-cell{ position:relative; overflow:hidden; border-radius:2px; }
+  .hero-layer{ position:absolute; inset:0; background-size:cover; background-position:center; transition: opacity 1s ease; will-change:opacity; }
+  .hero-layer.hidden{ opacity:0; }
+  .hero-layer.visible{ opacity:1; }
+
+  /* Mobile: reduce grid to 5x3 for performance and clarity */
+  @media (max-width: 640px){
+    .hero-grid{ grid-template-columns: repeat(5,1fr); grid-template-rows: repeat(3,1fr); }
+  }
+
+  /* (removed) Jello section entry effect */
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .hero-layer{ transition: none; }
+  }
   </style>
 
   <!-- Schema.org -->
@@ -197,6 +207,7 @@
           <a href="#our-story" class="nav-link text-lg hover:text-[var(--terracotta)]">Our Story</a>
           <a href="#our-services" class="nav-link text-lg hover:text-[var(--terracotta)]">Our Services</a>
           <a href="#gallery" class="nav-link text-lg hover:text-[var(--terracotta)]">Gallery</a>
+          <a href="#faq" class="nav-link text-lg hover:text-[var(--terracotta)]">FAQ</a>
           <a href="#contact-us" class="nav-link text-lg hover:text-[var(--terracotta)]">Contact Us</a>
         </div>
       </div>
@@ -204,22 +215,18 @@
     <div id="mobile-menu"
       class="hidden transform transition duration-300 ease-out origin-top bg-[var(--forest-900)] dark:bg-[var(--clay)] md:hidden text-center overflow-hidden opacity-0 scale-y-0 absolute w-full top-full left-0 z-50 text-[var(--cream)]">
       <a href="#our-story" class="block py-3 text-lg nav-link">Our Story</a>
-      <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
+  <a href="#our-services" class="block py-3 text-lg nav-link">Our Services</a>
   <a href="#gallery" class="block py-3 text-lg nav-link">Gallery</a>
+  <a href="#faq" class="block py-3 text-lg nav-link">FAQ</a>
       <a href="#contact-us" class="block py-3 text-lg nav-link">Contact Us</a>
     </div>
   </nav>
 
   <!-- Hero (with subtle plant animation background) -->
-  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden hero-collage">
-    <!-- Subtle plant growing animation background (~80% transparent) -->
-    <svg class="plant-anim pointer-events-none" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <!-- stem -->
-      <path d="M300 400 C300 360 290 320 300 280 C310 240 330 200 320 160" />
-      <!-- leaves -->
-      <path class="plant-delay-1" d="M298 300 C276 290 268 268 287 256" />
-      <path class="plant-delay-2" d="M312 240 C334 230 344 210 330 198" />
-    </svg>
+  <section class="pt-28 pb-16 hero-light dark:hero-dark section-light-1 section-dark-1 text-center relative overflow-hidden">
+    <!-- Animated collage grid -->
+    <div id="heroGrid" class="hero-grid"></div>
+    
     <div class="relative z-10 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto bg-white/85 dark:bg-[var(--forest-800)]/85 border dark:border-on-dark">
       <h1 class="hero-title text-4xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-up">Capture with Purpose. Create Change.</h1>
   <p class="text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-4 text-[var(--terracotta)] dark:text-[var(--forest-900)] animate-fade-up delay-100">High‑quality self‑shoot and photographer‑led sessions in Indang, Cavite — priceless photos at pocket‑friendly rates.</p>
@@ -231,6 +238,8 @@
     </div>
   </section>
 
+  
+
   <!-- Our Story & Rebranding -->
   <section id="our-story" class="py-20 px-6 section-light-2 section-dark-2">
     <div class="max-w-4xl mx-auto mb-10 text-center">
@@ -240,7 +249,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
       <!-- Origins card -->
-  <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('storyOrigins');this.querySelector('.chev').classList.toggle('open')">
+  <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:bg-[var(--forest-accent)] dark:text-[var(--forest-900)] card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('storyOrigins');this.querySelector('.chev').classList.toggle('open')">
         <header class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">How We Started</h3>
           <span class="expand-indicator"><i class="fa-solid fa-chevron-right chev rot-90"></i> Tap to expand</span>
@@ -259,7 +268,7 @@ Our goal is simple: to make photography fun and available to everyone who, like 
       </article>
 
       <!-- Rebrand card -->
-  <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('storyRebrand');this.querySelector('.chev').classList.toggle('open')">
+  <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:bg-[var(--forest-accent)] dark:text-[var(--forest-900)] card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('storyRebrand');this.querySelector('.chev').classList.toggle('open')">
         <header class="flex items-center justify-between">
           <h3 class="text-2xl font-semibold">Our 2025 Rebrand</h3>
           <span class="expand-indicator"><i class="fa-solid fa-chevron-right chev rot-90"></i> Tap to expand</span>
@@ -407,6 +416,60 @@ Our goal is simple: to make photography fun and available to everyone who, like 
     <div id="lightbox" class="fixed inset-0 hidden z-[75] grid place-items-center p-4">
       <button id="lightboxClose" aria-label="Close" class="absolute top-4 right-4 text-white/90 bg-black/40 hover:bg-black/60 rounded-full w-10 h-10 grid place-items-center text-xl">×</button>
       <img id="lightboxImg" src="" alt="Gallery preview" class="max-h-[90vh] max-w-[90vw] rounded-lg shadow-2xl" />
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section id="faq" class="py-16 section-light-1 section-dark-1">
+    <div class="max-w-7xl mx-auto px-6">
+  <h2 class="text-4xl font-semibold section-title">Frequently Asked Questions</h2>
+  <p class="mt-2 text-on-light/70 dark:text-on-dark/70 text-center">Quick answers about bookings, schedules, and services.</p>
+
+      <div class="mt-10 grid gap-6 md:grid-cols-2">
+        <!-- FAQ 1 -->
+        <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('faqBooking');this.querySelector('.chev').classList.toggle('open')">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-[var(--forest-900)] dark:text-[var(--terracotta)]">How do I book a session?</h3>
+            <span class="chev transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+          </div>
+          <div id="faqBooking" class="mt-4 hidden text-on-light/80 dark:text-[var(--forest-900)] dark:bg-[var(--forest-accent)] dark:p-4 dark:rounded-md">
+            You can book by clicking on the Book Now button here on our website or message us on Facebook. We are strictly by appointment and no walk-ins allowed.
+          </div>
+        </article>
+
+        <!-- FAQ 2 -->
+        <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('faqWalkins');this.querySelector('.chev').classList.toggle('open')">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-[var(--forest-900)] dark:text-[var(--terracotta)]">Do you accept walk-ins?</h3>
+            <span class="chev transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+          </div>
+          <div id="faqWalkins" class="mt-4 hidden text-on-light/80 dark:text-[var(--forest-900)] dark:bg-[var(--forest-accent)] dark:p-4 dark:rounded-md">
+            No. We are strictly by appointment only.
+          </div>
+        </article>
+
+        <!-- FAQ 3 -->
+        <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('faqRates');this.querySelector('.chev').classList.toggle('open')">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-[var(--forest-900)] dark:text-[var(--terracotta)]">What are your rates?</h3>
+            <span class="chev transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+          </div>
+          <div id="faqRates" class="mt-4 hidden text-on-light/80 dark:text-[var(--forest-900)] dark:bg-[var(--forest-accent)] dark:p-4 dark:rounded-md">
+            Rates vary per service (Self-Shoot or With Photographer). Please see the Our Services section for details and inclusions.
+          </div>
+        </article>
+
+        <!-- FAQ 4 -->
+        <article class="cursor-pointer transform transition hover:shadow-xl bg-white dark:surface card border dark:border-on-dark rounded-xl p-6 shadow-md" onclick="toggleService('faqLocation');this.querySelector('.chev').classList.toggle('open')">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-[var(--forest-900)] dark:text-[var(--terracotta)]">Where are you located?</h3>
+            <span class="chev transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+          </div>
+          <div id="faqLocation" class="mt-4 hidden text-on-light/80 dark:text-[var(--forest-900)] dark:bg-[var(--forest-accent)] dark:p-4 dark:rounded-md">
+            We are inside Green Valley Field Subdivision in Indang, Cavite. It is between Indang Central Elementary School and Lintiw Road.
+          </div>
+        </article>
+      </div>
     </div>
   </section>
 
@@ -612,6 +675,58 @@ Our goal is simple: to make photography fun and available to everyone who, like 
   const gallerySection = document.getElementById('gallery');
   if(gallerySection) galleryObserver.observe(gallerySection);
   loadBtn?.addEventListener('click', loadBatch);
+
+  // Hero Collage Grid crossfading every 3s
+  (function initHeroCollage(){
+    const grid = document.getElementById('heroGrid');
+    if(!grid) return;
+    const isMobile = window.matchMedia('(max-width: 640px)').matches;
+    const cols = isMobile ? 5 : 15;
+    const rows = 3;
+    const cells = [];
+    const minIdx = 2874, maxIdx = 3035; // observed range from assets/gallery
+    function buildSrc(n){ return `assets/gallery/IMG_${n}.JPG`; }
+    function randIdx(){ return Math.floor(Math.random()*(maxIdx-minIdx+1))+minIdx; }
+    function preload(url){ const i=new Image(); i.src=url; }
+
+    for(let r=0; r<rows; r++){
+      for(let c=0; c<cols; c++){
+        const cell = document.createElement('div');
+        cell.className = 'hero-cell';
+        const a = document.createElement('div');
+        const b = document.createElement('div');
+        a.className = 'hero-layer visible';
+        b.className = 'hero-layer hidden';
+        const idxA = randIdx(); const idxB = randIdx();
+        a.style.backgroundImage = `url(${buildSrc(idxA)})`;
+        b.style.backgroundImage = `url(${buildSrc(idxB)})`;
+        preload(buildSrc(idxA)); preload(buildSrc(idxB));
+        cell.appendChild(a); cell.appendChild(b);
+        grid.appendChild(cell);
+        cells.push({a,b,flip:false});
+      }
+    }
+
+    function tick(){
+      // update ~25% of cells each tick for a subtle shuffle
+      const toUpdate = Math.max(1, Math.floor(cells.length*0.25));
+      for(let i=0;i<toUpdate;i++){
+        const k = Math.floor(Math.random()*cells.length);
+        const cell = cells[k];
+        const show = cell.flip ? cell.a : cell.b;
+        const hide = cell.flip ? cell.b : cell.a;
+        const nextIdx = randIdx();
+        // Preload next image on the hidden layer before revealing
+        hide.style.backgroundImage = `url(${buildSrc(nextIdx)})`;
+        // force reflow for transition reliability
+        void hide.offsetWidth;
+        hide.classList.remove('hidden'); hide.classList.add('visible');
+        show.classList.remove('visible'); show.classList.add('hidden');
+        cell.flip = !cell.flip;
+      }
+    }
+    setInterval(tick, 3000);
+  })();
   </script>
 </body>
 </html>
