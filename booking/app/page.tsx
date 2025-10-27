@@ -275,7 +275,10 @@ export default function App(){
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddr] = useState("");
-
+  //Email verification
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [sentCode, setSentCode] = useState("");
     // Social / event consent - CHANGED: Single required field
   const [socialConsent, setSocialConsent] = useState<"yes" | "no" | "">("");
   const [eventType, setEventType] = useState("");
@@ -351,29 +354,69 @@ export default function App(){
   }
   function onAllocationChange(key:string,value:string){ const v=Math.max(0, Number(value)||0); setAllocations(prev=>({ ...prev, [key]: v })); }
 
-  async function submitBooking(){
-    setBusy(true);
-    const payload = {
-      createdAt: new Date().toISOString(), timezone: STUDIO_TZ,
-      selections: { serviceType, serviceCategory, serviceGroup, service, duration },
-      schedule: { date, time, buffer: BUFFER_MINUTES },
-      customer: { firstName, lastName, email, phone, address },
-      consent: { socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate },
-      selfShoot: serviceType === "Self-Shoot" ? { backdrops: selectedBackdrops, allocations } : null,
-      addons,
-      totals: { sessionPrice, addonsTotal, grandTotal }
-    };
-    // TODO: POST payload to your API/Notion/email here
-    await new Promise(r=>setTimeout(r,900));
+async function submitBooking(){
+  console.log('🎯 submitBooking called!');
+  setBusy(true);
+  const payload = {
+    createdAt: new Date().toISOString(), 
+    timezone: STUDIO_TZ,
+    selections: { serviceType, serviceCategory, serviceGroup, service, duration },
+    schedule: { date, time, buffer: BUFFER_MINUTES },
+    customer: { firstName, lastName, email, phone, address },
+    consent: { socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate },
+    selfShoot: serviceType === "Self-Shoot" ? { backdrops: selectedBackdrops, allocations } : null,
+    addons,
+    totals: { sessionPrice, addonsTotal, grandTotal }
+  };
+  
+  console.log('📤 About to send payload:', payload);
+  
+  try {
+    console.log('🌐 Calling fetch /api/bookings...');
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log('📨 Fetch response received, status:', response.status);
+    const result = await response.json();
+    console.log('📋 Result:', result);
+    
+    if (result.success) {
+      console.log('✅ Booking created:', result.bookingId);
+      setStep(STEPS.length-1); // Go to confirmation
+    } else {
+      console.error('❌ Booking failed:', result.error);
+      alert('Failed to create booking. Please try again.');
+    }
+  } catch (error) {
+    console.error('❌ Network error:', error);
+    alert('Network error. Please check your connection.');
+  } finally {
+    console.log('🏁 setBusy(false)');
     setBusy(false);
-    setStep(STEPS.length-1);
   }
+}
 
   const canContinue = useMemo(()=>{
     switch(step){
-      case 0: return !!service; // unified service picker
-      case 1: return !!date && !!time; // schedule
-      case 2: return !!firstName && !!lastName && !!email && !!phone; // customer
+      case 0: return !!service;
+      case 1: return !!date && !!time;
+      case 2: {
+      const result = !!firstName && !!lastName && !!email && !!phone && emailVerified;
+      console.log('🔍 Step 2 validation:', {
+        firstName: !!firstName,
+        lastName: !!lastName,
+        email: !!email,
+        phone: !!phone,
+        emailVerified,
+        canContinue: result
+      });
+      return result;
+    }// ADD emailVerified
       case 3: { // consent conditional questions - CHANGED
         if (!socialConsent) return false; // Always required
         
@@ -406,7 +449,7 @@ export default function App(){
       case 7: return true; // review
       default: return false;
     }
-  }, [step, service, date, time, firstName, lastName, email, phone, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, accepted, serviceType, serviceGroup]);
+  }, [step, service, date, time, firstName, lastName, email, phone, emailVerified, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, accepted, serviceType, serviceGroup]);
 
   return (
     <div className="min-h-screen w-full flex items-start justify-center p-4 md:p-8" style={{ backgroundColor: BRAND.cream }}>
@@ -440,7 +483,24 @@ export default function App(){
             )}
 
             {step === 2 && (
-              <StepCustomer firstName={firstName} lastName={lastName} email={email} phone={phone} address={address} setFirst={setFirst} setLast={setLast} setEmail={setEmail} setPhone={setPhone} setAddr={setAddr} />
+              <StepCustomer 
+                firstName={firstName} 
+                lastName={lastName} 
+                email={email} 
+                phone={phone} 
+                address={address} 
+                setFirst={setFirst} 
+                setLast={setLast} 
+                setEmail={setEmail} 
+                setPhone={setPhone} 
+                setAddr={setAddr}
+                emailVerified={emailVerified}
+                setEmailVerified={setEmailVerified}
+                verificationCode={verificationCode}
+                setVerificationCode={setVerificationCode}
+                sentCode={sentCode}
+                setSentCode={setSentCode}
+              />
             )}
 
             {step === 3 && (
@@ -776,18 +836,149 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
   );
 }
 
-function StepCustomer(props:{ firstName:string; lastName:string; email:string; phone:string; address:string; setFirst:(v:string)=>void; setLast:(v:string)=>void; setEmail:(v:string)=>void; setPhone:(v:string)=>void; setAddr:(v:string)=>void; }){
-  const { firstName, lastName, email, phone, address, setFirst, setLast, setEmail, setPhone, setAddr } = props;
+function StepCustomer(props: { 
+  firstName: string; 
+  lastName: string; 
+  email: string; 
+  phone: string; 
+  address: string; 
+  setFirst: (v: string) => void; 
+  setLast: (v: string) => void; 
+  setEmail: (v: string) => void; 
+  setPhone: (v: string) => void; 
+  setAddr: (v: string) => void;
+  emailVerified: boolean;
+  setEmailVerified: (v: boolean) => void;
+  verificationCode: string;
+  setVerificationCode: (v: string) => void;
+  sentCode: string;
+  setSentCode: (v: string) => void;
+}) {
+  const { firstName, lastName, email, phone, address, setFirst, setLast, setEmail, setPhone, setAddr, emailVerified, setEmailVerified, verificationCode, setVerificationCode, sentCode, setSentCode } = props;
+  const [sendingCode, setSendingCode] = useState(false);
+  const [emailError, setEmailError] = useState("");
+
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  async function sendVerificationCode() {
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    setSendingCode(true);
+    setEmailError("");
+
+    try {
+      const response = await fetch('/api/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+    if (result.success) {
+      setSentCode(result.code || 'SENT'); // Use 'SENT' placeholder if code not returned
+      // Change the alert to not show the code:
+      alert(`✅ Verification code sent to ${email}!\n\nPlease check your email inbox (and spam folder).`);
+    } else {
+        setEmailError(result.error || 'Failed to send verification code');
+      }
+    } catch (error) {
+      setEmailError('Network error. Please try again.');
+    } finally {
+      setSendingCode(false);
+    }
+  }
+
+  function verifyCode() {
+    console.log('🔍 Verifying code...');
+    console.log('  Entered code:', verificationCode);
+    console.log('  Expected code:', sentCode);
+    console.log('  Match:', verificationCode === sentCode);
+    
+    if (verificationCode === sentCode) {
+      console.log('✅ Setting emailVerified to TRUE');
+      setEmailVerified(true);
+      alert('✅ Email verified successfully!');
+    } else {
+      console.log('❌ Codes do not match');
+      alert('❌ Invalid verification code. Please try again.');
+    }
+  }
+
   return (
     <div>
       <h2 className="text-xl font-semibold">Your details</h2>
-      <p className="text-neutral-600 mb-4">We’ll send your confirmation and reminders here.</p>
+      <p className="text-neutral-600 mb-4">We'll send your confirmation and reminders here.</p>
+      
       <div className="grid md:grid-cols-2 gap-3">
-        <Input placeholder="First name" value={firstName} onChange={(e)=>setFirst(e.target.value)}/>
-        <Input placeholder="Last name" value={lastName} onChange={(e)=>setLast(e.target.value)}/>
-        <Input placeholder="Email" type="email" value={email} onChange={(e)=>setEmail(e.target.value)}/>
-        <Input placeholder="Phone" value={phone} onChange={(e)=>setPhone(e.target.value)}/>
-        <div className="md:col-span-2"><Input placeholder="Address" value={address} onChange={(e)=>setAddr(e.target.value)}/></div>
+        <Input placeholder="First name *" value={firstName} onChange={(e) => setFirst(e.target.value)} />
+        <Input placeholder="Last name *" value={lastName} onChange={(e) => setLast(e.target.value)} />
+        
+        <div className="md:col-span-2">
+          <div className="flex gap-2">
+            <Input 
+              placeholder="Email *" 
+              type="email" 
+              value={email} 
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setEmailVerified(false);
+                setEmailError("");
+              }}
+              disabled={emailVerified}
+              className={emailVerified ? "bg-green-50 border-green-600" : ""}
+            />
+            {!emailVerified && (
+              <Button 
+                onClick={sendVerificationCode} 
+                disabled={!email || sendingCode}
+                style={{ backgroundColor: BRAND.terracotta, color: BRAND.white }}
+              >
+                {sendingCode ? "Sending..." : "Verify"}
+              </Button>
+            )}
+            {emailVerified && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-600 rounded-lg text-green-700">
+                <CheckCircle2 className="w-4 h-4" /> Verified
+              </div>
+            )}
+          </div>
+          {emailError && (
+            <div className="text-red-600 text-sm mt-1">{emailError}</div>
+          )}
+        </div>
+
+        {sentCode && !emailVerified && (
+          <div className="md:col-span-2 p-4 border-2 border-blue-600 rounded-xl bg-blue-50">
+            <p className="text-sm text-blue-900 mb-2">📧 Enter the 6-digit code sent to {email}</p>
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Enter 6-digit code" 
+                value={verificationCode} 
+                onChange={(e) => setVerificationCode(e.target.value)}
+                maxLength={6}
+              />
+              <Button 
+                onClick={verifyCode}
+                disabled={verificationCode.length !== 6}
+                style={{ backgroundColor: BRAND.clay, color: BRAND.white }}
+              >
+                Confirm
+              </Button>
+            </div>
+            <p className="text-xs text-blue-700 mt-2">Didn't receive it? <button onClick={sendVerificationCode} className="underline font-medium">Resend code</button></p>
+          </div>
+        )}
+
+        <Input placeholder="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <div className="md:col-span-2">
+          <Input placeholder="Address" value={address} onChange={(e) => setAddr(e.target.value)} />
+        </div>
       </div>
     </div>
   );
