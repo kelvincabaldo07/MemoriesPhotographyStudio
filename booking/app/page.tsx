@@ -244,7 +244,8 @@ export default function App(){
   const [celebrantName, setCelebName] = useState("");
   const [birthdayAge, setBirthdayAge] = useState("");
   const [graduationLevel, setGradLevel] = useState("");
-
+  const [eventDate, setEventDate] = useState(""); // ADD THIS LINE
+  
   // Self-shoot backdrops
   const duration = useMemo(()=>inferDuration(service), [service]);
   const bdLimit = backdropLimitByDuration(duration);
@@ -287,7 +288,7 @@ export default function App(){
       selections: { serviceType, serviceCategory, serviceGroup, service, duration },
       schedule: { date, time, buffer: BUFFER_MINUTES },
       customer: { firstName, lastName, email, phone, address },
-            consent: { socialConsent, eventType, celebrantName, birthdayAge, graduationLevel },
+      consent: { socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate },
       selfShoot: serviceType === "Self-Shoot" ? { backdrops: selectedBackdrops, allocations } : null,
       addons,
       totals: { sessionPrice, addonsTotal, grandTotal }
@@ -304,11 +305,24 @@ export default function App(){
       case 1: return !!date && !!time; // schedule
       case 2: return !!firstName && !!lastName && !!email && !!phone; // customer
       case 3: { // consent conditional questions - CHANGED
+        // For Seasonal Sessions, auto-set to Christmas
+        if (serviceType === "Seasonal Sessions") {
+          return true; // No questions needed
+        }
+        
+        // For With Photographer pre-birthday packages, always need name & age
+        const isPreBirthday = serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)";
+        if (serviceType === "With Photographer" && isPreBirthday) {
+          if (!celebrantName || !birthdayAge) return false;
+        }
+        
+        // For all other cases
         if (!socialConsent) return false; // Required field
         if (socialConsent === "yes"){
           if (!eventType || !celebrantName) return false;
-          if (eventType === "Birthday" && !birthdayAge) return false;
-          if (eventType === "Graduation" && !graduationLevel) return false;
+          if (eventType === "Birthday" && (!birthdayAge || !eventDate)) return false;
+          if (eventType === "Graduation/Moving Up" && (!graduationLevel || !eventDate)) return false;
+          if (["Prenup", "Wedding", "Monthsary", "Anniversary", "Maternity", "Other"].includes(eventType) && !eventDate) return false;
         }
         return true;
       }
@@ -318,7 +332,7 @@ export default function App(){
       case 7: return true; // review
       default: return false;
     }
-    }, [step, service, date, time, firstName, lastName, email, phone, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, allocationValid, accepted, serviceType]);
+  }, [step, service, date, time, firstName, lastName, email, phone, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, accepted, serviceType, serviceGroup]);
 
   return (
     <div className="min-h-screen w-full bg-neutral-50 flex items-start justify-center p-4 md:p-8">
@@ -357,6 +371,8 @@ export default function App(){
 
             {step === 3 && (
               <StepConsent 
+                serviceType={serviceType}
+                serviceGroup={serviceGroup}
                 socialConsent={socialConsent} 
                 setSocialConsent={setSocialConsent} 
                 eventType={eventType} 
@@ -366,7 +382,9 @@ export default function App(){
                 birthdayAge={birthdayAge} 
                 setBirthdayAge={setBirthdayAge} 
                 graduationLevel={graduationLevel} 
-                setGradLevel={setGradLevel} 
+                setGradLevel={setGradLevel}
+                eventDate={eventDate}
+                setEventDate={setEventDate}
               />
             )}
 
@@ -377,7 +395,7 @@ export default function App(){
             {step === 5 && (<StepAddons addons={addons} toggle={toggleAddon} />)}
             {step === 6 && (<StepVideoAndTerms accepted={accepted} setAccepted={setAccepted} />)}
             {step === 7 && (
-              <StepReview data={{ serviceType, serviceCategory, serviceGroup, service, duration, date, time, firstName, lastName, email, phone, address, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, selectedBackdrops, allocations, addons, sessionPrice, addonsTotal, grandTotal }} />
+              <StepReview data={{ serviceType, serviceCategory, serviceGroup, service, duration, date, time, firstName, lastName, email, phone, address, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, selectedBackdrops, allocations, addons, sessionPrice, addonsTotal, grandTotal }} />
             )}
             {step === 8 && (<Confirmation />)}
 
@@ -622,6 +640,8 @@ function StepCustomer(props:{ firstName:string; lastName:string; email:string; p
 }
 
 function StepConsent(props:{
+  serviceType: string;
+  serviceGroup: string;
   socialConsent: "yes" | "no" | "";
   setSocialConsent: (v: "yes" | "no" | "") => void;
   eventType: string;
@@ -632,11 +652,51 @@ function StepConsent(props:{
   setBirthdayAge: (v: string) => void;
   graduationLevel: string;
   setGradLevel: (v: string) => void;
+  eventDate: string;
+  setEventDate: (v: string) => void;
 }){
-  const { socialConsent, setSocialConsent, eventType, setEventType, celebrantName, setCelebName, birthdayAge, setBirthdayAge, graduationLevel, setGradLevel } = props;
-  const eventTypes = ["Birthday", "Graduation", "Anniversary", "Milestone", "Other"];
+  const { serviceType, serviceGroup, socialConsent, setSocialConsent, eventType, setEventType, celebrantName, setCelebName, birthdayAge, setBirthdayAge, graduationLevel, setGradLevel, eventDate, setEventDate } = props;
+  const eventTypes = ["Birthday", "Graduation/Moving Up", "Prenup", "Wedding", "Monthsary", "Anniversary", "Maternity", "Other"];
   const gradLevels = ["Elementary", "High School", "College", "Post Graduate"];
 
+  // For Seasonal Sessions, skip all questions
+  if (serviceType === "Seasonal Sessions") {
+    return (
+      <div>
+        <h2 className="text-xl font-semibold">Event information</h2>
+        <div className="p-4 border rounded-xl bg-neutral-50">
+          <p className="text-sm text-neutral-600">🎄 This is a Christmas session. No additional information needed.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // For With Photographer pre-birthday packages
+  const isPreBirthday = serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)";
+  
+  if (serviceType === "With Photographer" && isPreBirthday) {
+    return (
+      <div>
+        <h2 className="text-xl font-semibold">Birthday celebrant information</h2>
+        <p className="text-neutral-600 mb-4">Tell us about the birthday celebrant.</p>
+        
+        <div className="grid md:grid-cols-2 gap-3">
+          <Input 
+            placeholder="Celebrant's name *" 
+            value={celebrantName} 
+            onChange={(e) => setCelebName(e.target.value)} 
+          />
+          <Input 
+            placeholder="Age *" 
+            value={birthdayAge} 
+            onChange={(e) => setBirthdayAge(e.target.value)} 
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // For all other cases (Self-Shoot and other With Photographer packages)
   return (
     <div>
       <h2 className="text-xl font-semibold">Social & event information</h2>
@@ -677,24 +737,110 @@ function StepConsent(props:{
             value={celebrantName} 
             onChange={(e) => setCelebName(e.target.value)} 
           />
+          
+          {/* Birthday-specific fields */}
           {eventType === "Birthday" && (
+            <>
+              <Input 
+                placeholder="Age *" 
+                value={birthdayAge} 
+                onChange={(e) => setBirthdayAge(e.target.value)} 
+              />
+              <Input 
+                type="date"
+                placeholder="Birthday date *" 
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </>
+          )}
+          
+          {/* Graduation-specific fields */}
+          {eventType === "Graduation/Moving Up" && (
+            <>
+              <Select value={graduationLevel} onValueChange={setGradLevel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Graduation level *" />
+                </SelectTrigger>
+                <SelectContent>
+                  {gradLevels.map((t) => (
+                    <SelectItem value={t} key={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input 
+                type="date"
+                placeholder="Graduation date *" 
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </>
+          )}
+          
+          {/* Prenup date */}
+          {eventType === "Prenup" && (
             <Input 
-              placeholder="Age *" 
-              value={birthdayAge} 
-              onChange={(e) => setBirthdayAge(e.target.value)} 
+              type="date"
+              placeholder="Wedding date *" 
+              value={eventDate} 
+              onChange={(e) => setEventDate(e.target.value)} 
+              className="md:col-span-2"
             />
           )}
-          {eventType === "Graduation" && (
-            <Select value={graduationLevel} onValueChange={setGradLevel}>
-              <SelectTrigger>
-                <SelectValue placeholder="Graduation level *" />
-              </SelectTrigger>
-              <SelectContent>
-                {gradLevels.map((t) => (
-                  <SelectItem value={t} key={t}>{t}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          
+          {/* Wedding date */}
+          {eventType === "Wedding" && (
+            <Input 
+              type="date"
+              placeholder="Wedding date *" 
+              value={eventDate} 
+              onChange={(e) => setEventDate(e.target.value)} 
+              className="md:col-span-2"
+            />
+          )}
+          
+          {/* Monthsary date */}
+          {eventType === "Monthsary" && (
+            <Input 
+              type="date"
+              placeholder="Monthsary date *" 
+              value={eventDate} 
+              onChange={(e) => setEventDate(e.target.value)} 
+              className="md:col-span-2"
+            />
+          )}
+          
+          {/* Anniversary date */}
+          {eventType === "Anniversary" && (
+            <Input 
+              type="date"
+              placeholder="Anniversary date *" 
+              value={eventDate} 
+              onChange={(e) => setEventDate(e.target.value)} 
+              className="md:col-span-2"
+            />
+          )}
+          
+          {/* Maternity date */}
+          {eventType === "Maternity" && (
+            <Input 
+              type="date"
+              placeholder="Expected due date *" 
+              value={eventDate} 
+              onChange={(e) => setEventDate(e.target.value)} 
+              className="md:col-span-2"
+            />
+          )}
+          
+          {/* Other - generic date */}
+          {eventType === "Other" && (
+            <Input 
+              type="date"
+              placeholder="Event date *" 
+              value={eventDate} 
+              onChange={(e) => setEventDate(e.target.value)} 
+              className="md:col-span-2"
+            />
           )}
         </div>
       )}
@@ -841,13 +987,44 @@ function StepReview({ data }:{ data:any }){
           <Line label="Phone" value={data.phone}/>
           {data.address && <Line label="Address" value={data.address}/>}
           <Separator className="my-2"/>
-          <Line label="Social Media Consent" value={data.socialConsent === "yes" ? "Yes" : "No"} />
-          {data.socialConsent === "yes" && (<>
-            <Line label="Event" value={data.eventType}/>
-            <Line label="Celebrant" value={data.celebrantName}/>
-            {data.eventType==="Birthday" && <Line label="Age" value={data.birthdayAge}/>} 
-            {data.eventType==="Graduation" && <Line label="Level" value={data.graduationLevel}/>}
-          </>)}
+          {data.serviceType === "Seasonal Sessions" ? (
+            <Line label="Event" value="Christmas Session" />
+          ) : (
+            <>
+              {(data.serviceGroup === "Kids Pre-birthday (Girls)" || data.serviceGroup === "Kids Pre-birthday (Boys)") ? (
+                <>
+                  <Line label="Celebrant" value={data.celebrantName}/>
+                  <Line label="Age" value={data.birthdayAge}/>
+                </>
+              ) : (
+                <>
+                  <Line label="Social Media Consent" value={data.socialConsent === "yes" ? "Yes" : "No"} />
+                  {data.socialConsent === "yes" && (<>
+                    <Line label="Event" value={data.eventType}/>
+                    <Line label="Celebrant" value={data.celebrantName}/>
+                    {data.eventType === "Birthday" && (
+                      <>
+                        <Line label="Age" value={data.birthdayAge}/>
+                        <Line label="Birthday" value={data.eventDate}/>
+                      </>
+                    )}
+                    {data.eventType === "Graduation/Moving Up" && (
+                      <>
+                        <Line label="Level" value={data.graduationLevel}/>
+                        <Line label="Graduation Date" value={data.eventDate}/>
+                      </>
+                    )}
+                    {data.eventType === "Prenup" && <Line label="Wedding Date" value={data.eventDate}/>}
+                    {data.eventType === "Wedding" && <Line label="Wedding Date" value={data.eventDate}/>}
+                    {data.eventType === "Monthsary" && <Line label="Monthsary Date" value={data.eventDate}/>}
+                    {data.eventType === "Anniversary" && <Line label="Anniversary Date" value={data.eventDate}/>}
+                    {data.eventType === "Maternity" && <Line label="Due Date" value={data.eventDate}/>}
+                    {data.eventType === "Other" && <Line label="Event Date" value={data.eventDate}/>}
+                  </>)}
+                </>
+              )}
+            </>
+          )}
         </div>
         {data.serviceType === "Self-Shoot" && (
           <div className="border rounded-2xl p-3 md:col-span-2">
