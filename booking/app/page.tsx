@@ -453,6 +453,16 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
     setServiceGroup(g===serviceGroup?"":g); setOpenGroup(g===openGroup?"":g); setService("");
   }
 
+  // ✅ ADD THIS HELPER FUNCTION HERE
+  function getGroupDescription(groupName: string): string {
+    switch(groupName) {
+      case "Solo/Duo": return "1–2 persons";
+      case "Small Group": return "3–5 persons";
+      case "Big Group": return "6–15 persons";
+      default: return "Pick a theme / type";
+    }
+  }
+
   const groups = (serviceType ? TAXONOMY.groups[serviceType as keyof typeof TAXONOMY.groups] : []) || [];
   const services = (serviceType && serviceGroup ? (TAXONOMY.services?.[serviceType as keyof typeof TAXONOMY.services] as any)?.[serviceGroup]||[] : []);
 
@@ -503,7 +513,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                           <div>
                             <div className="font-medium">{g}</div>
-                            <div className="text-xs text-neutral-500">{g.includes("Group")?"Pick a duration":"Pick a theme / type"}</div>
+                            {/* ✅ CHANGE THIS LINE */}
+                            <div className="text-xs text-neutral-500">{getGroupDescription(g)}</div>
                           </div>
                         </button>
                       ))}
