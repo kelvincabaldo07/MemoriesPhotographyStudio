@@ -42,25 +42,30 @@ const BUFFER_MINUTES = 30; // 30-min buffer between sessions
 
 // Studio brand colors - earthy, natural palette
 const BRAND = {
-  primary: "#8B9A7B",      // Sage green
-  primaryLight: "#A8B89D", // Light sage
-  secondary: "#C17856",    // Terracotta
-  secondaryLight: "#D4886B", // Light terracotta
-  accent: "#F5F1E8",       // Cream
-  accentDark: "#EDE7DC",   // Darker cream/beige
-  brown: "#8B6F47",        // Warm brown
-  text: "#4A4238",         // Dark brown text
-  textLight: "#8B7E6F",    // Light brown
+  charcoal: "#2C2C2C",
+  cream: "#FAF3E0",
+  white: "#FFFFFF",
+  terracotta: "#A62F20",
+  clay: "#8B5E3C",
 };
 
+// const BACKDROPS = [
+//   { key: "tan", name: "Tan", swatch: "#D2B48C" },
+//   { key: "lemon", name: "Lemon Yellow", swatch: "#FFE45E" },
+//   { key: "mardi", name: "Mardi Gras", swatch: "#880085" },
+//   { key: "ivory", name: "Ivory", swatch: "#FFFFF0" },
+//   { key: "gray", name: "Gray", swatch: "#BDBDBD" },
+//   { key: "bluegreen", name: "Blue Green", swatch: "#0FA3B1" },
+//   { key: "lotus", name: "Lotus Root Pink", swatch: "#F4C2C2" },
+// ];
 const BACKDROPS = [
-  { key: "tan", name: "Tan", swatch: "#D2B48C" },
-  { key: "lemon", name: "Lemon Yellow", swatch: "#FFE45E" },
-  { key: "mardi", name: "Mardi Gras", swatch: "#880085" },
-  { key: "ivory", name: "Ivory", swatch: "#FFFFF0" },
-  { key: "gray", name: "Gray", swatch: "#BDBDBD" },
-  { key: "bluegreen", name: "Blue Green", swatch: "#0FA3B1" },
-  { key: "lotus", name: "Lotus Root Pink", swatch: "#F4C2C2" },
+  { key: "gray", name: "Gray", swatch: "#838383", image: "/backdrops/gray.jpg" },
+  { key: "mugwort", name: "Mugwort", swatch: "#99FFBB", image: "/backdrops/mugwort.jpg" },
+  { key: "beige", name: "Beige", swatch: "#F7D69D", image: "/backdrops/beige.jpg" },
+  { key: "ivory", name: "Ivory", swatch: "#FFFFF0", image: "/backdrops/ivory.jpg" },
+  { key: "lightblue", name: "Light Blue", swatch: "#ADD8E6", image: "/backdrops/lightblue.jpg" },
+  { key: "flamered", name: "Flame Red", swatch: "#800000", image: "/backdrops/flamered.jpg" },
+  { key: "carnationpink", name: "Carnation Pink", swatch: "#FFA6C9", image: "/backdrops/carnationpink.jpg" },
 ];
 
 const CHRISTMAS_2025 = {
@@ -124,19 +129,50 @@ const TAXONOMY = {
 } as const;
 
 // Detailed service info (descriptions & prices)
-const SERVICE_INFO: Record<string, { details: string; price: number; thumb?: string }> = {
-  // Self-shoot
-  "Solo/Duo 15": { details: "1–2 pax • 15 minutes • 2 backdrops • ALL ENHANCED photos", price: 250 },
-  "Solo/Duo 30": { details: "1–2 pax • 30 minutes • 2 backdrops • ALL ENHANCED photos", price: 400 },
-  "Solo/Duo 60": { details: "1–2 pax • 60 minutes • 4 backdrops • ALL ENHANCED photos", price: 700 },
+const SERVICE_INFO: Record<string, { details: string; price: number; digitalPrice?: number; classicDetails?: string }> = {
+  // Self-shoot - Digital & Classic variants
+  "Solo/Duo 15": { 
+    details: "1–2 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 250,
+    classicDetails: "1–2 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+  },
+  "Solo/Duo 30": { 
+    details: "1–2 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 400,
+    classicDetails: "1–2 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+  },
+  "Solo/Duo 60": { 
+    details: "1–2 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 700,
+    classicDetails: "1–2 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips) • 10 mins photo selection (Select up to 7 photos)"
+  },
 
-  "Small Group 15": { details: "3–5 pax • 15 minutes • 2 backdrops • ALL ENHANCED photos", price: 350 },
-  "Small Group 30": { details: "3–5 pax • 30 minutes • 2 backdrops • ALL ENHANCED photos", price: 600 },
-  "Small Group 60": { details: "3–5 pax • 60 minutes • 4 backdrops • ALL ENHANCED photos", price: 1000 },
+  "Small Group 15": { 
+    details: "3–5 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 350,
+    classicDetails: "3–5 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+  },
+  "Small Group 30": { 
+    details: "3–5 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 600,
+    classicDetails: "3–5 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+  },
+  "Small Group 60": { 
+    details: "3–5 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 1000,
+    classicDetails: "3–5 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips) • 10 mins photo selection (Select up to 7 photos)"
+  },
 
-  "Big Group 30": { details: "6–15 pax • 30 minutes • 2 backdrops • ALL ENHANCED photos", price: 800 },
-  "Big Group 60": { details: "6–15 pax • 60 minutes • 4 backdrops • ALL ENHANCED photos", price: 1500 },
-
+  "Big Group 30": { 
+    details: "6–15 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 800,
+    classicDetails: "6–15 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+  },
+  "Big Group 60": { 
+    details: "6–15 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    price: 1500,
+    classicDetails: "6–15 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips) • 10 mins photo selection (Select up to 7 photos)"
+  },
   // With photographer (45 min)
   "Adult’s Pre-Birthday": { details: "45 minutes • WITH photographer • FREE family portraits • FREE number balloons • ALL ENHANCED photos", price: 1000 },
   "Family Portraits": { details: "3–8 pax • 45 minutes • WITH photographer • FREE use of all backdrops & props • ALL ENHANCED photos", price: 1000 },
@@ -176,8 +212,10 @@ const GROUP_THUMBS: Record<string, string> = {
 
 // Optional add-ons
 const ADDONS = [
-  { id: "4r", label: "Printed 4R photos (per 10 pcs)", price: 250 },
-  { id: "photostrip", label: "Printed photostrip (per 5 pcs)", price: 180 },
+  { id: "4r", label: "Printed 1 copy of 4R photo", price: 30 },
+  { id: "photostrip", label: "Printed 2 photo strips", price: 30 },
+  { id: "wallet", label: "Printed 4 wallet size photos", price: 30 },
+  { id: "premium4r", label: "Premium Printed 1 copy of 4R photo (Canon Selphy CP1500)", price: 50 },
 ];
 
 // Demo bookings
@@ -259,7 +297,12 @@ export default function App(){
   const [accepted, setAccepted] = useState(false);
 
   // Totals
-  const sessionPrice = SERVICE_INFO[service]?.price ?? 0;
+  const sessionPrice = useMemo(() => {
+    const baseInfo = SERVICE_INFO[service];
+    if (!baseInfo) return 0;
+    // Add ₱50 for Classic category
+    return serviceCategory === "Classic" ? baseInfo.price + 50 : baseInfo.price;
+  }, [service, serviceCategory]);
   const addonsTotal = useMemo(() => Object.entries(addons).reduce((sum,[id,qty])=>{
     const item = ADDONS.find(a=>a.id===id); return sum + (item ? (item.price * (qty||0)) : 0);
   },0), [addons]);
@@ -270,15 +313,42 @@ export default function App(){
   const availableSlots = useMemo(()=> slots.filter((s)=>isSlotAvailable(s, duration, blocked)), [slots, duration, blocked]);
 
   const allocationValid = useMemo(()=>{
-    if (serviceType !== "Self-Shoot") return true;
+    const needsBackdrops = serviceType === "Self-Shoot" || (serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot");
+    if (!needsBackdrops) return true;
     const total = Object.values(allocations).reduce((a,b)=>a+(Number(b)||0),0);
     const countOk = selectedBackdrops.length>0 && selectedBackdrops.length<=bdLimit;
     return countOk && total===duration;
-  }, [allocations, selectedBackdrops, bdLimit, duration, serviceType]);
+  }, [allocations, selectedBackdrops, bdLimit, duration, serviceType, serviceGroup]);
 
   function toggleAddon(id: string, delta: number){ setAddons(prev=>{ const qty=Math.max(0,(prev[id]||0)+delta); return { ...prev, [id]: qty };}); }
   function moveBackdrop(idx:number,dir:number){ setSelectedBackdrops(prev=>{ const arr=[...prev]; const swap=idx+dir; if(swap<0||swap>=arr.length) return prev; [arr[idx],arr[swap]]=[arr[swap],arr[idx]]; return arr; }); }
-  function onBackdropToggle(key:string){ setSelectedBackdrops(prev=>{ if(prev.includes(key)) return prev.filter(k=>k!==key); if(prev.length>=bdLimit) return prev; return [...prev, key]; }); }
+  function onBackdropToggle(key:string){ 
+    setSelectedBackdrops(prev=>{ 
+      if(prev.includes(key)) {
+        // Removing backdrop
+        const newBackdrops = prev.filter(k=>k!==key);
+        // Recalculate allocations
+        if (newBackdrops.length > 0) {
+          const perBackdrop = Math.floor(duration / newBackdrops.length);
+          const newAlloc: Record<string, number> = {};
+          newBackdrops.forEach(bd => { newAlloc[bd] = perBackdrop; });
+          setAllocations(newAlloc);
+        } else {
+          setAllocations({});
+        }
+        return newBackdrops;
+      }
+      if(prev.length>=bdLimit) return prev;
+      
+      // Adding backdrop
+      const newBackdrops = [...prev, key];
+      const perBackdrop = Math.floor(duration / newBackdrops.length);
+      const newAlloc: Record<string, number> = {};
+      newBackdrops.forEach(bd => { newAlloc[bd] = perBackdrop; });
+      setAllocations(newAlloc);
+      return newBackdrops;
+    }); 
+  }
   function onAllocationChange(key:string,value:string){ const v=Math.max(0, Number(value)||0); setAllocations(prev=>({ ...prev, [key]: v })); }
 
   async function submitBooking(){
@@ -305,24 +375,28 @@ export default function App(){
       case 1: return !!date && !!time; // schedule
       case 2: return !!firstName && !!lastName && !!email && !!phone; // customer
       case 3: { // consent conditional questions - CHANGED
-        // For Seasonal Sessions, auto-set to Christmas
-        if (serviceType === "Seasonal Sessions") {
-          return true; // No questions needed
-        }
+        if (!socialConsent) return false; // Always required
         
-        // For With Photographer pre-birthday packages, always need name & age
         const isPreBirthday = serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)";
+        const isChristmas = serviceType === "Seasonal Sessions";
+        
+        // Pre-birthday: always need name & age
         if (serviceType === "With Photographer" && isPreBirthday) {
           if (!celebrantName || !birthdayAge) return false;
         }
         
-        // For all other cases
-        if (!socialConsent) return false; // Required field
+        // Christmas or if they said "yes" to social consent
         if (socialConsent === "yes"){
-          if (!eventType || !celebrantName) return false;
-          if (eventType === "Birthday" && (!birthdayAge || !eventDate)) return false;
-          if (eventType === "Graduation/Moving Up" && (!graduationLevel || !eventDate)) return false;
-          if (["Prenup", "Wedding", "Monthsary", "Anniversary", "Maternity", "Other"].includes(eventType) && !eventDate) return false;
+          if (isChristmas) {
+            // Christmas: need celebrant name only
+            if (!celebrantName) return false;
+          } else {
+            // All other cases
+            if (!eventType || !celebrantName) return false;
+            if (eventType === "Birthday" && (!birthdayAge || !eventDate)) return false;
+            if (eventType === "Graduation/Moving Up" && (!graduationLevel || !eventDate)) return false;
+            if (["Prenup", "Wedding", "Monthsary", "Anniversary", "Maternity", "Other"].includes(eventType) && !eventDate) return false;
+          }
         }
         return true;
       }
@@ -335,7 +409,7 @@ export default function App(){
   }, [step, service, date, time, firstName, lastName, email, phone, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, accepted, serviceType, serviceGroup]);
 
   return (
-    <div className="min-h-screen w-full bg-neutral-50 flex items-start justify-center p-4 md:p-8">
+    <div className="min-h-screen w-full flex items-start justify-center p-4 md:p-8" style={{ backgroundColor: BRAND.cream }}>
       <div className="w-full max-w-5xl">
         <Header onReset={()=>{ setStep(0); setServiceType(""); setServiceCategory(""); setServiceGroup(""); setService(""); }} />
         <Stepper step={step} />
@@ -389,7 +463,19 @@ export default function App(){
             )}
 
             {step === 4 && (
-              <StepBackdrops enabled={serviceType === "Self-Shoot"} duration={duration} limit={bdLimit} selected={selectedBackdrops} onToggle={onBackdropToggle} move={moveBackdrop} allocations={allocations} setAlloc={onAllocationChange} />
+              <StepBackdrops 
+                enabled={
+                  serviceType === "Self-Shoot" || 
+                  (serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot")
+                } 
+                duration={duration} 
+                limit={bdLimit} 
+                selected={selectedBackdrops} 
+                onToggle={onBackdropToggle} 
+                move={moveBackdrop} 
+                allocations={allocations} 
+                setAlloc={onAllocationChange} 
+              />
             )}
 
             {step === 5 && (<StepAddons addons={addons} toggle={toggleAddon} />)}
@@ -403,10 +489,28 @@ export default function App(){
               <Button variant="ghost" onClick={()=>setStep(Math.max(step-1,0))} disabled={step===0}><ChevronLeft className="w-4 h-4 mr-2"/> Back</Button>
 
               {step < 7 && (
-                <Button onClick={()=>setStep(step+1)} disabled={!canContinue}>Next <ChevronRight className="w-4 h-4 ml-2"/></Button>
+                <Button 
+                  onClick={()=>setStep(step+1)} 
+                  disabled={!canContinue}
+                  style={{ 
+                    backgroundColor: canContinue ? BRAND.terracotta : "#ccc", 
+                    color: BRAND.white 
+                  }}
+                >
+                  Next <ChevronRight className="w-4 h-4 ml-2"/>
+                </Button>
               )}
               {step === 7 && (
-                <Button onClick={submitBooking} disabled={!canContinue || busy}>{busy?"Submitting…":"Confirm & Book"}</Button>
+                <Button 
+                  onClick={submitBooking} 
+                  disabled={!canContinue || busy}
+                  style={{ 
+                    backgroundColor: canContinue && !busy ? BRAND.clay : "#ccc", 
+                    color: BRAND.white 
+                  }}
+                >
+                  {busy?"Submitting…":"Confirm & Book"}
+                </Button>
               )}
             </div>
           </CardContent>
@@ -449,7 +553,21 @@ function Stepper({ step }:{ step:number }){
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-9 gap-2 mt-3">
       {STEPS.map((label,i)=> (
-        <div key={i} className={cn("px-2 py-2 rounded-xl text-xs md:text-sm border transition", i<=step?"bg-neutral-900 text-white border-neutral-900":"bg-white border-neutral-200 text-neutral-600")}>{i+1}. {label}</div>
+        <div 
+          key={i} 
+          className={cn("px-2 py-2 rounded-xl text-xs md:text-sm border transition")}
+          style={i <= step ? {
+            backgroundColor: BRAND.charcoal,
+            color: BRAND.white,
+            borderColor: BRAND.charcoal
+          } : {
+            backgroundColor: BRAND.white,
+            borderColor: "#e5e5e5",
+            color: "#737373"
+          }}
+        >
+          {i+1}. {label}
+        </div>
       ))}
     </div>
   );
@@ -503,7 +621,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
       {/* Types */}
       <div className="space-y-3">
         {(chosenTypeOnly ? [serviceType] : TAXONOMY.types).filter(Boolean).map((t)=> (
-          <div key={t as string} className={cn("border rounded-2xl overflow-hidden transition", openType===t?"border-neutral-900 bg-white":"border-neutral-200")}>            
+          <div 
+            key={t as string} 
+            className="border rounded-2xl overflow-hidden transition"
+            style={{
+              borderColor: openType === t ? BRAND.charcoal : "#e5e5e5",
+              backgroundColor: openType === t ? BRAND.white : "#fafafa"
+            }}
+          >
             <div className="flex items-center justify-between p-3 bg-neutral-50">
               <button className="text-left flex-1" onClick={()=>toggleType(String(t))}>
                 <div className="font-medium">{t as string}</div>
@@ -518,19 +643,35 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
             {/* Categories */}
             {openType===t && (
               <div className="px-4 pb-4 animate-accordion">
-                <div className={cn("grid gap-3 mt-3", chosenCategoryOnly?"grid-cols-1":"md:grid-cols-2")}>                  
-                  {(chosenCategoryOnly ? [serviceCategory] : TAXONOMY.categories).filter(Boolean).map((c)=> (
-                    <div key={String(c)} className={cn("text-left border rounded-xl p-3 hover:shadow-sm transition flex items-start gap-3", serviceCategory===c?"border-neutral-900":"border-neutral-200")}>                      
-                      <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
-                        <div className="font-medium">{String(c)}</div>
-                        <div className="text-xs text-neutral-500">{c === "Classic" ? "Session + printed copies" : "Session + digital-only"}</div>
-                      </button>
-                      {serviceCategory && String(c)===serviceCategory && (
-                        <Button size="sm" variant="outline" onClick={()=>{ setServiceCategory(""); setOpenCategory(""); setServiceGroup(""); setOpenGroup(""); setService(""); }}>Change</Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                {/* Only show category selection for Self-Shoot */}
+                {t === "Self-Shoot" ? (
+                  <div className={cn("grid gap-3 mt-3", chosenCategoryOnly?"grid-cols-1":"md:grid-cols-2")}>                  
+                    {(chosenCategoryOnly ? [serviceCategory] : TAXONOMY.categories).filter(Boolean).map((c)=> (
+                      <div key={String(c)} className={cn("text-left border rounded-xl p-3 hover:shadow-sm transition flex items-start gap-3", serviceCategory===c?"border-neutral-900":"border-neutral-200")}>                      
+                        <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
+                          <div className="font-medium">{String(c)}</div>
+                          <div className="text-xs text-neutral-500">{c === "Classic" ? "Session + printed copies" : "Session + digital-only"}</div>
+                        </button>
+                        {serviceCategory && String(c)===serviceCategory && (
+                          <Button size="sm" variant="outline" onClick={()=>{ setServiceCategory(""); setOpenCategory(""); setServiceGroup(""); setOpenGroup(""); setService(""); }}>Change</Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // Auto-select Digital for With Photographer and Seasonal Sessions
+                  (() => {
+                    if (!serviceCategory) {
+                      setServiceCategory("Digital");
+                      setOpenCategory("Digital");
+                    }
+                    return (
+                      <div className="mb-3 p-3 border rounded-xl bg-neutral-50">
+                        <p className="text-sm text-neutral-600">📱 Digital-only package (photos delivered via Lightroom)</p>
+                      </div>
+                    );
+                  })()
+                )}
 
                 {/* Groups */}
                 {serviceCategory && (
@@ -538,7 +679,12 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     <div className="text-sm font-medium mb-2">Groups</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {groups.map((g)=> (
-                        <button key={g} className={cn("text-left border rounded-xl p-3 hover:shadow-sm transition flex items-center gap-3", serviceGroup===g?"border-neutral-900":"border-neutral-200")} onClick={()=>toggleGroup(g)}>
+                      <button 
+                        key={g} 
+                        className="text-left border rounded-xl p-3 hover:shadow-sm transition flex items-center gap-3"
+                        style={{ borderColor: serviceGroup === g ? BRAND.charcoal : "#e5e5e5" }}
+                        onClick={()=>toggleGroup(g)}
+                      >
                           <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                           <div>
                             <div className="font-medium">{g}</div>
@@ -561,14 +707,22 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     <div className="grid md:grid-cols-3 gap-3">
                       {services.map((s: string)=> {
                         const info = SERVICE_INFO[s] || { details: "", price: 0 };
+                        // Use classic details if Classic category is selected, otherwise use digital details
+                        const displayDetails = serviceCategory === "Classic" && info.classicDetails ? info.classicDetails : info.details;
+                        const displayPrice = serviceCategory === "Classic" ? info.price + 50 : info.price;
                         return (
-                          <button key={s} onClick={()=> setService(s)} className={cn("text-left border rounded-xl p-3 hover:shadow-md transition", service===s?"border-neutral-900":"border-neutral-200")}>                            
+                          <button 
+                            key={s} 
+                            onClick={()=> setService(s)} 
+                            className="text-left border rounded-xl p-3 hover:shadow-md transition"
+                            style={{ borderColor: service === s ? BRAND.charcoal : "#e5e5e5" }}
+                          >
                             <div className="flex items-start justify-between gap-3">
                               <div>
                                 <div className="font-semibold">{s}</div>
-                                {info.details && (<div className="text-sm text-neutral-600 mt-1">{info.details}</div>)}
+                                {displayDetails && (<div className="text-sm text-neutral-600 mt-1">{displayDetails}</div>)}
                               </div>
-                              {info.price>0 && (<Badge>{currency(info.price)}</Badge>)}
+                              {displayPrice > 0 && (<Badge>{currency(displayPrice)}</Badge>)}
                             </div>
                           </button>
                         );
@@ -659,44 +813,9 @@ function StepConsent(props:{
   const eventTypes = ["Birthday", "Graduation/Moving Up", "Prenup", "Wedding", "Monthsary", "Anniversary", "Maternity", "Other"];
   const gradLevels = ["Elementary", "High School", "College", "Post Graduate"];
 
-  // For Seasonal Sessions, skip all questions
-  if (serviceType === "Seasonal Sessions") {
-    return (
-      <div>
-        <h2 className="text-xl font-semibold">Event information</h2>
-        <div className="p-4 border rounded-xl bg-neutral-50">
-          <p className="text-sm text-neutral-600">🎄 This is a Christmas session. No additional information needed.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // For With Photographer pre-birthday packages
   const isPreBirthday = serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)";
-  
-  if (serviceType === "With Photographer" && isPreBirthday) {
-    return (
-      <div>
-        <h2 className="text-xl font-semibold">Birthday celebrant information</h2>
-        <p className="text-neutral-600 mb-4">Tell us about the birthday celebrant.</p>
-        
-        <div className="grid md:grid-cols-2 gap-3">
-          <Input 
-            placeholder="Celebrant's name *" 
-            value={celebrantName} 
-            onChange={(e) => setCelebName(e.target.value)} 
-          />
-          <Input 
-            placeholder="Age *" 
-            value={birthdayAge} 
-            onChange={(e) => setBirthdayAge(e.target.value)} 
-          />
-        </div>
-      </div>
-    );
-  }
+  const isChristmas = serviceType === "Seasonal Sessions";
 
-  // For all other cases (Self-Shoot and other With Photographer packages)
   return (
     <div>
       <h2 className="text-xl font-semibold">Social & event information</h2>
@@ -717,7 +836,39 @@ function StepConsent(props:{
         </Select>
       </div>
 
-      {socialConsent === "yes" && (
+      {/* Pre-birthday: Always ask name & age regardless of consent */}
+      {isPreBirthday && (
+        <div className="mt-4 grid md:grid-cols-2 gap-3 p-4 border rounded-xl bg-neutral-50">
+          <div className="md:col-span-2">
+            <p className="text-sm text-neutral-600 mb-3">Please tell us about the birthday celebrant:</p>
+          </div>
+          <Input 
+            placeholder="Celebrant's name *" 
+            value={celebrantName} 
+            onChange={(e) => setCelebName(e.target.value)} 
+          />
+          <Input 
+            placeholder="Age *" 
+            value={birthdayAge} 
+            onChange={(e) => setBirthdayAge(e.target.value)} 
+          />
+        </div>
+      )}
+
+      {/* Christmas: If yes to consent, ask for celebrant name only */}
+      {isChristmas && socialConsent === "yes" && (
+        <div className="mt-4 p-4 border rounded-xl bg-neutral-50">
+          <p className="text-sm text-neutral-600 mb-3">🎄 This is a Christmas session. Please provide the name we should use for greetings:</p>
+          <Input 
+            placeholder="Name for greetings *" 
+            value={celebrantName} 
+            onChange={(e) => setCelebName(e.target.value)} 
+          />
+        </div>
+      )}
+
+      {/* All other cases: Full event questions if consent is yes */}
+      {!isPreBirthday && !isChristmas && socialConsent === "yes" && (
         <div className="mt-4 grid md:grid-cols-2 gap-3 p-4 border rounded-xl bg-neutral-50">
           <div className="md:col-span-2">
             <p className="text-sm text-neutral-600 mb-3">Great! Please tell us more about your event:</p>
@@ -741,111 +892,127 @@ function StepConsent(props:{
           {/* Birthday-specific fields */}
           {eventType === "Birthday" && (
             <>
-              <Input 
-                placeholder="Age *" 
-                value={birthdayAge} 
-                onChange={(e) => setBirthdayAge(e.target.value)} 
-              />
-              <Input 
-                type="date"
-                placeholder="Birthday date *" 
-                value={eventDate} 
-                onChange={(e) => setEventDate(e.target.value)} 
-              />
+              <div>
+                <label className="text-xs text-neutral-600 mb-1 block">Age *</label>
+                <Input 
+                  placeholder="Enter age" 
+                  value={birthdayAge} 
+                  onChange={(e) => setBirthdayAge(e.target.value)} 
+                />
+              </div>
+              <div>
+                <label className="text-xs text-neutral-600 mb-1 block">Birthday date *</label>
+                <Input 
+                  type="date"
+                  value={eventDate} 
+                  onChange={(e) => setEventDate(e.target.value)} 
+                />
+              </div>
             </>
           )}
           
           {/* Graduation-specific fields */}
           {eventType === "Graduation/Moving Up" && (
             <>
-              <Select value={graduationLevel} onValueChange={setGradLevel}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Graduation level *" />
-                </SelectTrigger>
-                <SelectContent>
-                  {gradLevels.map((t) => (
-                    <SelectItem value={t} key={t}>{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input 
-                type="date"
-                placeholder="Graduation date *" 
-                value={eventDate} 
-                onChange={(e) => setEventDate(e.target.value)} 
-              />
+              <div>
+                <label className="text-xs text-neutral-600 mb-1 block">Graduation level *</label>
+                <Select value={graduationLevel} onValueChange={setGradLevel}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {gradLevels.map((t) => (
+                      <SelectItem value={t} key={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-neutral-600 mb-1 block">Graduation date *</label>
+                <Input 
+                  type="date"
+                  value={eventDate} 
+                  onChange={(e) => setEventDate(e.target.value)} 
+                />
+              </div>
             </>
           )}
           
           {/* Prenup date */}
           {eventType === "Prenup" && (
-            <Input 
-              type="date"
-              placeholder="Wedding date *" 
-              value={eventDate} 
-              onChange={(e) => setEventDate(e.target.value)} 
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2">
+              <label className="text-xs text-neutral-600 mb-1 block">Wedding date *</label>
+              <Input 
+                type="date"
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </div>
           )}
           
           {/* Wedding date */}
           {eventType === "Wedding" && (
-            <Input 
-              type="date"
-              placeholder="Wedding date *" 
-              value={eventDate} 
-              onChange={(e) => setEventDate(e.target.value)} 
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2">
+              <label className="text-xs text-neutral-600 mb-1 block">Wedding date *</label>
+              <Input 
+                type="date"
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </div>
           )}
           
           {/* Monthsary date */}
           {eventType === "Monthsary" && (
-            <Input 
-              type="date"
-              placeholder="Monthsary date *" 
-              value={eventDate} 
-              onChange={(e) => setEventDate(e.target.value)} 
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2">
+              <label className="text-xs text-neutral-600 mb-1 block">Monthsary date *</label>
+              <Input 
+                type="date"
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </div>
           )}
           
           {/* Anniversary date */}
           {eventType === "Anniversary" && (
-            <Input 
-              type="date"
-              placeholder="Anniversary date *" 
-              value={eventDate} 
-              onChange={(e) => setEventDate(e.target.value)} 
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2">
+              <label className="text-xs text-neutral-600 mb-1 block">Anniversary date *</label>
+              <Input 
+                type="date"
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </div>
           )}
           
           {/* Maternity date */}
           {eventType === "Maternity" && (
-            <Input 
-              type="date"
-              placeholder="Expected due date *" 
-              value={eventDate} 
-              onChange={(e) => setEventDate(e.target.value)} 
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2">
+              <label className="text-xs text-neutral-600 mb-1 block">Expected due date *</label>
+              <Input 
+                type="date"
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </div>
           )}
           
           {/* Other - generic date */}
           {eventType === "Other" && (
-            <Input 
-              type="date"
-              placeholder="Event date *" 
-              value={eventDate} 
-              onChange={(e) => setEventDate(e.target.value)} 
-              className="md:col-span-2"
-            />
+            <div className="md:col-span-2">
+              <label className="text-xs text-neutral-600 mb-1 block">Event date *</label>
+              <Input 
+                type="date"
+                value={eventDate} 
+                onChange={(e) => setEventDate(e.target.value)} 
+              />
+            </div>
           )}
         </div>
       )}
 
-      {socialConsent === "no" && (
+      {socialConsent === "no" && !isPreBirthday && (
         <div className="mt-4 p-3 border rounded-xl bg-neutral-50">
           <p className="text-sm text-neutral-600">No problem! We respect your privacy and won't share your photos publicly.</p>
         </div>
@@ -856,7 +1023,7 @@ function StepConsent(props:{
 
 function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, allocations, setAlloc }:{ enabled:boolean; duration:number; limit:number; selected:string[]; onToggle:(k:string)=>void; move:(idx:number,dir:number)=>void; allocations:Record<string, number>; setAlloc:(k:string,v:string)=>void; }){
   if(!enabled){
-    return (<div className="text-sm text-neutral-600 flex items-center gap-2"><ImageIcon className="w-4 h-4"/> Backdrop selection applies to <span className="font-medium">Self‑Shoot</span> sessions only.</div>);
+    return (<div className="text-sm text-neutral-600 flex items-center gap-2"><ImageIcon className="w-4 h-4"/> Backdrop selection applies to <span className="font-medium">Self‑Shoot</span> and <span className="font-medium">Adult/Family With Photographer</span> sessions only.</div>);
   }
   const total = Object.values(allocations).reduce((a,b)=>a+(Number(b)||0),0);
   return (
@@ -864,17 +1031,46 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
       <h2 className="text-xl font-semibold">Choose backdrops & allocate time</h2>
       <p className="text-neutral-600">For {duration}‑minute sessions, you can select up to <span className="font-medium">{limit}</span> backdrops. Please allocate minutes that sum to <span className="font-medium">{duration}</span>.</p>
       <div className="grid md:grid-cols-3 gap-3 mt-3">
-        {BACKDROPS.map((bd)=> (
-          <button key={bd.key} onClick={()=>onToggle(bd.key)} className={cn("border rounded-2xl p-3 text-left shadow-sm hover:shadow-md transition", selected.includes(bd.key)?"border-neutral-900":"border-neutral-200")}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl" style={{background: bd.swatch}}/>
-              <div>
-                <div className="font-medium">{bd.name}</div>
-                <div className="text-xs text-neutral-500">Tap to {selected.includes(bd.key)?"remove":"add"}</div>
+        {BACKDROPS.map((bd)=> {
+          const isSelected = selected.includes(bd.key);
+          const canAdd = selected.length < limit;
+          const isDisabled = !isSelected && !canAdd;
+          
+          return (
+            <button 
+              key={bd.key} 
+              onClick={()=>onToggle(bd.key)} 
+              disabled={isDisabled}
+              className={cn(
+                "border rounded-2xl p-3 text-left shadow-sm transition relative",
+                isSelected ? "border-green-600 bg-green-50" : "border-neutral-200 hover:shadow-md",
+                isDisabled && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              {/* Selected checkmark badge */}
+              {isSelected && (
+                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
+                  <CheckCircle2 className="w-4 h-4 text-white" />
+                </div>
+              )}
+              
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl" style={{background: bd.swatch}}/>
+                <div>
+                  <div className="font-medium">{bd.name}</div>
+                  <div className="text-xs text-neutral-500">
+                    {isSelected 
+                      ? "✓ Selected • Tap to remove" 
+                      : isDisabled 
+                        ? `Max ${limit} backdrops` 
+                        : "Tap to add"
+                    }
+                  </div>
+                </div>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
       {selected.length>0 && (
         <div className="mt-4">
@@ -890,6 +1086,14 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
                     <div className="flex items-center gap-2 mt-1">
                       <Button variant="outline" size="sm" onClick={()=>move(idx,-1)} disabled={idx===0}>↑</Button>
                       <Button variant="outline" size="sm" onClick={()=>move(idx,1)} disabled={idx===selected.length-1}>↓</Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={()=>onToggle(key)}
+                        className="text-red-600 hover:text-red-700 hover:border-red-300"
+                      >
+                        Remove
+                      </Button>
                       <div className="ml-2 text-xs text-neutral-500">First to last = shooting order</div>
                     </div>
                   </div>
@@ -948,8 +1152,8 @@ function StepVideoAndTerms({ accepted, setAccepted }:{ accepted:boolean; setAcce
       <div className="mt-4 border rounded-2xl p-4">
         <div className="flex items-center gap-2 mb-2"><ShieldCheck className="w-4 h-4"/><span className="font-medium">Terms & Conditions</span></div>
         <ul className="list-disc pl-5 text-sm text-neutral-700 space-y-1">
-          <li>One-time reschedule allowed; no cancellations after confirmation.</li>
-          <li>Please arrive 10 minutes early; sessions end on time.</li>
+          <li>Two-time reschedule allowed; Cancellations after confirmation without a valid reason can subject you to a ban.</li>
+          <li>Please arrive 5 minutes early; sessions end on time.</li>
           <li>Studio buffer of 30 minutes between sessions is automatic.</li>
           <li>By booking, you agree to our house rules and studio safety policy.</li>
         </ul>
@@ -963,6 +1167,7 @@ function StepVideoAndTerms({ accepted, setAccepted }:{ accepted:boolean; setAcce
 
 function StepReview({ data }:{ data:any }){
   const session = SERVICE_INFO[data.service] || { price: 0, details: "" };
+  const displayDetails = data.serviceCategory === "Classic" && session.classicDetails ? session.classicDetails : session.details;
   return (
     <div>
       <h2 className="text-xl font-semibold">Review your booking</h2>
@@ -973,7 +1178,7 @@ function StepReview({ data }:{ data:any }){
           <Line label="Category" value={data.serviceCategory}/>
           <Line label="Group" value={data.serviceGroup}/>
           <Line label="Service" value={data.service}/>
-          {session.details && <Line label="Inclusions" value={session.details}/>}          
+          {displayDetails && <Line label="Inclusions" value={displayDetails}/>}       
           <Line label="Duration" value={`${data.duration} minutes`}/>
           <Line label="Session Price" value={currency(session.price)}/>
           <Separator className="my-2"/>
