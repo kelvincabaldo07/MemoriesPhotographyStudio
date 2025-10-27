@@ -238,9 +238,8 @@ export default function App(){
   const [phone, setPhone] = useState("");
   const [address, setAddr] = useState("");
 
-  // Social / event consent
-  const [okToPost, setOkToPost] = useState(false);
-  const [okToGreet, setOkToGreet] = useState(false);
+    // Social / event consent - CHANGED: Single required field
+  const [socialConsent, setSocialConsent] = useState<"yes" | "no" | "">("");
   const [eventType, setEventType] = useState("");
   const [celebrantName, setCelebName] = useState("");
   const [birthdayAge, setBirthdayAge] = useState("");
@@ -288,7 +287,7 @@ export default function App(){
       selections: { serviceType, serviceCategory, serviceGroup, service, duration },
       schedule: { date, time, buffer: BUFFER_MINUTES },
       customer: { firstName, lastName, email, phone, address },
-      consent: { okToPost, okToGreet, eventType, celebrantName, birthdayAge, graduationLevel },
+            consent: { socialConsent, eventType, celebrantName, birthdayAge, graduationLevel },
       selfShoot: serviceType === "Self-Shoot" ? { backdrops: selectedBackdrops, allocations } : null,
       addons,
       totals: { sessionPrice, addonsTotal, grandTotal }
@@ -304,8 +303,9 @@ export default function App(){
       case 0: return !!service; // unified service picker
       case 1: return !!date && !!time; // schedule
       case 2: return !!firstName && !!lastName && !!email && !!phone; // customer
-      case 3: { // consent conditional questions
-        if (okToPost || okToGreet){
+      case 3: { // consent conditional questions - CHANGED
+        if (!socialConsent) return false; // Required field
+        if (socialConsent === "yes"){
           if (!eventType || !celebrantName) return false;
           if (eventType === "Birthday" && !birthdayAge) return false;
           if (eventType === "Graduation" && !graduationLevel) return false;
@@ -318,7 +318,7 @@ export default function App(){
       case 7: return true; // review
       default: return false;
     }
-  }, [step, service, date, time, firstName, lastName, email, phone, okToPost, okToGreet, eventType, celebrantName, birthdayAge, graduationLevel, allocationValid, accepted, serviceType]);
+    }, [step, service, date, time, firstName, lastName, email, phone, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, allocationValid, accepted, serviceType]);
 
   return (
     <div className="min-h-screen w-full bg-neutral-50 flex items-start justify-center p-4 md:p-8">
@@ -356,7 +356,18 @@ export default function App(){
             )}
 
             {step === 3 && (
-              <StepConsent okToPost={okToPost} setOkToPost={(v)=>setOkToPost(Boolean(v))} okToGreet={okToGreet} setOkToGreet={(v)=>setOkToGreet(Boolean(v))} eventType={eventType} setEventType={setEventType} celebrantName={celebrantName} setCelebName={setCelebName} birthdayAge={birthdayAge} setBirthdayAge={setBirthdayAge} graduationLevel={graduationLevel} setGradLevel={setGradLevel} />
+              <StepConsent 
+                socialConsent={socialConsent} 
+                setSocialConsent={setSocialConsent} 
+                eventType={eventType} 
+                setEventType={setEventType} 
+                celebrantName={celebrantName} 
+                setCelebName={setCelebName} 
+                birthdayAge={birthdayAge} 
+                setBirthdayAge={setBirthdayAge} 
+                graduationLevel={graduationLevel} 
+                setGradLevel={setGradLevel} 
+              />
             )}
 
             {step === 4 && (
@@ -366,7 +377,7 @@ export default function App(){
             {step === 5 && (<StepAddons addons={addons} toggle={toggleAddon} />)}
             {step === 6 && (<StepVideoAndTerms accepted={accepted} setAccepted={setAccepted} />)}
             {step === 7 && (
-              <StepReview data={{ serviceType, serviceCategory, serviceGroup, service, duration, date, time, firstName, lastName, email, phone, address, okToPost, okToGreet, eventType, celebrantName, birthdayAge, graduationLevel, selectedBackdrops, allocations, addons, sessionPrice, addonsTotal, grandTotal }} />
+              <StepReview data={{ serviceType, serviceCategory, serviceGroup, service, duration, date, time, firstName, lastName, email, phone, address, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, selectedBackdrops, allocations, addons, sessionPrice, addonsTotal, grandTotal }} />
             )}
             {step === 8 && (<Confirmation />)}
 
@@ -610,32 +621,87 @@ function StepCustomer(props:{ firstName:string; lastName:string; email:string; p
   );
 }
 
-function StepConsent(props:{ okToPost:boolean; setOkToPost:(v:boolean)=>void; okToGreet:boolean; setOkToGreet:(v:boolean)=>void; eventType:string; setEventType:(v:string)=>void; celebrantName:string; setCelebName:(v:string)=>void; birthdayAge:string; setBirthdayAge:(v:string)=>void; graduationLevel:string; setGradLevel:(v:string)=>void; }){
-  const { okToPost, setOkToPost, okToGreet, eventType, setEventType, celebrantName, setCelebName, birthdayAge, setBirthdayAge, graduationLevel, setGradLevel } = props;
-  const eventTypes=["Birthday","Graduation","Anniversary","Milestone","Other"];
-  const gradLevels=["Elementary","High School","College","Post Graduate"];
+function StepConsent(props:{
+  socialConsent: "yes" | "no" | "";
+  setSocialConsent: (v: "yes" | "no" | "") => void;
+  eventType: string;
+  setEventType: (v: string) => void;
+  celebrantName: string;
+  setCelebName: (v: string) => void;
+  birthdayAge: string;
+  setBirthdayAge: (v: string) => void;
+  graduationLevel: string;
+  setGradLevel: (v: string) => void;
+}){
+  const { socialConsent, setSocialConsent, eventType, setEventType, celebrantName, setCelebName, birthdayAge, setBirthdayAge, graduationLevel, setGradLevel } = props;
+  const eventTypes = ["Birthday", "Graduation", "Anniversary", "Milestone", "Other"];
+  const gradLevels = ["Elementary", "High School", "College", "Post Graduate"];
+
   return (
     <div>
       <h2 className="text-xl font-semibold">Social & event information</h2>
-      <p className="text-neutral-600 mb-4">Let us know if we can feature your photos or greet you on social media.</p>
-      <div className="flex items-center gap-3">
-        <label className="flex items-center gap-2 text-sm"><Checkbox checked={okToPost} onCheckedChange={(v)=>setOkToPost(Boolean(v))}/> OK to post photos</label>
-        <label className="flex items-center gap-2 text-sm"><Checkbox checked={okToGreet} onCheckedChange={(v)=>setOkToGreet(Boolean(v))}/> OK to greet on social</label>
+      <p className="text-neutral-600 mb-4">Let us know if we can share your special moments.</p>
+      
+      <div className="mb-4">
+        <label className="text-sm font-medium mb-2 block">
+          Is it OK for us to greet you on your milestone or post about your photos on our social media accounts? <span className="text-red-500">*</span>
+        </label>
+        <Select value={socialConsent} onValueChange={(v) => setSocialConsent(v as "yes" | "no")}>
+          <SelectTrigger>
+            <SelectValue placeholder="Please select Yes or No" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="yes">Yes</SelectItem>
+            <SelectItem value="no">No</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      {(okToPost||okToGreet) && (
-        <div className="mt-4 grid md:grid-cols-2 gap-3">
+
+      {socialConsent === "yes" && (
+        <div className="mt-4 grid md:grid-cols-2 gap-3 p-4 border rounded-xl bg-neutral-50">
+          <div className="md:col-span-2">
+            <p className="text-sm text-neutral-600 mb-3">Great! Please tell us more about your event:</p>
+          </div>
           <Select value={eventType} onValueChange={setEventType}>
-            <SelectTrigger><SelectValue placeholder="Event or milestone"/></SelectTrigger>
-            <SelectContent>{eventTypes.map((t)=>(<SelectItem value={t} key={t}>{t}</SelectItem>))}</SelectContent>
+            <SelectTrigger>
+              <SelectValue placeholder="Event or milestone *" />
+            </SelectTrigger>
+            <SelectContent>
+              {eventTypes.map((t) => (
+                <SelectItem value={t} key={t}>{t}</SelectItem>
+              ))}
+            </SelectContent>
           </Select>
-          <Input placeholder="Celebrant’s name" value={celebrantName} onChange={(e)=>setCelebName(e.target.value)}/>
-          {eventType==="Birthday" && (<Input placeholder="Age" value={birthdayAge} onChange={(e)=>setBirthdayAge(e.target.value)}/>)}
-          {eventType==="Graduation" && (
+          <Input 
+            placeholder="Celebrant's name *" 
+            value={celebrantName} 
+            onChange={(e) => setCelebName(e.target.value)} 
+          />
+          {eventType === "Birthday" && (
+            <Input 
+              placeholder="Age *" 
+              value={birthdayAge} 
+              onChange={(e) => setBirthdayAge(e.target.value)} 
+            />
+          )}
+          {eventType === "Graduation" && (
             <Select value={graduationLevel} onValueChange={setGradLevel}>
-              <SelectTrigger><SelectValue placeholder="Graduation level"/></SelectTrigger>
-              <SelectContent>{gradLevels.map((t)=>(<SelectItem value={t} key={t}>{t}</SelectItem>))}</SelectContent>
+              <SelectTrigger>
+                <SelectValue placeholder="Graduation level *" />
+              </SelectTrigger>
+              <SelectContent>
+                {gradLevels.map((t) => (
+                  <SelectItem value={t} key={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           )}
+        </div>
+      )}
+
+      {socialConsent === "no" && (
+        <div className="mt-4 p-3 border rounded-xl bg-neutral-50">
+          <p className="text-sm text-neutral-600">No problem! We respect your privacy and won't share your photos publicly.</p>
         </div>
       )}
     </div>
@@ -773,9 +839,10 @@ function StepReview({ data }:{ data:any }){
           <Line label="Name" value={`${data.firstName} ${data.lastName}`}/>
           <Line label="Email" value={data.email}/>
           <Line label="Phone" value={data.phone}/>
-          {data.address && <Line label="Address" value={data.address}/>} 
-          {(data.okToPost||data.okToGreet) && (<>
-            <Separator className="my-2"/>
+          {data.address && <Line label="Address" value={data.address}/>}
+          <Separator className="my-2"/>
+          <Line label="Social Media Consent" value={data.socialConsent === "yes" ? "Yes" : "No"} />
+          {data.socialConsent === "yes" && (<>
             <Line label="Event" value={data.eventType}/>
             <Line label="Celebrant" value={data.celebrantName}/>
             {data.eventType==="Birthday" && <Line label="Age" value={data.birthdayAge}/>} 
