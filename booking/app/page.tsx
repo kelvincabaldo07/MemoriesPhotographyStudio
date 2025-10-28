@@ -42,11 +42,12 @@ const BUFFER_MINUTES = 30; // 30-min buffer between sessions
 
 // Studio brand colors - earthy, natural palette
 const BRAND = {
-  charcoal: "#2C2C2C",
-  cream: "#FAF3E0",
+  charcoal: "#2C2C2C",      // Regular text
+  cream: "#FAF3E0",          // Background
   white: "#FFFFFF",
-  terracotta: "#A62F20",
-  clay: "#8B5E3C",
+  forest: "#0b3d2e",         // Main brand color - titles, selections, primary buttons
+  terracotta: "#A62F20",     // Secondary accent (kept for variety)
+  clay: "#8B5E3C",           // Secondary accent (kept for variety)
 };
 
 // const BACKDROPS = [
@@ -553,7 +554,7 @@ async function submitBooking(){
                   onClick={()=>setStep(step+1)} 
                   disabled={!canContinue}
                   style={{ 
-                    backgroundColor: canContinue ? BRAND.terracotta : "#ccc", 
+                    backgroundColor: canContinue ? BRAND.forest : "#ccc", 
                     color: BRAND.white 
                   }}
                 >
@@ -565,7 +566,7 @@ async function submitBooking(){
                   onClick={submitBooking} 
                   disabled={!canContinue || busy}
                   style={{ 
-                    backgroundColor: canContinue && !busy ? BRAND.clay : "#ccc", 
+                    backgroundColor: canContinue && !busy ? BRAND.forest : "#ccc", 
                     color: BRAND.white 
                   }}
                 >
@@ -617,9 +618,9 @@ function Stepper({ step }:{ step:number }){
           key={i} 
           className={cn("px-2 py-2 rounded-xl text-xs md:text-sm border transition")}
           style={i <= step ? {
-            backgroundColor: BRAND.charcoal,
+            backgroundColor: BRAND.forest,
             color: BRAND.white,
-            borderColor: BRAND.charcoal
+            borderColor: BRAND.forest
           } : {
             backgroundColor: BRAND.white,
             borderColor: "#e5e5e5",
@@ -685,7 +686,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
             key={t as string} 
             className="border rounded-2xl overflow-hidden transition"
             style={{
-              borderColor: openType === t ? BRAND.charcoal : "#e5e5e5",
+              borderColor: openType === t ? BRAND.forest : "#e5e5e5",
               backgroundColor: openType === t ? BRAND.white : "#fafafa"
             }}
           >
@@ -742,7 +743,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                       <button 
                         key={g} 
                         className="text-left border rounded-xl p-3 hover:shadow-sm transition flex items-center gap-3"
-                        style={{ borderColor: serviceGroup === g ? BRAND.charcoal : "#e5e5e5" }}
+                        style={{ borderColor: serviceGroup === g ? BRAND.forest : "#e5e5e5" }}
                         onClick={()=>toggleGroup(g)}
                       >
                           <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
@@ -775,7 +776,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                             key={s} 
                             onClick={()=> setService(s)} 
                             className="text-left border rounded-xl p-3 hover:shadow-md transition"
-                            style={{ borderColor: service === s ? BRAND.charcoal : "#e5e5e5" }}
+                            style={{ borderColor: service === s ? BRAND.forest : "#e5e5e5" }}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div>
