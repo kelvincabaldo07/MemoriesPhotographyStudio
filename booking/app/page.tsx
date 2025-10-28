@@ -671,7 +671,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
   }
 
   const groups = (serviceType ? TAXONOMY.groups[serviceType as keyof typeof TAXONOMY.groups] : []) || [];
-  const services = (serviceType && serviceGroup ? (TAXONOMY.services?.[serviceType as keyof typeof TAXONOMY.services] as any)?.[serviceGroup]||[] : []);
+  const services = (serviceType && serviceGroup ? (TAXONOMY.services?.[serviceType as keyof typeof TAXONOMY.services] as Record<string, readonly string[]>)?.[serviceGroup]||[] : []);
 
   return (
     <div>
@@ -887,7 +887,7 @@ function StepCustomer(props: {
     } else {
         setEmailError(result.error || 'Failed to send verification code');
       }
-    } catch (error) {
+    } catch {
       setEmailError('Network error. Please try again.');
     } finally {
       setSendingCode(false);
@@ -913,7 +913,7 @@ function StepCustomer(props: {
   return (
     <div>
       <h2 className="text-xl font-semibold">Your details</h2>
-      <p className="text-neutral-600 mb-4">We'll send your confirmation and reminders here.</p>
+      <p className="text-neutral-600 mb-4">We&apos;ll send your confirmation and reminders here.</p>
       
       <div className="grid md:grid-cols-2 gap-3">
         <Input placeholder="First name *" value={firstName} onChange={(e) => setFirst(e.target.value)} />
@@ -971,7 +971,7 @@ function StepCustomer(props: {
                 Confirm
               </Button>
             </div>
-            <p className="text-xs text-blue-700 mt-2">Didn't receive it? <button onClick={sendVerificationCode} className="underline font-medium">Resend code</button></p>
+            <p className="text-xs text-blue-700 mt-2">Didn&apos;t receive it? <button onClick={sendVerificationCode} className="underline font-medium">Resend code</button></p>
           </div>
         )}
 
@@ -1205,7 +1205,7 @@ function StepConsent(props:{
 
       {socialConsent === "no" && !isPreBirthday && (
         <div className="mt-4 p-3 border rounded-xl bg-neutral-50">
-          <p className="text-sm text-neutral-600">No problem! We respect your privacy and won't share your photos publicly.</p>
+          <p className="text-sm text-neutral-600">No problem! We respect your privacy and won&apos;t share your photos publicly.</p>
         </div>
       )}
     </div>
@@ -1356,7 +1356,32 @@ function StepVideoAndTerms({ accepted, setAccepted }:{ accepted:boolean; setAcce
   );
 }
 
-function StepReview({ data }:{ data:any }){
+function StepReview({ data }:{ data: {
+  serviceType: string;
+  serviceCategory: string;
+  serviceGroup: string;
+  service: string;
+  duration: number;
+  date: string;
+  time: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  socialConsent: string;
+  eventType: string;
+  celebrantName: string;
+  birthdayAge: string;
+  graduationLevel: string;
+  eventDate: string;
+  selectedBackdrops: string[];
+  allocations: Record<string, number>;
+  addons: Record<string, number>;
+  sessionPrice: number;
+  addonsTotal: number;
+  grandTotal: number;
+}}){
   const session = SERVICE_INFO[data.service] || { price: 0, details: "" };
   const displayDetails = data.serviceCategory === "Classic" && session.classicDetails ? session.classicDetails : session.details;
   return (
