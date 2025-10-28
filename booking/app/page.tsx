@@ -133,71 +133,71 @@ const TAXONOMY = {
 const SERVICE_INFO: Record<string, { details: string; price: number; digitalPrice?: number; classicDetails?: string }> = {
   // Self-shoot - Digital & Classic variants
   "Solo/Duo 15": { 
-    details: "1–2 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 1–2 pax\n• UNLIMITED shots for 15 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)",
     price: 250,
-    classicDetails: "1–2 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 1–2 pax\n• UNLIMITED shots for 15 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 2 photostrips)\n• 5 mins photo selection (Select up to 7 photos)"
   },
   "Solo/Duo 30": { 
-    details: "1–2 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 1–2 pax\n• UNLIMITED shots for 30 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 400,
-    classicDetails: "1–2 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 1–2 pax\n• UNLIMITED shots for 30 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 2 photostrips)\n• 5 mins photo selection (Select up to 7 photos)"
   },
   "Solo/Duo 60": { 
-    details: "1–2 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 1–2 pax\n• UNLIMITED shots for 60 minutes\n• 4 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 700,
-    classicDetails: "1–2 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips) • 10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 1–2 pax\n• UNLIMITED shots for 60 minutes\n• 4 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n• 10 mins photo selection (Select up to 7 photos)"
   },
 
   "Small Group 15": { 
-    details: "3–5 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 3–5 pax\n• UNLIMITED shots for 15 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 350,
-    classicDetails: "3–5 pax • UNLIMITED shots for 15 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 3–5 pax\n• UNLIMITED shots for 15 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 2 photostrips)\n• 5 mins photo selection (Select up to 7 photos)"
   },
   "Small Group 30": { 
-    details: "3–5 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 3–5 pax\n• UNLIMITED shots for 30 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 600,
-    classicDetails: "3–5 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 3–5 pax\n• UNLIMITED shots for 30 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 2 photostrips)\n• 5 mins photo selection (Select up to 7 photos)"
   },
   "Small Group 60": { 
-    details: "3–5 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 3–5 pax\n• UNLIMITED shots for 60 minutes\n• 4 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 1000,
-    classicDetails: "3–5 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips) • 10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 3–5 pax\n• UNLIMITED shots for 60 minutes\n• 4 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n• 10 mins photo selection (Select up to 7 photos)"
   },
 
   "Big Group 30": { 
-    details: "6–15 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 6–15 pax\n• UNLIMITED shots for 30 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 800,
-    classicDetails: "6–15 pax • UNLIMITED shots for 30 minutes • 2 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 2 photostrips) • 5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 6–15 pax\n• UNLIMITED shots for 30 minutes\n• 2 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 2 photostrips)\n• 5 mins photo selection (Select up to 7 photos)"
   },
   "Big Group 60": { 
-    details: "6–15 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "• 6–15 pax\n• UNLIMITED shots for 60 minutes\n• 4 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 1500,
-    classicDetails: "6–15 pax • UNLIMITED shots for 60 minutes • 4 backdrops of choice • ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours) • Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips) • 10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "• 6–15 pax\n• UNLIMITED shots for 60 minutes\n• 4 backdrops of choice\n• ALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\n• Printed Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n• 10 mins photo selection (Select up to 7 photos)"
   },
   // With photographer (45 min)
-  "Adult’s Pre-Birthday": { details: "45 minutes • WITH photographer • FREE family portraits • FREE number balloons • ALL ENHANCED photos", price: 1000 },
-  "Family Portraits": { details: "3–8 pax • 45 minutes • WITH photographer • FREE use of all backdrops & props • ALL ENHANCED photos", price: 1000 },
-  "Maternity Photoshoot": { details: "45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
+  "Adult’s Pre-Birthday": { details: "• 45 minutes\n• WITH photographer\n• FREE family portraits\n• FREE number balloons\n• ALL ENHANCED photos", price: 1000 },
+  "Family Portraits": { details: "• 3–8 pax\n• 45 minutes\n• WITH photographer\n• FREE use of all backdrops & props\n• ALL ENHANCED photos", price: 1000 },
+  "Maternity Photoshoot": { details: "• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
   // Kids themes (45 min, with photographer)
-  "Racing Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Safari Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Outer Space Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Hot Air Balloon Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Cuddly Bear Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Under the Sea Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Train Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Navy Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Dreamy Rainbow Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Bloom & Blush Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Rainbow Boho Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Pastel Daisies": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Butterfly Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
-  "Mermaid Theme": { details: "Kids 0–7 • 45 minutes • WITH photographer • FREE family portraits • ALL ENHANCED photos", price: 1000 },
+  "Racing Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Safari Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Outer Space Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Hot Air Balloon Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Cuddly Bear Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Under the Sea Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Train Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Navy Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Dreamy Rainbow Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Bloom & Blush Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Rainbow Boho Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Pastel Daisies": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Butterfly Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
+  "Mermaid Theme": { details: "• Kids 0–7\n• 45 minutes\n• WITH photographer\n• FREE family portraits\n• ALL ENHANCED photos", price: 1000 },
 
   // Seasonal Christmas
-  "2025 Christmas – White & Gold (Solo/Duo)": { details: "1–2 pax • 45 minutes • Edited photos via private Lightroom album • Cozy white & gold set", price: 1000 },
-  "2025 Christmas – White & Gold (Small Group)": { details: "3–5 pax • 45 minutes • Edited photos via private Lightroom album • Cozy white & gold set", price: 2000 },
-  "2025 Christmas – White & Gold (Big Group)": { details: "6–8 pax • 45 minutes • Edited photos via private Lightroom album • Cozy white & gold set", price: 2500 },
+  "2025 Christmas – White & Gold (Solo/Duo)": { details: "• 1–2 pax\n• 45 minutes\n• Edited photos via private Lightroom album\n• Cozy white & gold set", price: 1000 },
+  "2025 Christmas – White & Gold (Small Group)": { details: "• 3–5 pax\n• 45 minutes\n• Edited photos via private Lightroom album\n• Cozy white & gold set", price: 2000 },
+  "2025 Christmas – White & Gold (Big Group)": { details: "• 6–8 pax\n• 45 minutes\n• Edited photos via private Lightroom album\n• Cozy white & gold set", price: 2500 },
 };
 
 // UI thumbnails (emoji-based for now)
@@ -578,7 +578,7 @@ async function submitBooking(){
         </Card>
 
         <footer className="text-xs text-center text-neutral-500 mt-4">
-          © {new Date().getFullYear()} Memories Photography Studio — “Capturing moments, creating memories.”
+          © {new Date().getFullYear()} Memories Photography Studio — "Capture With Purpose. Create Change."
         </footer>
       </div>
     </div>
@@ -684,10 +684,13 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
         {(chosenTypeOnly ? [serviceType] : TAXONOMY.types).filter(Boolean).map((t)=> (
           <div 
             key={t as string} 
-            className="border rounded-2xl overflow-hidden transition"
+            className={cn(
+              "border rounded-2xl overflow-hidden transition",
+              openType === t && "shadow-md"
+            )}
             style={{
-              borderColor: openType === t ? BRAND.forest : "#e5e5e5",
-              backgroundColor: openType === t ? BRAND.white : "#fafafa"
+              borderColor: openType === t ? BRAND.cream : "#e5e5e5",
+              backgroundColor: openType === t ? BRAND.cream : "#fafafa"
             }}
           >
             <div className="flex items-center justify-between p-3 bg-neutral-50">
@@ -708,7 +711,17 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {t === "Self-Shoot" ? (
                   <div className={cn("grid gap-3 mt-3", chosenCategoryOnly?"grid-cols-1":"md:grid-cols-2")}>                  
                     {(chosenCategoryOnly ? [serviceCategory] : TAXONOMY.categories).filter(Boolean).map((c)=> (
-                      <div key={String(c)} className={cn("text-left border rounded-xl p-3 hover:shadow-sm transition flex items-start gap-3", serviceCategory===c?"border-neutral-900":"border-neutral-200")}>                      
+                      <div 
+                        key={String(c)} 
+                        className={cn(
+                          "text-left border rounded-xl p-3 hover:shadow-sm transition flex items-start gap-3",
+                          serviceCategory === c && "shadow-md"
+                        )}
+                        style={{
+                          borderColor: serviceCategory === c ? BRAND.cream : "#e5e5e5",
+                          backgroundColor: serviceCategory === c ? BRAND.cream : BRAND.white
+                        }}
+                      >
                         <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
                           <div className="font-medium">{String(c)}</div>
                           <div className="text-xs text-neutral-500">{c === "Classic" ? "Session + printed copies" : "Session + digital-only"}</div>
@@ -740,17 +753,23 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     <div className="text-sm font-medium mb-2">Groups</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {groups.map((g)=> (
-                      <button 
-                        key={g} 
-                        className="text-left border rounded-xl p-3 hover:shadow-sm transition flex items-center gap-3"
-                        style={{ borderColor: serviceGroup === g ? BRAND.forest : "#e5e5e5" }}
-                        onClick={()=>toggleGroup(g)}
-                      >
+                        <button 
+                          key={g} 
+                          className={cn(
+                            "text-left border rounded-xl p-3 hover:shadow-sm transition flex items-center gap-3",
+                            serviceGroup === g && "shadow-md"
+                          )}
+                          style={{ 
+                            borderColor: serviceGroup === g ? BRAND.forest : "#e5e5e5",
+                            backgroundColor: serviceGroup === g ? BRAND.forest : BRAND.white
+                          }}
+                          onClick={()=>toggleGroup(g)}
+                        >
                           <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                           <div>
-                            <div className="font-medium">{g}</div>
+                            <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
                             {/* ✅ CHANGE THIS LINE */}
-                            <div className="text-xs text-neutral-500">{getGroupDescription(g)}</div>
+                            <div className="text-xs" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
                           </div>
                         </button>
                       ))}
@@ -775,15 +794,34 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           <button 
                             key={s} 
                             onClick={()=> setService(s)} 
-                            className="text-left border rounded-xl p-3 hover:shadow-md transition"
-                            style={{ borderColor: service === s ? BRAND.forest : "#e5e5e5" }}
+                            className={cn(
+                              "text-left border rounded-xl p-3 hover:shadow-md transition",
+                              service === s && "shadow-lg"
+                            )}
+                            style={{ 
+                              borderColor: service === s ? BRAND.forest : "#e5e5e5",
+                              backgroundColor: service === s ? "#e8f5f0" : BRAND.white
+                            }}
                           >
                             <div className="flex items-start justify-between gap-3">
                               <div>
-                                <div className="font-semibold">{s}</div>
-                                {displayDetails && (<div className="text-sm text-neutral-600 mt-1">{displayDetails}</div>)}
+                                <div className="font-semibold" style={{ color: BRAND.forest }}>{s}</div>
+                                {displayDetails && (
+                                <ul className="text-sm text-neutral-600 mt-2 space-y-1">
+                                  {displayDetails.split('\n').map((line, idx) => (
+                                    <li key={idx} className="flex items-start gap-1">
+                                      <span className="text-green-600 mt-0.5">•</span>
+                                      <span>{line}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
                               </div>
-                              {displayPrice > 0 && (<Badge>{currency(displayPrice)}</Badge>)}
+                              {displayPrice > 0 && (
+                              <Badge style={{ backgroundColor: BRAND.forest, color: BRAND.white }}>
+                                {currency(displayPrice)}
+                              </Badge>
+                            )}
                             </div>
                           </button>
                         );
@@ -825,7 +863,28 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
           <div className="mt-1 grid grid-cols-3 md:grid-cols-6 gap-2 max-h-64 overflow-auto p-1 border rounded-xl">
             {availableSlots.length===0 && (<div className="col-span-6 text-sm text-neutral-500 p-2">No available times for this date. Please try another day.</div>)}
             {availableSlots.map((s)=> (
-              <button key={s} className={cn("text-sm border rounded-xl px-2 py-1 flex items-center justify-center", time===s?"border-neutral-900":"border-neutral-200")} onClick={()=>setTime(s)}>
+              <button 
+                key={s} 
+                className="text-sm border rounded-xl px-2 py-1 flex items-center justify-center transition"
+                style={{
+                  borderColor: time === s ? BRAND.forest : "#e5e5e5",
+                  backgroundColor: time === s ? BRAND.forest : BRAND.white,
+                  color: time === s ? BRAND.white : BRAND.charcoal
+                }}
+                onMouseEnter={(e) => {
+                  if (time !== s) {
+                    e.currentTarget.style.borderColor = BRAND.forest;
+                    e.currentTarget.style.backgroundColor = "#e8f5f0";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (time !== s) {
+                    e.currentTarget.style.borderColor = "#e5e5e5";
+                    e.currentTarget.style.backgroundColor = BRAND.white;
+                  }
+                }}
+                onClick={()=>setTime(s)}
+              >
                 <Clock className="w-4 h-4 mr-1"/> {s}
               </button>
             ))}
