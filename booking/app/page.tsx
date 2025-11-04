@@ -37,8 +37,16 @@ import { twMerge as cn } from "tailwind-merge";
 
 // ---------- Configuration ----------
 const STUDIO_TZ = "Asia/Manila";
+
+// Add type definition
+type ShopHours = {
+  open: number;
+  close: number;
+  lunchBreak?: { start: number; end: number } | null;
+};
+
 // Studio hours by day of week
-const SHOP_HOURS_BY_DAY = {
+const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
   0: { open: 13, close: 20, lunchBreak: null }, // Sunday: 1 PM - 8 PM (no lunch break)
   1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Monday: 8 AM - 8 PM (lunch 12-1)
   2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Tuesday: 8 AM - 8 PM (lunch 12-1)
@@ -273,21 +281,20 @@ function offsetDate(days = 0) {
 // ---------- Utils ----------
 function pad(n: number) { return n.toString().padStart(2, "0"); }
 // Get shop hours for a specific date
-function getShopHoursForDate(dateStr: string) {
+function getShopHoursForDate(dateStr: string): ShopHours {
   const date = new Date(dateStr + 'T12:00:00');
   const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-  return SHOP_HOURS_BY_DAY[dayOfWeek as keyof typeof SHOP_HOURS_BY_DAY];
+  return SHOP_HOURS_BY_DAY[dayOfWeek];
 }
 function toMinutes(hhmm: string) { const [h,m] = hhmm.split(":").map(Number); return h*60+m; }
 function toHHMM(mins: number) { const h = Math.floor(mins/60), m = mins%60; return `${pad(h)}:${pad(m)}`; }
 function range(start: number, end: number, step: number){ const out:number[]=[]; for(let x=start;x<=end;x+=step) out.push(x); return out; }
 function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES){ 
-  const hours = dateStr ? getShopHoursForDate(dateStr) : SHOP_HOURS;
+  const hours: ShopHours = dateStr ? getShopHoursForDate(dateStr) : { ...SHOP_HOURS, lunchBreak: null };
   const start = hours.open * 60;
   const end = hours.close * 60;
   
   // Calculate the latest possible start time
-  // A slot must have enough time for: session duration + buffer before closing
   const latestStartTime = end - duration - buffer;
   
   // Generate all slots up to the latest valid start time
