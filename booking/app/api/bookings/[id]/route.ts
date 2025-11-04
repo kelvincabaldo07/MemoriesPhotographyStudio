@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET booking by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const bookingId = params.id;
+  const { id: bookingId } = await params;
   
   // TODO: Fetch from your database (Notion, etc.)
   // For now, we'll return mock data
@@ -36,9 +36,9 @@ export async function GET(
 // PUT (update) booking by ID
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const bookingId = params.id;
+  const { id: bookingId } = await params;
   const updates = await request.json();
   
   console.log('🔄 Updating booking:', bookingId);
@@ -75,9 +75,9 @@ export async function PUT(
 // DELETE (cancel) booking by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const bookingId = params.id;
+  const { id: bookingId } = await params;
   
   console.log('🗑️ Cancelling booking:', bookingId);
   
