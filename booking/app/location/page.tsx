@@ -32,7 +32,7 @@ export default function LocationPage() {
             {/* Google Map Embed */}
             <div className="mb-6 rounded-xl overflow-hidden border shadow-sm">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3867.8234567890123!2d120.87654321!3d14.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDA3JzI0LjQiTiAxMjDCsDUyJzM1LjYiRQ!5e0!3m2!1sen!2sph!4v1234567890123!5m2!1sen!2sph"
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d600.6082789609123!2d120.8823626!3d14.1907713!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33bd83b509678963%3A0xc0b4d56ba848e15a!2sMemories%20Photography%20Studio!5e1!3m2!1sen!2sph!4v1762257396533!5m2!1sen!2sph"
                 width="100%" 
                 height="400" 
                 style={{ border: 0 }}
@@ -43,7 +43,7 @@ export default function LocationPage() {
             </div>
 
             <a 
-              href="https://maps.app.goo.gl/AJiMvbvD5f3FSdtE6"
+              href="https://maps.app.goo.gl/V9HJxvk118gvcm3H6"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg mb-6 hover:opacity-80 transition shadow-sm"

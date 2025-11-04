@@ -80,7 +80,7 @@ export default function ContactPage() {
                 </a>
 
                 <a 
-                  href="https://www.instagram.com/memoriesphotographystudio/" 
+                  href="https://www.instagram.com/creatingmemoriesphotostudio/" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 px-6 py-3 rounded-lg border hover:shadow-md transition flex-1 min-w-[200px]"
@@ -100,7 +100,7 @@ export default function ContactPage() {
                   </svg>
                   <div>
                     <p className="font-medium">Instagram</p>
-                    <p className="text-xs text-neutral-500">@memoriesphotographystudio</p>
+                    <p className="text-xs text-neutral-500">@creatingmemoriesphotostudio</p>
                   </div>
                 </a>
               </div>
