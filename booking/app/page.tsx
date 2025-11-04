@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
-import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User } from 'lucide-react';
+import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User, Phone, Mail } from 'lucide-react';
 // import React, { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,10 +36,11 @@ import { twMerge as cn } from "tailwind-merge";
  */
 
 // ---------- Configuration ----------
-const STUDIO_TZ = "Asia/Manila"; // informative only in this demo
-const SHOP_HOURS = { open: 9, close: 19 }; // 9:00–19:00
-const SLOT_MINUTES = 15; // 15-minute increments
+const STUDIO_TZ = "Asia/Manila";
+const SHOP_HOURS = { open: 8, close: 20 }; // 8:00 AM – 8:00 PM (12 hours = 720 minutes)
+const SLOT_MINUTES = 15; // 15-minute increments for display
 const BUFFER_MINUTES = 30; // 30-min buffer between sessions
+const MIN_SESSION_DURATION = 45; // Minimum booking duration (for slot count calculation)
 
 // Studio brand colors - earthy, natural palette
 const BRAND = {
@@ -101,7 +102,7 @@ const TAXONOMY = {
         "Dreamy Rainbow Theme",
         "Bloom & Blush Theme",
         "Rainbow Boho Theme",
-        "Pastel Daisies",
+        "Pastel Daisies Theme",
         "Butterfly Theme",
         "Cuddly Bear Theme",
         "Mermaid Theme",
@@ -117,7 +118,7 @@ const TAXONOMY = {
         "Train Theme",
         "Navy Theme",
       ],
-      "Adult/Family Shoot": ["Adult’s Pre-Birthday", "Maternity Photoshoot", "Family Portraits"],
+      "Adult/Family Shoot": ["Adult’s Pre-Birthday", "Maternity Photoshoot", "Family/Group Portraits"],
     },
     // Seasonal
     "Seasonal Sessions": {
@@ -177,7 +178,7 @@ const SERVICE_INFO: Record<string, { details: string; price: number; digitalPric
   },
   // With photographer (45 min)
   "Adult’s Pre-Birthday": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Family Portraits": { details: "3–8 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Family/Group Portraits": { details: "3–8 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Maternity Photoshoot": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   // Kids themes (45 min, with photographer)
   "Racing Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
@@ -191,14 +192,14 @@ const SERVICE_INFO: Record<string, { details: string; price: number; digitalPric
   "Dreamy Rainbow Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Bloom & Blush Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Rainbow Boho Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Pastel Daisies": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Pastel Daisies Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Butterfly Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Mermaid Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
 
   // Seasonal Christmas
-  "2025 Christmas – White & Gold (Solo/Duo)": { details: "1–2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)\nCozy white & gold set", price: 1000 },
-  "2025 Christmas – White & Gold (Small Group)": { details: "3–5 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)\nCozy white & gold set", price: 2000 },
-  "2025 Christmas – White & Gold (Big Group)": { details: "6–8 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)\nCozy white & gold set", price: 2500 },
+  "2025 Christmas – White & Gold (Solo/Duo)": { details: "1–2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 1000 },
+  "2025 Christmas – White & Gold (Small Group)": { details: "3–5 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2000 },
+  "2025 Christmas – White & Gold (Big Group)": { details: "6–8 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2500 },
 };
 
 // UI thumbnails (emoji-based for now)
@@ -214,10 +215,10 @@ const GROUP_THUMBS: Record<string, string> = {
 
 // Optional add-ons
 const ADDONS = [
-  { id: "4r", label: "Printed 1 copy of 4R photo", price: 30 },
+  { id: "4r", label: "Printed 1 4R photo", price: 30 },
   { id: "photostrip", label: "Printed 2 photo strips", price: 30 },
   { id: "wallet", label: "Printed 4 wallet size photos", price: 30 },
-  { id: "premium4r", label: "Premium Printed 1 copy of 4R photo (Canon Selphy CP1500)", price: 50 },
+  { id: "premium4r", label: "Printed 1 4R photo (Canon Selphy CP1500)", price: 50 },
 ];
 
 // Demo bookings
@@ -255,7 +256,12 @@ function isSlotAvailable(slotHHMM: string, duration: number, blocked:[number,num
 function inferDuration(serviceLabel?: string){ if(!serviceLabel) return 30; if(/(15)/i.test(serviceLabel)) return 15; if(/(60)/i.test(serviceLabel)) return 60; return 30; }
 function backdropLimitByDuration(mins: number){ return mins>=60?4:2; }
 function currency(n:number){ return new Intl.NumberFormat("en-PH", { style:"currency", currency:"PHP"}).format(n); }
-
+function to12Hour(hhmm: string) { 
+  const [h, m] = hhmm.split(":").map(Number); 
+  const period = h >= 12 ? "PM" : "AM"; 
+  const hour12 = h % 12 || 12; 
+  return `${hour12}:${pad(m)} ${period}`; 
+}
 // ---------- Main Component ----------
 export default function App(){
   const [step, setStep] = useState(0);
@@ -573,7 +579,23 @@ async function submitBooking(){
             {step === 8 && (<Confirmation />)}
 
             <div className="mt-6 flex items-center justify-between">
-              <Button variant="ghost" onClick={()=>setStep(Math.max(step-1,0))} disabled={step===0}><ChevronLeft className="w-4 h-4 mr-2"/> Back</Button>
+              <Button variant="ghost" onClick={()=>setStep(Math.max(step-1,0))} disabled={step===0}>
+                <ChevronLeft className="w-4 h-4 mr-2"/> Back
+              </Button>
+
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setStep(0);
+                  setServiceType("");
+                  setServiceCategory("");
+                  setServiceGroup("");
+                  setService("");
+                }}
+                className=""
+              >
+                Start Over
+              </Button>
 
               {step < 7 && (
                 <Button 
@@ -599,8 +621,8 @@ async function submitBooking(){
                   {busy?"Submitting…":"Confirm & Book"}
                 </Button>
               )}
-            </div>
-          </CardContent>
+            </div>          
+            </CardContent>
         </Card>
 
         <footer className="text-xs text-center text-neutral-500 mt-4">
@@ -613,32 +635,111 @@ async function submitBooking(){
 
 // ---------- Subcomponents ----------
 function Header({ onReset }:{ onReset: ()=>void }){
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   return (
-    <div className="text-center">
-      {/* Logo */}
-      <div className="flex justify-center mb-3">
-        <img 
-          src="/favicon.ico" 
-          alt="Memories Photography Studio" 
-          className="w-16 h-16 md:w-20 md:h-20"
-        />
+    <>
+      {/* Navigation Bar */}
+      <nav className="bg-white shadow-sm mb-8 -mx-4 md:-mx-8 px-4 md:px-8 py-4 relative z-50">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.href = '/'}>
+            <img 
+              src="/logo.png" 
+              alt="Memories Photography Studio" 
+              className="w-12 h-12 md:w-14 md:h-14"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <div className="hidden md:block">
+              <h2 className="font-semibold text-lg" style={{ color: BRAND.forest }}>
+                Memories Photography Studio
+              </h2>
+              <p className="text-xs text-neutral-500">Capture With Purpose. Create Change.</p>
+            </div>
+          </div>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center gap-6">
+            <button 
+              onClick={() => window.location.href = '/my-bookings'}
+              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
+              style={{ color: BRAND.charcoal }}
+            >
+              <Calendar className="w-4 h-4" />
+              My Bookings
+            </button>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
+              style={{ color: BRAND.charcoal }}
+            >
+              <ShoppingBag className="w-4 h-4" />
+              Book Now
+            </button>
+            <button 
+              onClick={() => window.location.href = '/contact'}
+              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
+              style={{ color: BRAND.charcoal }}
+            >
+              <Phone className="w-4 h-4" />
+              Contact Us
+            </button>
+            <button 
+              onClick={() => window.location.href = '/location'}
+              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
+              style={{ color: BRAND.charcoal }}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              Our Location
+            </button>
+          </div>
+
+          {/* Mobile Icon Menu - Forest Green Bar */}
+          <div className="md:hidden flex items-center gap-4 px-4 py-2 rounded-xl" style={{ backgroundColor: BRAND.forest }}>
+            <button 
+              onClick={() => window.location.href = '/my-bookings'}
+              className="flex flex-col items-center gap-1"
+            >
+              <Calendar className="w-5 h-5" style={{ color: BRAND.white }} />
+              <span className="text-[9px]" style={{ color: BRAND.white }}>Bookings</span>
+            </button>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="flex flex-col items-center gap-1"
+            >
+              <ShoppingBag className="w-5 h-5" style={{ color: BRAND.white }} />
+              <span className="text-[9px]" style={{ color: BRAND.white }}>Book</span>
+            </button>
+            <button 
+              onClick={() => window.location.href = '/contact'}
+              className="flex flex-col items-center gap-1"
+            >
+              <Phone className="w-5 h-5" style={{ color: BRAND.white }} />
+              <span className="text-[9px]" style={{ color: BRAND.white }}>Contact</span>
+            </button>
+            <button 
+              onClick={() => window.location.href = '/location'}
+              className="flex flex-col items-center gap-1"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style={{ color: BRAND.white }}>
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              <span className="text-[9px]" style={{ color: BRAND.white }}>Location</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Page Header */}
+      <div className="text-center mb-6">
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ color: BRAND.forest }}>
+          Book Your Session
+        </h1>
+        <p className="text-neutral-600 mt-1">Create beautiful memories with us today</p>
       </div>
-      {/* Studio Name */}
-      <h1 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ color: BRAND.forest }}>
-        Memories Photography Studio
-      </h1>
-      {/* Tagline */}
-      <p className="text-neutral-600 mt-1">Book your session with us today and create change.</p>
-      
-      {/* Start Over button - moved to top right corner */}
-      <Button 
-        variant="outline" 
-        onClick={onReset}
-        className="absolute top-4 right-4 md:top-8 md:right-8"
-      >
-        Start Over
-      </Button>
-    </div>
+    </>
   );
 }
 
@@ -942,56 +1043,257 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
           <div className="text-xs text-neutral-500 mt-1">Press Next to continue.</div>
         </div>
       )}
+            {service && (
+        <div className="mt-4 border rounded-2xl p-3 bg-neutral-50">
+          <div className="text-sm">Selected:</div>
+          <div className="font-medium">{serviceType} • {serviceCategory} • {serviceGroup} • {service}</div>
+          <div className="text-xs text-neutral-500 mt-1">Press Next to continue.</div>
+        </div>
+      )}
     </div>
   );
 }
 
+
 function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }:{
   date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[];
 }){
+  const [loading, setLoading] = useState(false);
+  const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>(availableSlots);
+  const [usingMockData, setUsingMockData] = useState(false);
+  const [availabilityCache, setAvailabilityCache] = useState<Record<string, number>>({});
+  const [loadingDates, setLoadingDates] = useState(false);
+
+  // Get today's date in YYYY-MM-DD format (Manila timezone)
+  const today = useMemo(() => {
+    const now = new Date();
+    const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+    return manilaTime.toISOString().split('T')[0];
+  }, []);
+
+  // Generate next 30 days for calendar
+  const next30Days = useMemo(() => {
+    const days: string[] = [];
+    const start = new Date(today);
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      days.push(date.toISOString().split('T')[0]);
+    }
+    return days;
+  }, [today]);
+
+  // Filter out past time slots if selected date is today
+  const filterPastSlots = (slots: string[], checkDate: string) => {
+    if (checkDate !== today) return slots;
+    
+    const now = new Date();
+    const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+    const currentHour = manilaTime.getHours();
+    const currentMinute = manilaTime.getMinutes();
+    const currentTimeInMinutes = currentHour * 60 + currentMinute;
+    
+    return slots.filter(slot => {
+      const [hours, minutes] = slot.split(':').map(Number);
+      const slotTimeInMinutes = hours * 60 + minutes;
+      return slotTimeInMinutes > currentTimeInMinutes + 30;
+    });
+  };
+
+  // Pre-fetch availability for next 30 days - OPTIMIZED: Single batch request
+  useEffect(() => {
+    if (!duration) return;
+    
+    setLoadingDates(true);
+    
+    fetch('/api/calendar/availability-batch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dates: next30Days, duration })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const cache: Record<string, number> = {};
+          data.results.forEach(({ date, count }: { date: string; count: number }) => {
+            cache[date] = count;
+          });
+          setAvailabilityCache(cache);
+          setUsingMockData(data.usingMockData || false);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load availability:', err);
+      })
+      .finally(() => setLoadingDates(false));
+  }, [duration, next30Days]);
+
+  // Fetch slots for selected date
+  useEffect(() => {
+    if (!date || !duration) return;
+    
+    setLoading(true);
+    fetch(`/api/calendar/availability?date=${date}&duration=${duration}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('Calendar availability response:', data);
+        if (data.success) {
+          const filteredSlots = filterPastSlots(data.availableSlots, date);
+          setRealAvailableSlots(filteredSlots);
+          setUsingMockData(data.usingMockData || false);
+        } else {
+          console.error('Failed to fetch availability:', data.error);
+          const filteredSlots = filterPastSlots(availableSlots, date);
+          setRealAvailableSlots(filteredSlots);
+          setUsingMockData(true);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching availability:', err);
+        const filteredSlots = filterPastSlots(availableSlots, date);
+        setRealAvailableSlots(filteredSlots);
+        setUsingMockData(true);
+      })
+      .finally(() => setLoading(false));
+  }, [date, duration, availableSlots, today]);
+
+  // Format date for display
+  const formatDateDisplay = (dateStr: string) => {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const getDayName = (dateStr: string) => {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'short' });
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold">Select date & time</h2>
-      <p className="text-neutral-600 mb-4">We show only logically available times with an automatic 30‑minute buffer between sessions.</p>
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="md:col-span-1">
-          <label className="text-sm font-medium">Date</label>
-          <Input type="date" value={date} onChange={(e)=>setDate(e.target.value)} className="mt-1"/>
-        </div>
-        <div className="md:col-span-2">
-          <label className="text-sm font-medium">Available times ({duration} mins)</label>
-          <div className="mt-1 grid grid-cols-3 md:grid-cols-6 gap-2 max-h-64 overflow-auto p-1 border rounded-xl">
-            {availableSlots.length===0 && (<div className="col-span-6 text-sm text-neutral-500 p-2">No available times for this date. Please try another day.</div>)}
-            {availableSlots.map((s)=> (
-              <button 
-                key={s} 
-                className="text-sm border rounded-xl px-2 py-1 flex items-center justify-center transition"
-                style={{
-                  borderColor: time === s ? BRAND.forest : "#e5e5e5",
-                  backgroundColor: time === s ? BRAND.forest : BRAND.white,
-                  color: time === s ? BRAND.white : BRAND.charcoal
-                }}
-                onMouseEnter={(e) => {
-                  if (time !== s) {
-                    e.currentTarget.style.borderColor = BRAND.forest;
-                    e.currentTarget.style.backgroundColor = "#e8f5f0";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (time !== s) {
-                    e.currentTarget.style.borderColor = "#e5e5e5";
-                    e.currentTarget.style.backgroundColor = BRAND.white;
-                  }
-                }}
-                onClick={()=>setTime(s)}
-              >
-                <Clock className="w-4 h-4 mr-1"/> {s}
-              </button>
-            ))}
+      <p className="text-neutral-600 mb-4">
+        {usingMockData 
+          ? "⚠️ Showing mock availability (Google Calendar not configured)"
+          : "✅ Available times synced with Google Calendar in real-time"}
+      </p>
+
+      {/* Custom Calendar Grid */}
+      <div className="mb-6">
+        <label className="text-sm font-medium mb-2 block">Select a Date</label>
+        {loadingDates && (
+          <div className="p-4 text-center text-neutral-500 border rounded-xl">
+            <Clock className="w-5 h-5 animate-spin mx-auto mb-2" />
+            Checking availability for next 30 days...
           </div>
-        </div>
+        )}
+        {!loadingDates && (
+          <div className="grid grid-cols-5 md:grid-cols-7 gap-2 p-4 border rounded-xl max-h-96 overflow-y-auto">
+            {next30Days.map((d) => {
+              const availableCount = availabilityCache[d] || 0;
+              const isFullyBooked = availableCount === 0;
+              const isSelected = date === d;
+              const isToday = d === today;
+
+              return (
+                <button
+                  key={d}
+                  onClick={() => {
+                    if (!isFullyBooked) {
+                      setDate(d);
+                      setTime('');
+                    }
+                  }}
+                  disabled={isFullyBooked}
+                  className={cn(
+                    "flex flex-col items-center justify-center p-2 rounded-lg border transition",
+                    isSelected && !isFullyBooked && "ring-2 ring-offset-1",
+                    isFullyBooked && "opacity-40 cursor-not-allowed",
+                    !isFullyBooked && "hover:shadow-md cursor-pointer"
+                  )}
+                  style={{
+                    borderColor: isSelected ? BRAND.forest : isFullyBooked ? "#ccc" : "#e5e5e5",
+                    backgroundColor: isSelected ? BRAND.forest : isFullyBooked ? "#f5f5f5" : BRAND.white,
+                    color: isSelected ? BRAND.white : isFullyBooked ? "#999" : BRAND.charcoal,
+                  }}
+                >
+                  <div className="text-[10px] font-medium">{getDayName(d)}</div>
+                  <div className="text-lg font-semibold">{formatDateDisplay(d).split(' ')[1]}</div>
+                  <div className="text-[9px] opacity-75">
+                    {isToday ? "Today" : formatDateDisplay(d).split(' ')[0]}
+                  </div>
+                  {!isFullyBooked && (
+                    <div className="text-[8px] mt-1 px-1 py-0.5 rounded" style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : '#e8f5f0', color: isSelected ? BRAND.white : BRAND.forest }}>
+                      {availableCount} session{availableCount !== 1 ? 's' : ''} 
+                    </div>
+                  )}
+                  {isFullyBooked && (
+                    <div className="text-[8px] mt-1 px-1 py-0.5 rounded bg-red-100 text-red-600">
+                      Full
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        <p className="text-xs text-neutral-500 mt-2">
+          🟢 Green badge = available slots • 🔴 Red badge = fully booked
+        </p>
       </div>
-      <p className="text-xs text-neutral-500 mt-3">Studio hours: {pad(SHOP_HOURS.open)}:00–{pad(SHOP_HOURS.close)}:00 ({STUDIO_TZ}) • Grid: {SLOT_MINUTES}‑minute slots • Buffer: {BUFFER_MINUTES} minutes</p>
+
+      {/* Time Slots */}
+      {date && (
+        <div>
+          <label className="text-sm font-medium">Available times for {formatDateDisplay(date)} ({duration} mins)</label>
+          {loading && (
+            <div className="mt-1 p-4 text-center text-neutral-500 border rounded-xl">
+              <Clock className="w-5 h-5 animate-spin mx-auto mb-2" />
+              Loading time slots...
+            </div>
+          )}
+          {!loading && (
+            <div className="mt-1 grid grid-cols-3 md:grid-cols-6 gap-2 max-h-64 overflow-auto p-1 border rounded-xl">
+              {realAvailableSlots.length===0 && (
+                <div className="col-span-6 text-sm text-neutral-500 p-2">
+                  {date === today 
+                    ? "No more available times today. Please select a future date."
+                    : "No available times for this date. Please try another day."}
+                </div>
+              )}
+              {realAvailableSlots.map((s)=> (
+                <button 
+                  key={s} 
+                  className="text-sm border rounded-xl px-2 py-1 flex items-center justify-center transition"
+                  style={{
+                    borderColor: time === s ? BRAND.forest : "#e5e5e5",
+                    backgroundColor: time === s ? BRAND.forest : BRAND.white,
+                    color: time === s ? BRAND.white : BRAND.charcoal
+                  }}
+                  onMouseEnter={(e) => {
+                    if (time !== s) {
+                      e.currentTarget.style.borderColor = BRAND.forest;
+                      e.currentTarget.style.backgroundColor = "#e8f5f0";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (time !== s) {
+                      e.currentTarget.style.borderColor = "#e5e5e5";
+                      e.currentTarget.style.backgroundColor = BRAND.white;
+                    }
+                  }}
+                  onClick={()=>setTime(s)}
+                >
+                  <Clock className="w-4 h-4 mr-1"/> {to12Hour(s)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <p className="text-xs text-neutral-500 mt-3">
+        {usingMockData ? "⚠️ Using mock data - configure Google Calendar for real-time availability" : "✅ Real-time Google Calendar sync"} • Studio hours: {pad(SHOP_HOURS.open)}:00–{pad(SHOP_HOURS.close)}:00 ({STUDIO_TZ})
+      </p>
     </div>
   );
 }
