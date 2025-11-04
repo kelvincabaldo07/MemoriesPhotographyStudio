@@ -2,16 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
 const STUDIO_TZ = 'Asia/Manila';
-const SHOP_HOURS_BY_DAY = {
-  0: { open: 13, close: 20, lunchBreak: null }, // Sunday: 1 PM - 8 PM (no lunch break)
-  1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Monday: 8 AM - 8 PM (lunch 12-1)
-  2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Tuesday: 8 AM - 8 PM (lunch 12-1)
-  3: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Wednesday: 8 AM - 8 PM (lunch 12-1)
-  4: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Thursday: 8 AM - 8 PM (lunch 12-1)
-  5: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Friday: 8 AM - 8 PM (lunch 12-1)
-  6: { open: 10, close: 20, lunchBreak: { start: 12, end: 13 } }, // Saturday: 10 AM - 8 PM (lunch 12-1)
+
+// Add type definition:
+type ShopHours = {
+  open: number;
+  close: number;
+  lunchBreak?: { start: number; end: number } | null;
 };
-const SHOP_HOURS = { open: 8, close: 20 }; // Default
+
+const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
+  0: { open: 13, close: 20, lunchBreak: null },
+  1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
+  2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
+  3: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
+  4: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
+  5: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
+  6: { open: 10, close: 20, lunchBreak: { start: 12, end: 13 } },
+};
+const SHOP_HOURS = { open: 8, close: 20 };
 const SLOT_MINUTES = 15;
 const BUFFER_MINUTES = 30;
 const MIN_SESSION_DURATION = 45; // Minimum booking duration
@@ -31,14 +39,14 @@ function toHHMM(mins: number) {
   return `${pad(h)}:${pad(m)}`;
 }
 
-function getShopHoursForDate(dateStr: string) {
+function getShopHoursForDate(dateStr: string): ShopHours {
   const date = new Date(dateStr + 'T12:00:00');
   const dayOfWeek = date.getDay();
-  return SHOP_HOURS_BY_DAY[dayOfWeek as keyof typeof SHOP_HOURS_BY_DAY];
+  return SHOP_HOURS_BY_DAY[dayOfWeek];
 }
 
 function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES) {
-  const hours = dateStr ? getShopHoursForDate(dateStr) : SHOP_HOURS;
+  const hours: ShopHours = dateStr ? getShopHoursForDate(dateStr) : { ...SHOP_HOURS, lunchBreak: null };
   const start = hours.open * 60;
   const end = hours.close * 60;
   
@@ -50,6 +58,7 @@ function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DUR
   for (let mins = start; mins <= latestStartTime; mins += SLOT_MINUTES) {
     slots.push(toHHMM(mins));
   }
+  
   // Filter out lunch break if applicable
   if (hours.lunchBreak) {
     const lunchStart = hours.lunchBreak.start * 60;
@@ -57,9 +66,8 @@ function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DUR
     
     return slots.filter(slot => {
       const slotMinutes = toMinutes(slot);
-      const slotEnd = slotMinutes + duration + buffer; // Session end time including buffer
+      const slotEnd = slotMinutes + duration + buffer;
       
-      // Slot is valid if it ends before lunch starts OR starts after lunch ends
       return slotEnd <= lunchStart || slotMinutes >= lunchEnd;
     });
   }
