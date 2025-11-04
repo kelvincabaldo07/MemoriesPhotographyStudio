@@ -211,8 +211,9 @@ export async function GET(request: NextRequest) {
     console.error('Calendar API Error:', error);
     
     const dateParam = request.nextUrl.searchParams.get('date') || '';
-    const allSlots = generateDailySlots(undefined, duration, BUFFER_MINUTES);
-    const realSlots = calculateRealSlots(allSlots, parseInt(request.nextUrl.searchParams.get('duration') || '45'));
+    const durationParam = parseInt(request.nextUrl.searchParams.get('duration') || '45');
+    const allSlots = generateDailySlots(dateParam, durationParam, BUFFER_MINUTES);
+    const realSlots = calculateRealSlots(allSlots, durationParam);
     
     return NextResponse.json({
       success: true,
