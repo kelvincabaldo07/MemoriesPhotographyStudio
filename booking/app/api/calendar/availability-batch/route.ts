@@ -3,6 +3,15 @@ import { google } from 'googleapis';
 
 const STUDIO_TZ = 'Asia/Manila';
 const SHOP_HOURS = { open: 8, close: 20 };
+const SHOP_HOURS_BY_DAY = {
+  0: { open: 13, close: 20, lunchBreak: null }, // Sunday: 1 PM - 8 PM (no lunch break)
+  1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Monday: 8 AM - 8 PM (lunch 12-1)
+  2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Tuesday: 8 AM - 8 PM (lunch 12-1)
+  3: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Wednesday: 8 AM - 8 PM (lunch 12-1)
+  4: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Thursday: 8 AM - 8 PM (lunch 12-1)
+  5: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Friday: 8 AM - 8 PM (lunch 12-1)
+  6: { open: 10, close: 20, lunchBreak: { start: 12, end: 13 } }, // Saturday: 10 AM - 8 PM (lunch 12-1)
+};
 const SLOT_MINUTES = 15;
 const BUFFER_MINUTES = 30;
 
@@ -21,13 +30,37 @@ function toHHMM(mins: number) {
   return `${pad(h)}:${pad(m)}`;
 }
 
-function generateDailySlots() {
-  const start = SHOP_HOURS.open * 60;
-  const end = SHOP_HOURS.close * 60;
+function getShopHoursForDate(dateStr: string) {
+  const date = new Date(dateStr + 'T12:00:00');
+  const dayOfWeek = date.getDay();
+  return SHOP_HOURS_BY_DAY[dayOfWeek as keyof typeof SHOP_HOURS_BY_DAY];
+}
+
+function generateDailySlots(dateStr?: string, duration: number = 45, buffer: number = BUFFER_MINUTES) {
+  const hours = dateStr ? getShopHoursForDate(dateStr) : SHOP_HOURS;
+  const start = hours.open * 60;
+  const end = hours.close * 60;
+  
+  // Calculate the latest possible start time
+  const latestStartTime = end - duration - buffer;
+  
   const slots: string[] = [];
-  for (let mins = start; mins <= end - SLOT_MINUTES; mins += SLOT_MINUTES) {
+  
+  for (let mins = start; mins <= latestStartTime; mins += SLOT_MINUTES) {
     slots.push(toHHMM(mins));
   }
+  
+  // Filter out lunch break if applicable
+  if (hours.lunchBreak) {
+    const lunchStart = hours.lunchBreak.start * 60;
+    const lunchEnd = hours.lunchBreak.end * 60;
+    
+    return slots.filter(slot => {
+      const slotMinutes = toMinutes(slot);
+      return slotMinutes < lunchStart || slotMinutes >= lunchEnd;
+    });
+  }
+  
   return slots;
 }
 

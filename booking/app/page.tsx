@@ -37,10 +37,46 @@ import { twMerge as cn } from "tailwind-merge";
 
 // ---------- Configuration ----------
 const STUDIO_TZ = "Asia/Manila";
-const SHOP_HOURS = { open: 8, close: 20 }; // 8:00 AM – 8:00 PM (12 hours = 720 minutes)
+// Studio hours by day of week
+const SHOP_HOURS_BY_DAY = {
+  0: { open: 13, close: 20, lunchBreak: null }, // Sunday: 1 PM - 8 PM (no lunch break)
+  1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Monday: 8 AM - 8 PM (lunch 12-1)
+  2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Tuesday: 8 AM - 8 PM (lunch 12-1)
+  3: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Wednesday: 8 AM - 8 PM (lunch 12-1)
+  4: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Thursday: 8 AM - 8 PM (lunch 12-1)
+  5: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Friday: 8 AM - 8 PM (lunch 12-1)
+  6: { open: 10, close: 20, lunchBreak: { start: 12, end: 13 } }, // Saturday: 10 AM - 8 PM (lunch 12-1)
+};
+const SHOP_HOURS = { open: 8, close: 20 }; // Default for general calculations
 const SLOT_MINUTES = 15; // 15-minute increments for display
 const BUFFER_MINUTES = 30; // 30-min buffer between sessions
 const MIN_SESSION_DURATION = 45; // Minimum booking duration (for slot count calculation)
+// Service-specific restrictions
+const SERVICE_RESTRICTIONS = {
+  // With Photographer: 8 AM to 6 PM only
+  "With Photographer": {
+    availableFrom: 8, // 8:00 AM (in hours, 24-hour format)
+    availableUntil: 18, // 6:00 PM (18:00 in 24-hour format)
+  },
+  
+  // Christmas sessions: Specific dates only
+  "Seasonal Sessions": {
+    allowedDates: [
+      // 2025
+      "2025-11-21",
+      "2025-11-28",
+      "2025-12-05",
+      "2025-12-06",
+      "2025-12-13",
+      // 2026 (same dates)
+      "2026-11-21",
+      "2026-11-28",
+      "2026-12-05",
+      "2026-12-06",
+      "2026-12-13",
+    ]
+  }
+};
 
 // Studio brand colors - earthy, natural palette
 const BRAND = {
@@ -236,17 +272,88 @@ function offsetDate(days = 0) {
 
 // ---------- Utils ----------
 function pad(n: number) { return n.toString().padStart(2, "0"); }
+// Get shop hours for a specific date
+function getShopHoursForDate(dateStr: string) {
+  const date = new Date(dateStr + 'T12:00:00');
+  const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  return SHOP_HOURS_BY_DAY[dayOfWeek as keyof typeof SHOP_HOURS_BY_DAY];
+}
 function toMinutes(hhmm: string) { const [h,m] = hhmm.split(":").map(Number); return h*60+m; }
 function toHHMM(mins: number) { const h = Math.floor(mins/60), m = mins%60; return `${pad(h)}:${pad(m)}`; }
 function range(start: number, end: number, step: number){ const out:number[]=[]; for(let x=start;x<=end;x+=step) out.push(x); return out; }
-function generateDailySlots(){ const start=SHOP_HOURS.open*60, end=SHOP_HOURS.close*60; return range(start, end-SLOT_MINUTES, SLOT_MINUTES).map(toHHMM); }
-function buildBlockedMap(date: string, existing: {date:string; start:string; duration:number}[], bufferMins=BUFFER_MINUTES){
-  const blocks:[number,number][]=[];
-  for(const b of existing.filter(x=>x.date===date)){
-    const s=toMinutes(b.start)-bufferMins; const e=toMinutes(b.start)+b.duration+bufferMins;
-    blocks.push([Math.max(s, SHOP_HOURS.open*60), Math.min(e, SHOP_HOURS.close*60)]);
+function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES){ 
+  const hours = dateStr ? getShopHoursForDate(dateStr) : SHOP_HOURS;
+  const start = hours.open * 60;
+  const end = hours.close * 60;
+  
+  // Calculate the latest possible start time
+  // A slot must have enough time for: session duration + buffer before closing
+  const latestStartTime = end - duration - buffer;
+  
+  // Generate all slots up to the latest valid start time
+  const allSlots = range(start, latestStartTime, SLOT_MINUTES).map(toHHMM);
+  
+  // Filter out lunch break if applicable
+  if (hours.lunchBreak) {
+    const lunchStart = hours.lunchBreak.start * 60;
+    const lunchEnd = hours.lunchBreak.end * 60;
+    
+    return allSlots.filter(slot => {
+      const slotMinutes = toMinutes(slot);
+      const slotEnd = slotMinutes + duration + buffer; // Session end time including buffer
+      
+      // Slot is valid if:
+      // 1. It ends before lunch starts, OR
+      // 2. It starts after lunch ends
+      return slotEnd <= lunchStart || slotMinutes >= lunchEnd;
+    });
   }
+  
+  return allSlots;
+}
+function buildBlockedMap(date: string, existing: {date:string; start:string; duration:number}[], bufferMins=BUFFER_MINUTES){
+  const hours = getShopHoursForDate(date);
+  const blocks:[number,number][]=[];
+  
+  // Add lunch break as a blocked range
+  if (hours.lunchBreak) {
+    blocks.push([hours.lunchBreak.start * 60, hours.lunchBreak.end * 60]);
+  }
+  
+  // Add existing bookings as blocked ranges
+  for(const b of existing.filter(x=>x.date===date)){
+    const s=toMinutes(b.start)-bufferMins; 
+    const e=toMinutes(b.start)+b.duration+bufferMins;
+    blocks.push([Math.max(s, hours.open*60), Math.min(e, hours.close*60)]);
+  }
+  
   return blocks;
+}
+// Check if a date is allowed for a service type
+function isDateAllowedForService(dateStr: string, serviceType: string): boolean {
+  if (serviceType !== "Seasonal Sessions") return true;
+  
+  const restrictions = SERVICE_RESTRICTIONS["Seasonal Sessions"];
+  if (!restrictions?.allowedDates) return true;
+  
+  // Check if the date is in the allowed dates list
+  return restrictions.allowedDates.includes(dateStr);
+}
+
+// Filter time slots based on service type
+function filterSlotsByService(slots: string[], serviceType: string): string[] {
+  if (serviceType !== "With Photographer") return slots;
+  
+  const restrictions = SERVICE_RESTRICTIONS["With Photographer"];
+  if (!restrictions) return slots;
+  
+  const fromMinutes = restrictions.availableFrom * 60;
+  const untilMinutes = restrictions.availableUntil * 60;
+  
+  return slots.filter(slot => {
+    const slotMinutes = toMinutes(slot);
+    return slotMinutes >= fromMinutes && slotMinutes < untilMinutes;
+  });
 }
 // ✅ FIXED syntax here
 function isSlotAvailable(slotHHMM: string, duration: number, blocked:[number,number][]): boolean {
@@ -512,7 +619,15 @@ async function submitBooking(){
             )}
 
             {step === 1 && (
-              <StepSchedule date={date} setDate={setDate} time={time} setTime={setTime} duration={duration} availableSlots={availableSlots} />
+              <StepSchedule 
+                date={date} 
+                setDate={setDate} 
+                time={time} 
+                setTime={setTime} 
+                duration={duration} 
+                availableSlots={availableSlots} 
+                serviceType={serviceType}
+              />
             )}
 
             {step === 2 && (
@@ -1055,8 +1170,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
 }
 
 
-function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }:{
-  date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[];
+function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, serviceType }:{
+  date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[]; serviceType:string;
 }){
   const [loading, setLoading] = useState(false);
   const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>(availableSlots);
@@ -1071,11 +1186,11 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
     return manilaTime.toISOString().split('T')[0];
   }, []);
 
-  // Generate next 30 days for calendar
-  const next30Days = useMemo(() => {
+  // Generate next 90 days (3 months) for calendar
+  const next90Days = useMemo(() => {
     const days: string[] = [];
     const start = new Date(today);
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 90; i++) {
       const date = new Date(start);
       date.setDate(start.getDate() + i);
       days.push(date.toISOString().split('T')[0]);
@@ -1109,7 +1224,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
     fetch('/api/calendar/availability-batch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dates: next30Days, duration })
+      body: JSON.stringify({ dates: next90Days, duration })
     })
       .then(res => res.json())
       .then(data => {
@@ -1126,13 +1241,14 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
         console.error('Failed to load availability:', err);
       })
       .finally(() => setLoadingDates(false));
-  }, [duration, next30Days]);
+  }, [duration, next90Days]);
 
   // Fetch slots for selected date
   useEffect(() => {
     if (!date || !duration) return;
     
     setLoading(true);
+    
     fetch(`/api/calendar/availability?date=${date}&duration=${duration}`)
       .then(res => res.json())
       .then(data => {
@@ -1188,9 +1304,10 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
         )}
         {!loadingDates && (
           <div className="grid grid-cols-5 md:grid-cols-7 gap-2 p-4 border rounded-xl max-h-96 overflow-y-auto">
-            {next30Days.map((d) => {
+            {next90Days.map((d) => {
+              const isDateAllowed = isDateAllowedForService(d, serviceType);
               const availableCount = availabilityCache[d] || 0;
-              const isFullyBooked = availableCount === 0;
+              const isFullyBooked = availableCount === 0 || !isDateAllowed;
               const isSelected = date === d;
               const isToday = d === today;
 
@@ -1203,7 +1320,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
                       setTime('');
                     }
                   }}
-                  disabled={isFullyBooked}
+                  disabled={isFullyBooked || !isDateAllowed}
                   className={cn(
                     "flex flex-col items-center justify-center p-2 rounded-lg border transition",
                     isSelected && !isFullyBooked && "ring-2 ring-offset-1",
@@ -1226,7 +1343,12 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
                       {availableCount} session{availableCount !== 1 ? 's' : ''} 
                     </div>
                   )}
-                  {isFullyBooked && (
+                  {isFullyBooked && availableCount > 0 && !isDateAllowed && (
+                    <div className="text-[8px] mt-1 px-1 py-0.5 rounded bg-amber-100 text-amber-700">
+                      Not available
+                    </div>
+                  )}
+                  {isFullyBooked && (availableCount === 0 || isDateAllowed) && (
                     <div className="text-[8px] mt-1 px-1 py-0.5 rounded bg-red-100 text-red-600">
                       Full
                     </div>
@@ -1260,8 +1382,8 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
                     : "No available times for this date. Please try another day."}
                 </div>
               )}
-              {realAvailableSlots.map((s)=> (
-                <button 
+              {filterSlotsByService(realAvailableSlots, serviceType).map((s)=> (
+                <button
                   key={s} 
                   className="text-sm border rounded-xl px-2 py-1 flex items-center justify-center transition"
                   style={{
@@ -1292,7 +1414,10 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots }
       )}
 
       <p className="text-xs text-neutral-500 mt-3">
-        {usingMockData ? "⚠️ Using mock data - configure Google Calendar for real-time availability" : "✅ Real-time Google Calendar sync"} • Studio hours: {pad(SHOP_HOURS.open)}:00–{pad(SHOP_HOURS.close)}:00 ({STUDIO_TZ})
+        {usingMockData ? "⚠️ Using mock data - configure Google Calendar for real-time availability" : "✅ Real-time Google Calendar sync"} • 
+        Studio hours: Mon-Fri 8AM-8PM, Sat 10AM-8PM, Sun 1PM-8PM • Lunch break: 12PM-1PM (Mon-Sat) ({STUDIO_TZ})
+        {serviceType === "With Photographer" && " • With Photographer sessions: 8:00 AM - 6:00 PM only"}
+        {serviceType === "Seasonal Sessions" && " • Christmas sessions: Nov 21,28 & Dec 5,6,13 only"}
       </p>
     </div>
   );
