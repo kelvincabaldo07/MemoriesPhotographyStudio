@@ -27,92 +27,116 @@ export default function AdminNav({ session }: { session: any }) {
   ];
 
   const isActive = (path: string) => pathname === path;
+  
+  const getCurrentSection = () => {
+    const current = navItems.find(item => isActive(item.path));
+    return current?.name || "Admin";
+  };
 
   return (
-    <nav className="bg-[#0b3d2e] dark:bg-[#0b3d2e] border-b border-[#0a3426] sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-  <div className="flex items-center justify-between h-14 gap-2">
-          {/* Logo */}
-          <div className="flex items-center gap-2 min-w-0">
-            <div 
-              className="w-7 h-7 rounded-full bg-white flex items-center justify-center cursor-pointer"
-              onClick={() => router.push("/admin/dashboard")}
-            >
-              <span className="text-[#0b3d2e] font-bold text-sm">M</span>
+    <>
+      {/* Top Header */}
+      <nav className="bg-[#0b3d2e] dark:bg-[#0b3d2e] border-b border-[#0a3426] sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between h-14 gap-2">
+            {/* Logo & Current Section */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div 
+                className="w-8 h-8 rounded-full bg-white flex items-center justify-center cursor-pointer flex-shrink-0"
+                onClick={() => router.push("/admin/dashboard")}
+              >
+                <span className="text-[#0b3d2e] font-bold text-sm">M</span>
+              </div>
+              <div className="min-w-0">
+                <span className="font-semibold text-white text-base truncate block lg:hidden">
+                  {getCurrentSection()}
+                </span>
+                <span className="font-semibold text-white text-base truncate hidden lg:block">
+                  Memories Studio Admin
+                </span>
+              </div>
             </div>
-            <div className="min-w-0">
-              <span className="font-semibold text-white hidden md:block text-sm truncate max-w-[12rem]">
-                Admin Dashboard
-              </span>
+
+            {/* Nav Items - Desktop Only */}
+            <div className="hidden lg:flex items-center gap-1 min-w-0">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => router.push(item.path)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      isActive(item.path)
+                        ? "bg-white text-[#0b3d2e]"
+                        : "text-white/90 hover:bg-white/10"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {item.name}
+                  </button>
+                );
+              })}
             </div>
-          </div>
 
-          {/* Nav Items - Desktop */}
-          <div className="hidden lg:flex items-center gap-1 min-w-0">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => router.push(item.path)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
-                    isActive(item.path)
-                      ? "bg-white text-[#0b3d2e]"
-                      : "text-white/90 hover:bg-white/10"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {item.name}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Mobile Nav (moved inline) */}
-          <div className="lg:hidden flex gap-0.5 overflow-x-auto pb-2 -mx-1 flex-shrink-0">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => router.push(item.path)}
-                  className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition whitespace-nowrap flex-shrink-0 ${
-                    isActive(item.path)
-                      ? "bg-white text-[#0b3d2e]"
-                      : "text-white/90 hover:bg-white/10"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {item.name}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* User Menu */}
-          <div className="flex items-center gap-2">
-            <div className="text-right hidden md:block min-w-0">
-              <p className="text-xs font-medium text-white">
-                {session?.user?.name}
-              </p>
-              <p className="text-[10px] text-white/70">
-                {session?.user?.email}
-              </p>
+            {/* User Menu - Desktop */}
+            <div className="hidden lg:flex items-center gap-2">
+              <div className="text-right min-w-0">
+                <p className="text-xs font-medium text-white truncate">
+                  {session?.user?.name}
+                </p>
+                <p className="text-[10px] text-white/70 truncate">
+                  {session?.user?.email}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => signOut({ callbackUrl: "/admin/login" })}
+                className="text-white hover:bg-white/10 h-9"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="ml-2 text-sm">Sign Out</span>
+              </Button>
             </div>
+
+            {/* Sign Out Button - Mobile */}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => signOut({ callbackUrl: "/admin/login" })}
-              className="text-white hover:bg-white/10 h-8 flex-shrink-0"
+              className="text-white hover:bg-white/10 h-9 lg:hidden"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="ml-1.5 hidden md:inline text-xs">Sign Out</span>
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>
+      </nav>
 
-        
+      {/* Bottom Tab Bar - Mobile Only */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom">
+        <div className="grid grid-cols-6 gap-0">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.path);
+            return (
+              <button
+                key={item.path}
+                onClick={() => router.push(item.path)}
+                className={`flex flex-col items-center justify-center py-2 px-1 transition ${
+                  active
+                    ? "text-[#0b3d2e] dark:text-white"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : "stroke-2"}`} />
+                <span className={`text-[10px] mt-1 ${active ? "font-semibold" : "font-medium"}`}>
+                  {item.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </nav>
+    </>
   );
 }
