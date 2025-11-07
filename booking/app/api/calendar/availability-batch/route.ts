@@ -151,18 +151,16 @@ export async function POST(request: NextRequest) {
     const startDate = new Date(dates[0] + 'T00:00:00+08:00');
     const endDate = new Date(dates[dates.length - 1] + 'T23:59:59+08:00');
 
-    console.log(`Fetching events from ${dates[0]} to ${dates[dates.length - 1]}`);
-
     const response = await calendar.events.list({
       calendarId: process.env.GOOGLE_CALENDAR_ID || 'primary',
       timeMin: startDate.toISOString(),
       timeMax: endDate.toISOString(),
       singleEvents: true,
       orderBy: 'startTime',
+      maxResults: 2500, // Increase limit for busy calendars
     });
 
     const events = response.data.items || [];
-    console.log(`Found ${events.length} events in date range`);
 
     // Group events by date
     const eventsByDate: Record<string, typeof events> = {};
@@ -205,8 +203,6 @@ export async function POST(request: NextRequest) {
         count: realSlots
       };
     });
-
-    console.log(`Processed ${results.length} dates successfully`);
 
     return NextResponse.json({
       success: true,

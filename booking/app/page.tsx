@@ -433,6 +433,13 @@ export default function App(){
   },0), [addons]);
   const grandTotal = sessionPrice + addonsTotal;
 
+  // Clear cache when service changes (duration changes)
+  useEffect(() => {
+    if (duration) {
+      sessionStorage.clear(); // Clear slot cache when changing services
+    }
+  }, [duration]);
+
   const slots = useMemo(()=>generateDailySlots(), []);
   const blocked = useMemo(()=>buildBlockedMap(date, EXISTING_BOOKINGS), [date]);
   const availableSlots = useMemo(()=> slots.filter((s)=>isSlotAvailable(s, duration, blocked)), [slots, duration, blocked]);
@@ -1226,6 +1233,9 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
   useEffect(() => {
     if (!duration) return;
     
+    // Skip if we already have data cached
+    if (Object.keys(availabilityCache).length > 0) return;
+    
     setLoadingDates(true);
     
     fetch('/api/calendar/availability-batch', {
@@ -1248,19 +1258,32 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
         console.error('Failed to load availability:', err);
       })
       .finally(() => setLoadingDates(false));
-  }, [duration, next90Days]);
+  }, [duration]);
 
-  // Fetch slots for selected date
+  // Fetch slots for selected date - WITH CACHING
   useEffect(() => {
     if (!date || !duration) return;
     
     setLoading(true);
     
+    // Create cache key for this specific date + duration combo
+    const cacheKey = `${date}-${duration}`;
+    
+    // Check if we already fetched this date + duration
+    const cachedSlots = sessionStorage.getItem(cacheKey);
+    if (cachedSlots) {
+      const filteredSlots = filterPastSlots(JSON.parse(cachedSlots), date);
+      setRealAvailableSlots(filteredSlots);
+      setLoading(false);
+      return;
+    }
+    
     fetch(`/api/calendar/availability?date=${date}&duration=${duration}`)
       .then(res => res.json())
       .then(data => {
-        console.log('Calendar availability response:', data);
         if (data.success) {
+          // Cache the raw slots for 5 minutes
+          sessionStorage.setItem(cacheKey, JSON.stringify(data.availableSlots));
           const filteredSlots = filterPastSlots(data.availableSlots, date);
           setRealAvailableSlots(filteredSlots);
           setUsingMockData(data.usingMockData || false);
@@ -1278,7 +1301,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
         setUsingMockData(true);
       })
       .finally(() => setLoading(false));
-  }, [date, duration, availableSlots, today]);
+  }, [date, duration]);
 
   // Format date for display
   const formatDateDisplay = (dateStr: string) => {
