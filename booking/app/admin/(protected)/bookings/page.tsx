@@ -18,7 +18,11 @@ import {
   XCircle,
   Edit,
   Save,
-  X as CloseIcon
+  X as CloseIcon,
+  Users,
+  Package,
+  Layers,
+  Tag
 } from "lucide-react";
 
 interface Booking {
@@ -277,51 +281,55 @@ export default function BookingsPage() {
         ))}
       </div>
 
-      {/* Stats - Single Row with Icons */}
-      <div className="grid grid-cols-4 gap-3">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+      {/* Summary - Dashboard Style */}
+      <div>
+        <h2 className="text-lg font-semibold text-[#0b3d2e] mb-3">Summary</h2>
+        <Card className="p-6">
+          <div className="grid grid-cols-4 gap-4 lg:gap-6">
+            {/* Total Bookings */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-neutral-600">Total Bookings</p>
-              <p className="text-xl font-bold text-[#0b3d2e]">{stats.total}</p>
+
+            {/* Revenue */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
+              </div>
             </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+
+            {/* Customers */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Customers</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-neutral-600">Confirmed</p>
-              <p className="text-xl font-bold text-green-600">{stats.confirmed}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
-            </div>
-            <div>
-              <p className="text-xs text-neutral-600">Pending</p>
-              <p className="text-xl font-bold text-yellow-600">{stats.pending}</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div>
-              <p className="text-xs text-neutral-600">Total Revenue</p>
-              <p className="text-xl font-bold text-[#0b3d2e]">
-                ₱{stats.revenue.toLocaleString()}
-              </p>
+
+            {/* Avg. Value */}
+            <div className="text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Value</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">
+                  ₱{stats.total > 0 ? Math.round(stats.revenue / stats.total).toLocaleString() : 0}
+                </p>
+              </div>
             </div>
           </div>
         </Card>
@@ -342,59 +350,86 @@ export default function BookingsPage() {
           </div>
 
           {/* Status Filters */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {["All", "Pending", "Confirmed", "Completed", "Cancelled"].map((status) => (
-              <Button
-                key={status}
-                variant={statusFilter === status ? "default" : "outline"}
-                size="sm"
-                onClick={() => setStatusFilter(status)}
-                className={`whitespace-nowrap ${
-                  statusFilter === status
-                    ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
-                    : ""
-                }`}
-              >
-                {status}
-              </Button>
-            ))}
+          <div>
+            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status</label>
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {["All", "Pending", "Confirmed", "Completed", "Cancelled"].map((status) => (
+                <Button
+                  key={status}
+                  variant={statusFilter === status ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setStatusFilter(status)}
+                  className={`whitespace-nowrap ${
+                    statusFilter === status
+                      ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
+                      : ""
+                  }`}
+                >
+                  {status}
+                </Button>
+              ))}
+            </div>
           </div>
 
-          {/* Additional Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-            <Input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              placeholder="Filter by date"
-            />
-            <select
-              value={serviceTypeFilter}
-              onChange={(e) => setServiceTypeFilter(e.target.value)}
-              className="px-3 py-2 border rounded-md text-sm"
-            >
-              {uniqueServiceTypes.map((type) => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
-            <select
-              value={serviceCategoryFilter}
-              onChange={(e) => setServiceCategoryFilter(e.target.value)}
-              className="px-3 py-2 border rounded-md text-sm"
-            >
-              {uniqueServiceCategories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            <select
-              value={serviceFilter}
-              onChange={(e) => setServiceFilter(e.target.value)}
-              className="px-3 py-2 border rounded-md text-sm"
-            >
-              {uniqueServices.map((svc) => (
-                <option key={svc} value={svc}>{svc}</option>
-              ))}
-            </select>
+          {/* Service Filters - 2 rows on mobile */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                Date
+              </label>
+              <Input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                placeholder="Filter by date"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+                <Package className="w-3 h-3" />
+                Service Type
+              </label>
+              <select
+                value={serviceTypeFilter}
+                onChange={(e) => setServiceTypeFilter(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md text-sm"
+              >
+                {uniqueServiceTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                Category
+              </label>
+              <select
+                value={serviceCategoryFilter}
+                onChange={(e) => setServiceCategoryFilter(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md text-sm"
+              >
+                {uniqueServiceCategories.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+                <Tag className="w-3 h-3" />
+                Service
+              </label>
+              <select
+                value={serviceFilter}
+                onChange={(e) => setServiceFilter(e.target.value)}
+                className="w-full px-3 py-2 border rounded-md text-sm"
+              >
+                {uniqueServices.map((svc) => (
+                  <option key={svc} value={svc}>{svc}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </Card>
@@ -452,16 +487,47 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Service Info */}
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="text-neutral-600">Service Type:</span>
-                    <p className="font-medium">{booking.serviceType}</p>
+                <div className="space-y-1 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Package className="w-4 h-4 text-neutral-500 mt-0.5" />
+                    <div>
+                      <span className="text-neutral-600">Service Type: </span>
+                      <span className="font-medium">{booking.serviceType}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-neutral-600">Service:</span>
-                    <p className="font-medium">{booking.service}</p>
+                  <div className="flex items-start gap-2">
+                    <Layers className="w-4 h-4 text-neutral-500 mt-0.5" />
+                    <div>
+                      <span className="text-neutral-600">Category: </span>
+                      <span className="font-medium">{booking.serviceCategory}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Tag className="w-4 h-4 text-neutral-500 mt-0.5" />
+                    <div>
+                      <span className="text-neutral-600">Service: </span>
+                      <span className="font-medium">{booking.service}</span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Add-ons and Backdrops */}
+                {(booking.addons.length > 0 || booking.backdrops.length > 0) && (
+                  <div className="space-y-1 text-xs pt-2 border-t">
+                    {booking.addons.length > 0 && (
+                      <div className="flex items-start gap-1">
+                        <span className="text-neutral-600">Add-ons:</span>
+                        <span className="text-neutral-800">{booking.addons.join(", ")}</span>
+                      </div>
+                    )}
+                    {booking.backdrops.length > 0 && (
+                      <div className="flex items-start gap-1">
+                        <span className="text-neutral-600">Backdrops:</span>
+                        <span className="text-neutral-800">{booking.backdrops.join(", ")}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Price */}
                 <div className="flex items-center justify-between pt-2 border-t">
