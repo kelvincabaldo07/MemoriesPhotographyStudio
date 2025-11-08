@@ -122,16 +122,22 @@ export default function AdminNav({ session }: { session: any }) {
               <button
                 key={item.path}
                 onClick={() => router.push(item.path)}
-                className={`flex flex-col items-center justify-center py-2 px-1 transition ${
-                  active
-                    ? "text-[#0b3d2e] dark:text-white"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
+                className="flex flex-col items-center justify-center py-2 px-1 transition relative"
               >
-                <Icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : "stroke-2"}`} />
-                <span className={`text-[10px] mt-1 ${active ? "font-semibold" : "font-medium"}`}>
-                  {item.name}
-                </span>
+                <div className={`flex flex-col items-center justify-center ${
+                  active ? "text-white dark:text-white" : "text-gray-500 dark:text-gray-400"
+                }`}>
+                  <div className={`rounded-lg p-1.5 transition ${
+                    active ? "bg-[#0b3d2e] dark:bg-[#0b3d2e]" : ""
+                  }`}>
+                    <Icon className={`w-5 h-5 ${active ? "stroke-[2.5]" : "stroke-2"}`} />
+                  </div>
+                  <span className={`text-[10px] mt-1 ${
+                    active ? "font-semibold text-[#0b3d2e] dark:text-white" : "font-medium"
+                  }`}>
+                    {item.name}
+                  </span>
+                </div>
               </button>
             );
           })}
