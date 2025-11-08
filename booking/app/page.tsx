@@ -59,29 +59,23 @@ const SHOP_HOURS = { open: 8, close: 20 }; // Default for general calculations
 const SLOT_MINUTES = 15; // 15-minute increments for display
 const BUFFER_MINUTES = 30; // 30-min buffer between sessions
 const MIN_SESSION_DURATION = 45; // Minimum booking duration (for slot count calculation)
-// Service-specific restrictions
-const SERVICE_RESTRICTIONS = {
-  // With Photographer: 8 AM to 6 PM only
+// Service-specific restrictions - will be loaded from API
+type ServiceRestriction = {
+  availableFrom?: number;
+  availableUntil?: number;
+  allowedDates?: string[];
+};
+
+const SERVICE_RESTRICTIONS: Record<string, ServiceRestriction> = {
+  // Default restrictions (fallback if API fails)
   "With Photographer": {
-    availableFrom: 8, // 8:00 AM (in hours, 24-hour format)
-    availableUntil: 18, // 6:00 PM (18:00 in 24-hour format)
+    availableFrom: 8,
+    availableUntil: 18,
   },
-  
-  // Christmas sessions: Specific dates only
   "Seasonal Sessions": {
     allowedDates: [
-      // 2025
-      "2025-11-21",
-      "2025-11-28",
-      "2025-12-05",
-      "2025-12-06",
-      "2025-12-13",
-      // 2026 (same dates)
-      "2026-11-21",
-      "2026-11-28",
-      "2026-12-05",
-      "2026-12-06",
-      "2026-12-13",
+      "2025-11-21", "2025-11-28", "2025-12-05", "2025-12-06", "2025-12-13",
+      "2026-11-21", "2026-11-28", "2026-12-05", "2026-12-06", "2026-12-13",
     ]
   }
 };
@@ -337,25 +331,21 @@ function buildBlockedMap(date: string, existing: {date:string; start:string; dur
   return blocks;
 }
 // Check if a date is allowed for a service type
-function isDateAllowedForService(dateStr: string, serviceType: string): boolean {
-  if (serviceType !== "Seasonal Sessions") return true;
-  
-  const restrictions = SERVICE_RESTRICTIONS["Seasonal Sessions"];
-  if (!restrictions?.allowedDates) return true;
+function isDateAllowedForService(dateStr: string, serviceType: string, restrictions: Record<string, ServiceRestriction>): boolean {
+  const typeRestrictions = restrictions[serviceType];
+  if (!typeRestrictions?.allowedDates) return true;
   
   // Check if the date is in the allowed dates list
-  return restrictions.allowedDates.includes(dateStr);
+  return typeRestrictions.allowedDates.includes(dateStr);
 }
 
 // Filter time slots based on service type
-function filterSlotsByService(slots: string[], serviceType: string): string[] {
-  if (serviceType !== "With Photographer") return slots;
+function filterSlotsByService(slots: string[], serviceType: string, restrictions: Record<string, ServiceRestriction>): string[] {
+  const typeRestrictions = restrictions[serviceType];
+  if (!typeRestrictions?.availableFrom || !typeRestrictions?.availableUntil) return slots;
   
-  const restrictions = SERVICE_RESTRICTIONS["With Photographer"];
-  if (!restrictions) return slots;
-  
-  const fromMinutes = restrictions.availableFrom * 60;
-  const untilMinutes = restrictions.availableUntil * 60;
+  const fromMinutes = typeRestrictions.availableFrom * 60;
+  const untilMinutes = typeRestrictions.availableUntil * 60;
   
   return slots.filter(slot => {
     const slotMinutes = toMinutes(slot);
@@ -386,6 +376,9 @@ export default function App(){
   const [serviceCategory, setServiceCategory] = useState("");
   const [serviceGroup, setServiceGroup] = useState("");
   const [service, setService] = useState("");
+  
+  // Dynamic service restrictions from API
+  const [serviceRestrictions, setServiceRestrictions] = useState<Record<string, ServiceRestriction>>(SERVICE_RESTRICTIONS);
 
   // Schedule
   const [date, setDate] = useState(offsetDate(0));
@@ -420,6 +413,48 @@ export default function App(){
 
   // Terms
   const [accepted, setAccepted] = useState(false);
+
+  // Load service restrictions from API on mount
+  useEffect(() => {
+    fetch('/api/admin/services/config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.services) {
+          const restrictions: Record<string, ServiceRestriction> = {};
+          
+          // Build restrictions from services data
+          data.services.forEach((svc: any) => {
+            // Time-based restrictions (for "With Photographer")
+            if (svc.availableFrom !== undefined && svc.availableUntil !== undefined) {
+              if (!restrictions[svc.type]) {
+                restrictions[svc.type] = {};
+              }
+              restrictions[svc.type].availableFrom = svc.availableFrom;
+              restrictions[svc.type].availableUntil = svc.availableUntil;
+            }
+            
+            // Date-based restrictions (for "Seasonal Sessions")
+            if (svc.specificDates && svc.specificDates.length > 0) {
+              if (!restrictions[svc.type]) {
+                restrictions[svc.type] = {};
+              }
+              // Merge all specific dates for this type
+              const existing = restrictions[svc.type].allowedDates || [];
+              restrictions[svc.type].allowedDates = [...new Set([...existing, ...svc.specificDates])];
+            }
+          });
+          
+          // Update state with API restrictions
+          if (Object.keys(restrictions).length > 0) {
+            setServiceRestrictions(prev => ({ ...prev, ...restrictions }));
+          }
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load service restrictions:', err);
+        // Keep using default SERVICE_RESTRICTIONS on error
+      });
+  }, []);
 
   // Totals
   const sessionPrice = useMemo(() => {
@@ -641,6 +676,7 @@ async function submitBooking(){
                 duration={duration} 
                 availableSlots={availableSlots} 
                 serviceType={serviceType}
+                serviceRestrictions={serviceRestrictions}
               />
             )}
 
@@ -1184,8 +1220,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
 }
 
 
-function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, serviceType }:{
-  date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[]; serviceType:string;
+function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, serviceType, serviceRestrictions }:{
+  date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[]; serviceType:string; serviceRestrictions: Record<string, ServiceRestriction>;
 }){
   const [loading, setLoading] = useState(false);
   const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>(availableSlots);
@@ -1335,7 +1371,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
         {!loadingDates && (
           <div className="grid grid-cols-5 md:grid-cols-7 gap-2 p-4 border rounded-xl max-h-96 overflow-y-auto">
             {next90Days.map((d) => {
-              const isDateAllowed = isDateAllowedForService(d, serviceType);
+              const isDateAllowed = isDateAllowedForService(d, serviceType, serviceRestrictions);
               const availableCount = availabilityCache[d] || 0;
               const isFullyBooked = availableCount === 0 || !isDateAllowed;
               const isSelected = date === d;
@@ -1412,7 +1448,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
                     : "No available times for this date. Please try another day."}
                 </div>
               )}
-              {filterSlotsByService(realAvailableSlots, serviceType).map((s)=> (
+              {filterSlotsByService(realAvailableSlots, serviceType, serviceRestrictions).map((s)=> (
                 <button
                   key={s} 
                   className="text-sm border rounded-xl px-2 py-1 flex items-center justify-center transition"
@@ -1446,8 +1482,9 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
       <p className="text-xs text-neutral-500 mt-3">
         {usingMockData ? "⚠️ Using mock data - configure Google Calendar for real-time availability" : "✅ Real-time Google Calendar sync"} • 
         Studio hours: Mon-Fri 8AM-8PM, Sat 10AM-8PM, Sun 1PM-8PM • Lunch break: 12PM-1PM (Mon-Sat) ({STUDIO_TZ})
-        {serviceType === "With Photographer" && " • With Photographer sessions: 8:00 AM - 6:00 PM only"}
-        {serviceType === "Seasonal Sessions" && " • Christmas sessions: Nov 21,28 & Dec 5,6,13 only"}
+        {serviceRestrictions[serviceType]?.availableFrom !== undefined && serviceRestrictions[serviceType]?.availableUntil !== undefined && 
+          ` • ${serviceType} sessions: ${serviceRestrictions[serviceType].availableFrom}:00 ${serviceRestrictions[serviceType].availableFrom! >= 12 ? 'PM' : 'AM'} - ${serviceRestrictions[serviceType].availableUntil! > 12 ? serviceRestrictions[serviceType].availableUntil! - 12 : serviceRestrictions[serviceType].availableUntil}:00 ${serviceRestrictions[serviceType].availableUntil! >= 12 ? 'PM' : 'AM'} only`}
+        {serviceRestrictions[serviceType]?.allowedDates && ` • Available on specific dates only`}
       </p>
     </div>
   );

@@ -307,11 +307,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
-  const session = await getServerSession(authOptions);
-  
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  // Allow public access for reading service configs (needed for booking page)
+  // Authentication is only required for POST/PUT/DELETE operations
 
   try {
     const notionApiKey = process.env.NOTION_API_KEY;
