@@ -84,7 +84,83 @@ export async function PATCH(
   console.log('📝 Updates:', updates);
   
   try {
-    // Send update to n8n
+    const notionApiKey = process.env.NOTION_API_KEY;
+
+    if (!notionApiKey) {
+      return NextResponse.json(
+        { error: "Notion API credentials not configured" },
+        { status: 500 }
+      );
+    }
+
+    // Build Notion properties update object
+    const notionProperties: any = {};
+
+    if (updates.status) {
+      notionProperties.Status = {
+        select: { name: updates.status }
+      };
+    }
+
+    if (updates.name) {
+      notionProperties.Name = {
+        title: [{ text: { content: updates.name } }]
+      };
+    }
+
+    if (updates.email) {
+      notionProperties.Email = {
+        email: updates.email
+      };
+    }
+
+    if (updates.phone) {
+      notionProperties.Phone = {
+        phone_number: updates.phone
+      };
+    }
+
+    if (updates.address) {
+      notionProperties.Address = {
+        rich_text: [{ text: { content: updates.address } }]
+      };
+    }
+
+    if (updates.date) {
+      notionProperties.Date = {
+        date: { start: updates.date }
+      };
+    }
+
+    if (updates.time) {
+      notionProperties.Time = {
+        rich_text: [{ text: { content: updates.time } }]
+      };
+    }
+
+    // Update Notion page
+    const response = await fetch(
+      `https://api.notion.com/v1/pages/${bookingId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${notionApiKey}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          properties: notionProperties,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Notion update error:', errorData);
+      throw new Error("Failed to update Notion");
+    }
+
+    // Also send to n8n webhook for any additional processing
     const n8nWebhookUrl = 'https://n8n-production-f7c3.up.railway.app/webhook/booking-updated';
     
     await fetch(n8nWebhookUrl, {
@@ -95,7 +171,7 @@ export async function PATCH(
         bookingId,
         updates,
       }),
-    });
+    }).catch(err => console.log('n8n webhook warning:', err.message));
     
     return NextResponse.json({
       success: true,

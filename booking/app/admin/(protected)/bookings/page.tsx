@@ -58,6 +58,7 @@ export default function BookingsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
+  const [timeRangeFilter, setTimeRangeFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("");
   const [serviceTypeFilter, setServiceTypeFilter] = useState<string>("All");
   const [serviceCategoryFilter, setServiceCategoryFilter] = useState<string>("All");
@@ -136,27 +137,65 @@ export default function BookingsPage() {
     }
   };
 
-  const filteredBookings = bookings.filter((booking) => {
-    const matchesSearch =
-      booking.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking.phone.includes(searchQuery);
+  // Filter bookings by time range
+  const getFilteredByTimeRange = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    const matchesStatus = statusFilter === "All" || booking.status === statusFilter;
-    
-    const matchesDate = !dateFilter || booking.date === dateFilter;
-    
-    const matchesServiceType = 
-      serviceTypeFilter === "All" || booking.serviceType === serviceTypeFilter;
-    
-    const matchesServiceCategory =
-      serviceCategoryFilter === "All" || booking.serviceCategory === serviceCategoryFilter;
-    
-    const matchesService = serviceFilter === "All" || booking.service === serviceFilter;
+    return bookings.filter((booking) => {
+      const bookingDate = new Date(booking.date);
+      
+      switch (timeRangeFilter) {
+        case "today":
+          return bookingDate.toDateString() === today.toDateString();
+        case "week":
+          const weekAgo = new Date(today);
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return bookingDate >= weekAgo;
+        case "month":
+          const monthAgo = new Date(today);
+          monthAgo.setMonth(monthAgo.getMonth() - 1);
+          return bookingDate >= monthAgo;
+        case "year":
+          const yearAgo = new Date(today);
+          yearAgo.setFullYear(yearAgo.getFullYear() - 1);
+          return bookingDate >= yearAgo;
+        default:
+          return true;
+      }
+    });
+  };
 
-    return matchesSearch && matchesStatus && matchesDate && 
-           matchesServiceType && matchesServiceCategory && matchesService;
-  });
+  const filteredBookings = getFilteredByTimeRange()
+    .filter((booking) => {
+      const matchesSearch =
+        booking.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking.phone.includes(searchQuery);
+      
+      const matchesStatus = statusFilter === "All" || booking.status === statusFilter;
+      
+      const matchesDate = !dateFilter || booking.date === dateFilter;
+      
+      const matchesServiceType = 
+        serviceTypeFilter === "All" || booking.serviceType === serviceTypeFilter;
+      
+      const matchesServiceCategory =
+        serviceCategoryFilter === "All" || booking.serviceCategory === serviceCategoryFilter;
+      
+      const matchesService = serviceFilter === "All" || booking.service === serviceFilter;
+
+      return matchesSearch && matchesStatus && matchesDate && 
+             matchesServiceType && matchesServiceCategory && matchesService;
+    })
+    .sort((a, b) => {
+      // Sort by date (descending), then by time (descending)
+      const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+      if (dateCompare !== 0) return dateCompare;
+      
+      // Compare times if dates are the same
+      return b.time.localeCompare(a.time);
+    });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -182,11 +221,13 @@ export default function BookingsPage() {
     });
   };
 
+  const timeRangeFilteredBookings = getFilteredByTimeRange();
+
   const stats = {
-    total: bookings.length,
-    confirmed: bookings.filter((b) => b.status === "Confirmed").length,
-    pending: bookings.filter((b) => b.status === "Pending").length,
-    revenue: bookings
+    total: timeRangeFilteredBookings.length,
+    confirmed: timeRangeFilteredBookings.filter((b) => b.status === "Confirmed").length,
+    pending: timeRangeFilteredBookings.filter((b) => b.status === "Pending").length,
+    revenue: timeRangeFilteredBookings
       .filter((b) => b.status === "Confirmed" || b.status === "Completed")
       .reduce((sum, b) => sum + b.grandTotal, 0),
   };
@@ -211,8 +252,33 @@ export default function BookingsPage() {
         </Button>
       </div>
 
+      {/* Time Range Filter */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {[
+          { value: "all", label: "All Time" },
+          { value: "today", label: "Today" },
+          { value: "week", label: "This Week" },
+          { value: "month", label: "This Month" },
+          { value: "year", label: "This Year" },
+        ].map((range) => (
+          <Button
+            key={range.value}
+            variant={timeRangeFilter === range.value ? "default" : "outline"}
+            size="sm"
+            onClick={() => setTimeRangeFilter(range.value)}
+            className={`whitespace-nowrap ${
+              timeRangeFilter === range.value
+                ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
+                : ""
+            }`}
+          >
+            {range.label}
+          </Button>
+        ))}
+      </div>
+
       {/* Stats - Single Row with Icons */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">

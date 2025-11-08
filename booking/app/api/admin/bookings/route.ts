@@ -49,11 +49,15 @@ export async function GET(request: Request) {
     // Transform Notion data to a simpler format
     const bookings = data.results.map((page: any) => {
       const props = page.properties;
+      const firstName = props["First Name"]?.rich_text?.[0]?.plain_text || "";
+      const lastName = props["Last Name"]?.rich_text?.[0]?.plain_text || "";
+      const fullName = `${firstName} ${lastName}`.trim() || props.Name?.title?.[0]?.plain_text || "";
+      
       return {
         id: page.id,
-        name: props.Name?.title?.[0]?.plain_text || "",
-        firstName: props["First Name"]?.rich_text?.[0]?.plain_text || "",
-        lastName: props["Last Name"]?.rich_text?.[0]?.plain_text || "",
+        name: fullName,
+        firstName,
+        lastName,
         email: props.Email?.email || "",
         phone: props.Phone?.phone_number || "",
         address: props.Address?.rich_text?.[0]?.plain_text || "",
