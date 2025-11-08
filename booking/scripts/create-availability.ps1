@@ -1,4 +1,5 @@
-﻿"use client";
+$content = @'
+"use client";
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -294,7 +295,7 @@ export default function AvailabilityPage() {
                           )}
                           {blocked.reason && (
                             <>
-                              <span className="text-neutral-300">â€¢</span>
+                              <span className="text-neutral-300">•</span>
                               <span className="text-xs text-neutral-500">{blocked.reason}</span>
                             </>
                           )}
@@ -314,3 +315,7 @@ export default function AvailabilityPage() {
     </div>
   );
 }
+'@
+
+$content | Out-File -FilePath "app\admin\(protected)\availability\page.tsx" -Encoding UTF8 -NoNewline
+Write-Host "Availability page created successfully!"
