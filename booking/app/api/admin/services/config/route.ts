@@ -1,20 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import fs from "fs/promises";
-import path from "path";
-
-const CONFIG_FILE = path.join(process.cwd(), "data", "services-config.json");
-
-// Ensure data directory exists
-async function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), "data");
-  try {
-    await fs.access(dataDir);
-  } catch {
-    await fs.mkdir(dataDir, { recursive: true });
-  }
-}
 
 // Default services configuration
 const DEFAULT_SERVICES = [
@@ -324,26 +310,69 @@ export async function GET(request: Request) {
   }
 
   try {
-    await ensureDataDir();
-    
-    let services;
-    try {
-      const data = await fs.readFile(CONFIG_FILE, "utf-8");
-      services = JSON.parse(data);
-    } catch {
-      // File doesn't exist, use defaults
-      services = DEFAULT_SERVICES;
-      // Save defaults
-      await fs.writeFile(CONFIG_FILE, JSON.stringify(services, null, 2));
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_SERVICES_DATABASE_ID;
+
+    // If no services database configured, return defaults
+    if (!notionApiKey || !databaseId) {
+      console.log("No services database configured, returning defaults");
+      return NextResponse.json({ services: DEFAULT_SERVICES });
     }
+
+    // Fetch from Notion services database
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${notionApiKey}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sorts: [
+            {
+              property: "Type",
+              direction: "ascending",
+            },
+          ],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("Failed to fetch from Notion, using defaults");
+      return NextResponse.json({ services: DEFAULT_SERVICES });
+    }
+
+    const data = await response.json();
+
+    // Transform Notion data to service config format
+    const services = data.results.map((page: any) => {
+      const props = page.properties;
+      return {
+        id: page.id, // Store Notion page ID for updates
+        name: props.Name?.title?.[0]?.plain_text || "",
+        type: props.Type?.select?.name || "Self-Shoot",
+        category: props.Category?.select?.name,
+        group: props.Group?.rich_text?.[0]?.plain_text || "",
+        description: props.Description?.rich_text?.[0]?.plain_text || "",
+        basePrice: props.BasePrice?.number || 0,
+        duration: props.Duration?.number || 45,
+        availableFrom: props.AvailableFrom?.number,
+        availableUntil: props.AvailableUntil?.number,
+        specificDates: props.SpecificDates?.multi_select?.map((d: any) => d.name) || [],
+        enabled: props.Enabled?.checkbox !== false,
+        classicPrice: props.ClassicPrice?.number,
+        thumbnail: props.Thumbnail?.url,
+      };
+    });
 
     return NextResponse.json({ services });
   } catch (error) {
     console.error("Error reading services config:", error);
-    return NextResponse.json(
-      { error: "Failed to read services configuration" },
-      { status: 500 }
-    );
+    // Return defaults on error
+    return NextResponse.json({ services: DEFAULT_SERVICES });
   }
 }
 
@@ -355,34 +384,144 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { action, index, service } = await request.json();
+    const { action, service } = await request.json();
     
-    await ensureDataDir();
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_SERVICES_DATABASE_ID;
 
-    // Read current config
-    let services;
-    try {
-      const data = await fs.readFile(CONFIG_FILE, "utf-8");
-      services = JSON.parse(data);
-    } catch {
-      services = DEFAULT_SERVICES;
+    if (!notionApiKey || !databaseId) {
+      return NextResponse.json(
+        { error: "Services database not configured" },
+        { status: 500 }
+      );
+    }
+
+    console.log('Service action:', action, 'Service:', service);
+
+    // Build Notion properties
+    const notionProperties: any = {
+      Name: {
+        title: [{ text: { content: service.name || "" } }]
+      },
+      Type: {
+        select: { name: service.type || "Self-Shoot" }
+      },
+      Group: {
+        rich_text: [{ text: { content: service.group || "" } }]
+      },
+      Description: {
+        rich_text: [{ text: { content: service.description || "" } }]
+      },
+      BasePrice: {
+        number: service.basePrice || 0
+      },
+      Duration: {
+        number: service.duration || 45
+      },
+      Enabled: {
+        checkbox: service.enabled !== false
+      }
+    };
+
+    // Optional properties
+    if (service.category) {
+      notionProperties.Category = {
+        select: { name: service.category }
+      };
+    }
+
+    if (service.availableFrom !== undefined) {
+      notionProperties.AvailableFrom = {
+        number: service.availableFrom
+      };
+    }
+
+    if (service.availableUntil !== undefined) {
+      notionProperties.AvailableUntil = {
+        number: service.availableUntil
+      };
+    }
+
+    if (service.classicPrice) {
+      notionProperties.ClassicPrice = {
+        number: service.classicPrice
+      };
     }
 
     // Perform action
     if (action === "add") {
-      services.push(service);
-    } else if (action === "update" && typeof index === "number" && index >= 0) {
-      services[index] = service;
-    } else if (action === "delete" && typeof index === "number" && index >= 0) {
-      services.splice(index, 1);
+      // Create new page in Notion
+      const response = await fetch("https://api.notion.com/v1/pages", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${notionApiKey}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          parent: { database_id: databaseId },
+          properties: notionProperties,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Notion create error:', errorData);
+        throw new Error("Failed to create service in Notion");
+      }
+
+      return NextResponse.json({ success: true });
+    } else if (action === "update" && service.id) {
+      // Update existing page in Notion
+      const response = await fetch(
+        `https://api.notion.com/v1/pages/${service.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${notionApiKey}`,
+            "Notion-Version": "2022-06-28",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            properties: notionProperties,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Notion update error:', errorData);
+        throw new Error("Failed to update service in Notion");
+      }
+
+      return NextResponse.json({ success: true });
+    } else if (action === "delete" && service.id) {
+      // Archive page in Notion
+      const response = await fetch(
+        `https://api.notion.com/v1/pages/${service.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${notionApiKey}`,
+            "Notion-Version": "2022-06-28",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            archived: true,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Notion delete error:', errorData);
+        throw new Error("Failed to delete service in Notion");
+      }
+
+      return NextResponse.json({ success: true });
     } else {
-      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid action or missing service ID" }, { status: 400 });
     }
-
-    // Save updated config
-    await fs.writeFile(CONFIG_FILE, JSON.stringify(services, null, 2));
-
-    return NextResponse.json({ success: true, services });
   } catch (error) {
     console.error("Error updating services config:", error);
     return NextResponse.json(

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 interface ServiceConfig {
+  id?: string; // Notion page ID
   name: string;
   type: "Self-Shoot" | "With Photographer" | "Seasonal Sessions";
   category?: "Classic" | "Digital";
@@ -115,7 +116,6 @@ export default function ServicesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: editingIndex === -1 ? "add" : "update",
-          index: editingIndex,
           service: editForm,
         }),
       });
@@ -123,13 +123,18 @@ export default function ServicesPage() {
       if (response.ok) {
         await fetchServicesAndStats();
         cancelEdit();
+        alert('Service saved successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Failed to save: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error saving service:", error);
+      alert('Error saving service. Please try again.');
     }
   };
 
-  const deleteService = async (index: number) => {
+  const deleteService = async (service: ServiceConfig & { id?: string; originalIndex: number }) => {
     if (!confirm("Are you sure you want to delete this service?")) return;
 
     try {
@@ -138,36 +143,43 @@ export default function ServicesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "delete",
-          index,
+          service: { id: service.id, name: service.name },
         }),
       });
 
       if (response.ok) {
         await fetchServicesAndStats();
+        alert('Service deleted successfully!');
+      } else {
+        const error = await response.json();
+        alert(`Failed to delete: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error deleting service:", error);
+      alert('Error deleting service. Please try again.');
     }
   };
 
-  const toggleEnabled = async (index: number) => {
-    const service = services[index];
+  const toggleEnabled = async (service: ServiceConfig & { id?: string }) => {
     try {
       const response = await fetch("/api/admin/services/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "update",
-          index,
           service: { ...service, enabled: !service.enabled },
         }),
       });
 
       if (response.ok) {
         await fetchServicesAndStats();
+      } else {
+        const error = await response.json();
+        alert(`Failed to toggle: ${error.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error toggling service:", error);
+      alert('Error toggling service. Please try again.');
     }
   };
 
@@ -231,31 +243,55 @@ export default function ServicesPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <p className="text-sm text-neutral-600">Active Services</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">
-            {totalStats.totalServices}
-          </p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-sm text-neutral-600">Total Bookings</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
-            {totalStats.totalBookings}
-          </p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-sm text-neutral-600">Total Revenue</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
-            ₱{totalStats.totalRevenue.toLocaleString()}
-          </p>
-        </Card>
-        <Card className="p-4">
-          <p className="text-sm text-neutral-600">Average Price</p>
-          <p className="text-2xl font-bold text-purple-600 mt-1">
-            ₱{totalStats.avgPrice.toLocaleString()}
-          </p>
+      {/* Summary - Dashboard Style */}
+      <div>
+        <h2 className="text-lg font-semibold text-[#0b3d2e] mb-3">Summary</h2>
+        <Card className="p-6">
+          <div className="grid grid-cols-4 gap-4 lg:gap-6">
+            {/* Active Services */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <Package className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Services</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">{totalStats.totalServices}</p>
+              </div>
+            </div>
+
+            {/* Total Bookings */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">{totalStats.totalBookings}</p>
+              </div>
+            </div>
+
+            {/* Total Revenue */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{totalStats.totalRevenue.toLocaleString()}</p>
+              </div>
+            </div>
+
+            {/* Average Price */}
+            <div className="text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Price</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{totalStats.avgPrice.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
         </Card>
       </div>
 
@@ -458,7 +494,7 @@ export default function ServicesPage() {
                                           <Button
                                             size="sm"
                                             variant="ghost"
-                                            onClick={() => toggleEnabled(service.originalIndex)}
+                                            onClick={() => toggleEnabled(service)}
                                             title={service.enabled ? "Disable" : "Enable"}
                                           >
                                             {service.enabled ? (
@@ -477,7 +513,7 @@ export default function ServicesPage() {
                                           <Button
                                             size="sm"
                                             variant="ghost"
-                                            onClick={() => deleteService(service.originalIndex)}
+                                            onClick={() => deleteService(service)}
                                           >
                                             <Trash2 className="w-4 h-4 text-red-600" />
                                           </Button>
