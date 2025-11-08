@@ -72,6 +72,45 @@ export async function PUT(
   }
 }
 
+// PATCH (partial update) booking by ID
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: bookingId } = await params;
+  const updates = await request.json();
+  
+  console.log('🔄 Patching booking:', bookingId);
+  console.log('📝 Updates:', updates);
+  
+  try {
+    // Send update to n8n
+    const n8nWebhookUrl = 'https://n8n-production-f7c3.up.railway.app/webhook/booking-updated';
+    
+    await fetch(n8nWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: 'booking_updated',
+        bookingId,
+        updates,
+      }),
+    });
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Booking updated successfully',
+      bookingId,
+    });
+  } catch (error) {
+    console.error('❌ Update error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to update booking' },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE (cancel) booking by ID
 export async function DELETE(
   request: NextRequest,
