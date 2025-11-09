@@ -523,9 +523,109 @@
   </section>
 
   <!-- Footer -->
-  <footer class="text-center py-10 border-t dark:border-on-dark section-light-1 section-dark-1">
+  <footer class="text-center py-10 pb-24 lg:pb-10 border-t dark:border-on-dark section-light-1 section-dark-1">
     <p>© 2025 Memories Photography Studio. All rights reserved.</p>
   </footer>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50">
+    <div class="grid grid-cols-5 gap-0">
+      <button onclick="window.location.href='booking/'" class="flex flex-col items-center justify-center py-2 px-1 transition">
+        <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+          <div class="rounded-lg p-1.5 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+            </svg>
+          </div>
+          <span class="text-[10px] mt-1 font-medium">Book</span>
+        </div>
+      </button>
+      
+      <button onclick="window.location.href='booking/my-bookings'" class="flex flex-col items-center justify-center py-2 px-1 transition">
+        <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+          <div class="rounded-lg p-1.5 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <span class="text-[10px] mt-1 font-medium">Bookings</span>
+        </div>
+      </button>
+      
+      <button onclick="window.location.href='booking/contact'" class="flex flex-col items-center justify-center py-2 px-1 transition">
+        <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+          <div class="rounded-lg p-1.5 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+            </svg>
+          </div>
+          <span class="text-[10px] mt-1 font-medium">Contact</span>
+        </div>
+      </button>
+      
+      <button onclick="window.location.href='booking/location'" class="flex flex-col items-center justify-center py-2 px-1 transition">
+        <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+          <div class="rounded-lg p-1.5 transition">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <span class="text-[10px] mt-1 font-medium">Location</span>
+        </div>
+      </button>
+      
+      <button onclick="window.open('https://www.memories-studio.com', '_blank')" class="flex flex-col items-center justify-center py-2 px-1 transition">
+        <div class="flex flex-col items-center justify-center text-white dark:text-white">
+          <div class="rounded-lg p-1.5 transition bg-[#0b3d2e] dark:bg-[#0b3d2e]">
+            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+            </svg>
+          </div>
+          <span class="text-[10px] mt-1 font-semibold text-[#0b3d2e] dark:text-white">Website</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <div class="hidden lg:block fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-3">
+      <div class="flex items-center justify-center gap-6">
+        <button onclick="window.location.href='booking/'" class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+          </svg>
+          Book Now
+        </button>
+        <button onclick="window.location.href='booking/my-bookings'" class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          My Bookings
+        </button>
+        <button onclick="window.location.href='booking/contact'" class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+          Contact Us
+        </button>
+        <button onclick="window.location.href='booking/location'" class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          </svg>
+          Our Location
+        </button>
+        <button onclick="window.open('https://www.memories-studio.com', '_blank')" class="flex items-center gap-2 text-sm font-semibold text-[#0b3d2e] dark:text-white transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+          </svg>
+          Website
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <script>
