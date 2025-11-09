@@ -420,8 +420,11 @@ export default function App(){
   // Add-ons
   const [addons, setAddons] = useState<Record<string, number>>({});
 
-  // Terms
-  const [accepted, setAccepted] = useState(false);
+  // Terms - Individual agreement tracking
+  const [acceptedPhotoDelivery, setAcceptedPhotoDelivery] = useState(false);
+  const [acceptedLocation, setAcceptedLocation] = useState(false);
+  const [acceptedParking, setAcceptedParking] = useState(false);
+  const [acceptedBookingPolicy, setAcceptedBookingPolicy] = useState(false);
 
   // Load service data from API on mount
   useEffect(() => {
@@ -678,11 +681,11 @@ async function submitBooking(){
       }
       case 4: return serviceType !== "Self-Shoot" ? true : allocationValid; // backdrops
       case 5: return true; // add-ons optional
-      case 6: return accepted; // terms
+      case 6: return acceptedPhotoDelivery && acceptedLocation && acceptedParking && acceptedBookingPolicy; // all terms must be accepted
       case 7: return true; // review
       default: return false;
     }
-  }, [step, service, date, time, firstName, lastName, email, phone, emailVerified, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, accepted, serviceType, serviceGroup]);
+  }, [step, service, date, time, firstName, lastName, email, phone, emailVerified, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, acceptedPhotoDelivery, acceptedLocation, acceptedParking, acceptedBookingPolicy, serviceType, serviceGroup]);
 
   return (
     <div className="min-h-screen w-full flex items-start justify-center p-4 md:p-8 pb-28 md:pb-32" style={{ backgroundColor: BRAND.cream }}>
@@ -836,7 +839,18 @@ async function submitBooking(){
             )}
 
             {step === 5 && (<StepAddons addons={addons} toggle={toggleAddon} />)}
-            {step === 6 && (<StepVideoAndTerms accepted={accepted} setAccepted={setAccepted} />)}
+            {step === 6 && (
+              <StepVideoAndTerms 
+                acceptedPhotoDelivery={acceptedPhotoDelivery}
+                setAcceptedPhotoDelivery={setAcceptedPhotoDelivery}
+                acceptedLocation={acceptedLocation}
+                setAcceptedLocation={setAcceptedLocation}
+                acceptedParking={acceptedParking}
+                setAcceptedParking={setAcceptedParking}
+                acceptedBookingPolicy={acceptedBookingPolicy}
+                setAcceptedBookingPolicy={setAcceptedBookingPolicy}
+              />
+            )}
             {step === 7 && (
               <StepReview data={{ serviceType, serviceCategory, serviceGroup, service, duration, date, time, firstName, lastName, email, phone, address, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, selectedBackdrops, allocations, addons, sessionPrice, addonsTotal, grandTotal }} />
             )}
@@ -2264,25 +2278,189 @@ function StepAddons({ addons, toggle }:{ addons:Record<string, number>; toggle:(
   );
 }
 
-function StepVideoAndTerms({ accepted, setAccepted }:{ accepted:boolean; setAccepted:(v:boolean)=>void; }){
+function StepVideoAndTerms({ 
+  acceptedPhotoDelivery, setAcceptedPhotoDelivery,
+  acceptedLocation, setAcceptedLocation,
+  acceptedParking, setAcceptedParking,
+  acceptedBookingPolicy, setAcceptedBookingPolicy
+}:{ 
+  acceptedPhotoDelivery: boolean; setAcceptedPhotoDelivery: (v:boolean)=>void;
+  acceptedLocation: boolean; setAcceptedLocation: (v:boolean)=>void;
+  acceptedParking: boolean; setAcceptedParking: (v:boolean)=>void;
+  acceptedBookingPolicy: boolean; setAcceptedBookingPolicy: (v:boolean)=>void;
+}){
   return (
-    <div>
-      <h2 className="text-xl font-semibold">Our story & terms</h2>
-      <p className="text-neutral-600">Watch a short video about why we started Memories Photography Studio.</p>
-      <div className="mt-3 aspect-video w-full rounded-2xl overflow-hidden bg-black">
-        <video className="w-full h-full" src="" controls poster=""/>
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-xl font-semibold">Terms & Conditions</h2>
+        <p className="text-neutral-600">Please read and agree to each term individually to proceed.</p>
       </div>
-      <div className="mt-4 border rounded-2xl p-4">
-        <div className="flex items-center gap-2 mb-2"><ShieldCheck className="w-4 h-4"/><span className="font-medium">Terms & Conditions</span></div>
-        <ul className="list-disc pl-5 text-sm text-neutral-700 space-y-1">
-          <li>Two-time reschedule allowed; Cancellations after confirmation without a valid reason can subject you to a ban.</li>
-          <li>Please arrive 5 minutes early; sessions end on time.</li>
-          <li>Studio buffer of 30 minutes between sessions is automatic.</li>
-          <li>By booking, you agree to our house rules and studio safety policy.</li>
-        </ul>
-        <label className="flex items-center gap-2 mt-3 text-sm">
-          <Checkbox checked={accepted} onCheckedChange={(v)=>setAccepted(Boolean(v))}/> I agree to the Terms & Conditions
+
+      {/* Term 1: Photo Delivery via Adobe Lightroom */}
+      <div className="border rounded-2xl p-4 bg-white">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="w-5 h-5 text-blue-600"/>
+          <span className="font-semibold text-base">Photo Delivery Method</span>
+        </div>
+        <div className="space-y-2 text-sm text-neutral-700 mb-4">
+          <p className="font-medium">English:</p>
+          <p>Our preferred method of delivering your photos is via <strong>Adobe Lightroom</strong>. By agreeing, you understand that:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>You need to have an <strong>Adobe Lightroom account</strong> (free to create)</li>
+            <li>If accessing via mobile or tablet, you need to download the <strong>Lightroom mobile app</strong></li>
+            <li>Your photos will be shared with you through this platform</li>
+          </ul>
+          <p className="font-medium mt-3">Filipino:</p>
+          <p>Ang aming ginagamit na paraan ng paghahatid ng inyong mga larawan ay sa pamamagitan ng <strong>Adobe Lightroom</strong>. Sa pagsang-ayon, nauunawaan ninyo na:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Kailangan ninyong gumawa ng <strong>Adobe Lightroom account</strong> (libre lang po)</li>
+            <li>Kung gagamitin sa cellphone o tablet, kailangan i-download ang <strong>Lightroom mobile app</strong></li>
+            <li>Ang inyong mga larawan ay ibibigay sa inyo sa pamamagitan ng platform na ito</li>
+          </ul>
+        </div>
+        <label className="flex items-start gap-3 text-sm cursor-pointer">
+          <Checkbox 
+            checked={acceptedPhotoDelivery} 
+            onCheckedChange={(v)=>setAcceptedPhotoDelivery(Boolean(v))}
+            className="mt-1"
+          />
+          <span className="flex-1">
+            <strong>I agree</strong> to receive my photos via Adobe Lightroom and will create an account/download the app as needed.
+            <br/>
+            <span className="text-neutral-600">
+              <strong>Sumasang-ayon ako</strong> na tatanggapin ang aking mga larawan sa Adobe Lightroom at gagawa ng account/mag-download ng app kung kinakailangan.
+            </span>
+          </span>
         </label>
+      </div>
+
+      {/* Term 2: Studio Location & Punctuality */}
+      <div className="border rounded-2xl p-4 bg-white">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="w-5 h-5 text-green-600"/>
+          <span className="font-semibold text-base">Studio Location & Arrival Time</span>
+        </div>
+        <div className="space-y-2 text-sm text-neutral-700 mb-4">
+          <p className="font-medium">English:</p>
+          <p>Our studio is located in <strong>Indang, Cavite</strong>. By agreeing, you confirm that:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>You have verified our location via the <a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google Maps link</a></li>
+            <li>You understand where the studio is located</li>
+            <li>You commit to arriving <strong>at least 5 minutes early or on time</strong></li>
+            <li>Sessions end on time regardless of arrival time</li>
+          </ul>
+          <p className="font-medium mt-3">Filipino:</p>
+          <p>Ang aming studio ay matatagpuan sa <strong>Indang, Cavite</strong>. Sa pagsang-ayon, kinikilala ninyo na:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Tiningnan ninyo ang aming lokasyon sa <a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google Maps link</a></li>
+            <li>Nauunawaan ninyo kung saan matatagpuan ang studio</li>
+            <li>Nangako kayong darating nang <strong>hindi bababa sa 5 minuto bago o sakto sa oras</strong></li>
+            <li>Ang session ay matatapos sa tamang oras kahit anong oras kayo dumating</li>
+          </ul>
+        </div>
+        <label className="flex items-start gap-3 text-sm cursor-pointer">
+          <Checkbox 
+            checked={acceptedLocation} 
+            onCheckedChange={(v)=>setAcceptedLocation(Boolean(v))}
+            className="mt-1"
+          />
+          <span className="flex-1">
+            <strong>I agree</strong> and confirm that I know the studio location and will arrive on time.
+            <br/>
+            <span className="text-neutral-600">
+              <strong>Sumasang-ayon ako</strong> at kinukumpirma na alam ko ang lokasyon ng studio at darating ako sa tamang oras.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      {/* Term 3: Parking Guidelines */}
+      <div className="border rounded-2xl p-4 bg-white">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="w-5 h-5 text-orange-600"/>
+          <span className="font-semibold text-base">Parking Guidelines</span>
+        </div>
+        <div className="space-y-2 text-sm text-neutral-700 mb-4">
+          <p className="font-medium">English:</p>
+          <p>Parking at our studio is <strong>street parking only</strong>. By agreeing, you understand and commit to:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>DO NOT block the gate or driveway</strong> at any time</li>
+            <li>Park <strong>only under the rambutan tree</strong> (designated parking area)</li>
+            <li>Follow proper parking etiquette to avoid inconvenience to others</li>
+          </ul>
+          <p className="font-medium mt-3">Filipino:</p>
+          <p>Ang parking sa aming studio ay <strong>street parking lamang</strong>. Sa pagsang-ayon, nauunawaan at nangagako kayong:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>HUWAG haharangan ang gate o driveway</strong> anumang oras</li>
+            <li>Mag-park <strong>lamang sa ilalim ng puno ng rambutan</strong> (itinalagang parking area)</li>
+            <li>Sumunod sa tamang parking etiquette upang hindi makaabala sa iba</li>
+          </ul>
+        </div>
+        <label className="flex items-start gap-3 text-sm cursor-pointer">
+          <Checkbox 
+            checked={acceptedParking} 
+            onCheckedChange={(v)=>setAcceptedParking(Boolean(v))}
+            className="mt-1"
+          />
+          <span className="flex-1">
+            <strong>I agree</strong> to follow the parking guidelines and will only park under the rambutan tree.
+            <br/>
+            <span className="text-neutral-600">
+              <strong>Sumasang-ayon ako</strong> na susundin ang parking guidelines at mag-park lamang sa ilalim ng puno ng rambutan.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      {/* Term 4: Booking Policy (Reschedule & Cancellation) */}
+      <div className="border rounded-2xl p-4 bg-white">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="w-5 h-5 text-red-600"/>
+          <span className="font-semibold text-base">Booking Policy: Reschedule & Cancellation</span>
+        </div>
+        <div className="space-y-2 text-sm text-neutral-700 mb-4">
+          <p className="font-medium">English:</p>
+          <p><strong>Important:</strong> By agreeing, you understand our strict booking policy:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Reschedule or cancellation notice</strong> must be given <strong>at least 2 hours before</strong> your scheduled session</li>
+            <li><strong>Valid reason required</strong> for reschedule or cancellation</li>
+            <li><strong>Maximum of 2 reschedules allowed</strong> per booking</li>
+            <li><strong>Late cancellation or no-show without valid reason may result in a ban</strong> from future bookings</li>
+          </ul>
+          <p className="font-medium mt-3">Filipino:</p>
+          <p><strong>Mahalaga:</strong> Sa pagsang-ayon, nauunawaan ninyo ang aming mahigpit na booking policy:</p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Ang <strong>pag-reschedule o cancellation</strong> ay dapat ipaalam <strong>hindi bababa sa 2 oras bago</strong> ang inyong schedule</li>
+            <li><strong>Kailangan ng valid na dahilan</strong> para sa pag-reschedule o cancellation</li>
+            <li><strong>Maximum na 2 beses lamang</strong> ang pwedeng mag-reschedule bawat booking</li>
+            <li><strong>Ang late cancellation o no-show na walang valid na dahilan ay maaaring magresulta sa pag-ban</strong> mula sa mga susunod na booking</li>
+          </ul>
+        </div>
+        <label className="flex items-start gap-3 text-sm cursor-pointer">
+          <Checkbox 
+            checked={acceptedBookingPolicy} 
+            onCheckedChange={(v)=>setAcceptedBookingPolicy(Boolean(v))}
+            className="mt-1"
+          />
+          <span className="flex-1">
+            <strong>I agree</strong> to the booking policy and understand the reschedule/cancellation terms.
+            <br/>
+            <span className="text-neutral-600">
+              <strong>Sumasang-ayon ako</strong> sa booking policy at nauunawaan ko ang mga patakaran sa pag-reschedule/cancellation.
+            </span>
+          </span>
+        </label>
+      </div>
+
+      {/* All Terms Summary */}
+      <div className="border-2 border-neutral-300 rounded-2xl p-4 bg-neutral-50">
+        <p className="text-sm text-center">
+          {acceptedPhotoDelivery && acceptedLocation && acceptedParking && acceptedBookingPolicy ? (
+            <span className="text-green-600 font-semibold">✓ All terms accepted. You may proceed to review your booking.</span>
+          ) : (
+            <span className="text-neutral-600">Please agree to all terms above to continue.</span>
+          )}
+        </p>
       </div>
     </div>
   );
