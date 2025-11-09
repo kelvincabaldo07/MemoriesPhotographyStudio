@@ -617,20 +617,18 @@ async function submitBooking(){
     switch(step){
       case 0: return !!service;
       case 1: return !!date && !!time;
-      // removing email verification for now
-      //   case 2: {
-    //   const result = !!firstName && !!lastName && !!email && !!phone && emailVerified;
-    //   console.log('🔍 Step 2 validation:', {
-    //     firstName: !!firstName,
-    //     lastName: !!lastName,
-    //     email: !!email,
-    //     phone: !!phone,
-    //     emailVerified,
-    //     canContinue: result
-    //   });
-    //   return result;
-    // }// ADD emailVerified
-      case 2: return !!firstName && !!lastName && !!email && !!phone;
+      case 2: {
+        const result = !!firstName && !!lastName && !!email && !!phone && emailVerified;
+        console.log('🔍 Step 2 validation:', {
+          firstName: !!firstName,
+          lastName: !!lastName,
+          email: !!email,
+          phone: !!phone,
+          emailVerified,
+          canContinue: result
+        });
+        return result;
+      }
       case 3: { // consent conditional questions - CHANGED
         if (!socialConsent) return false; // Always required
         
