@@ -419,9 +419,11 @@ export default function App(){
 
   // Load service data from API on mount
   useEffect(() => {
+    console.log('🔄 Loading service data from API...');
     fetch('/api/admin/services/config')
       .then(res => res.json())
       .then(data => {
+        console.log('📦 Received service data:', data);
         if (data.services) {
           const restrictions: Record<string, ServiceRestriction> = {};
           const info: Record<string, { details: string; price: number; classicDetails?: string }> = {};
@@ -447,15 +449,37 @@ export default function App(){
               restrictions[svc.type].allowedDates = [...new Set([...existing, ...svc.specificDates])];
             }
             
-            // Service descriptions and prices
+            // Service descriptions and prices - handle both Classic and Digital services
             if (svc.name) {
-              info[svc.name] = {
-                details: svc.description || "",
-                price: svc.basePrice || 0,
-                classicDetails: svc.category === "Classic" ? svc.description : undefined,
-              };
+              // Services in Notion have "Digital " or "Classic " prefix
+              // But booking page uses base names like "Solo/Duo 15"
+              const baseServiceName = svc.name.replace(/^(Classic |Digital )/, '');
+              
+              console.log(`Processing service: ${svc.name} -> ${baseServiceName} (Category: ${svc.category})`);
+              
+              // Initialize entry if it doesn't exist
+              if (!info[baseServiceName]) {
+                info[baseServiceName] = {
+                  details: "",
+                  price: 0,
+                };
+              }
+              
+              // If it's a Classic service, store classic details and price
+              if (svc.category === "Classic") {
+                info[baseServiceName].classicDetails = svc.description || "";
+                // Classic price is base price, Digital is 50 less
+                info[baseServiceName].price = (svc.basePrice || 0) - 50;
+              } else {
+                // Digital or no category - use as base details and price
+                info[baseServiceName].details = svc.description || "";
+                info[baseServiceName].price = svc.basePrice || 0;
+              }
             }
           });
+          
+          console.log('✅ Built service info:', info);
+          console.log('✅ Built restrictions:', restrictions);
           
           // Update state with API data
           if (Object.keys(restrictions).length > 0) {
@@ -467,7 +491,7 @@ export default function App(){
         }
       })
       .catch(err => {
-        console.error('Failed to load service data:', err);
+        console.error('❌ Failed to load service data:', err);
         // Keep using defaults on error
       });
   }, []);
