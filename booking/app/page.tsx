@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
-import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User, Phone, Mail } from 'lucide-react';
+import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User, Phone, Mail, X as CloseIcon } from 'lucide-react';
 // import React, { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -397,6 +397,12 @@ export default function App(){
   const [emailVerified, setEmailVerified] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [sentCode, setSentCode] = useState("");
+  
+  // Modal states
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
     // Social / event consent - CHANGED: Single required field
   const [socialConsent, setSocialConsent] = useState<"yes" | "no" | "">("");
   const [eventType, setEventType] = useState("");
@@ -602,11 +608,13 @@ async function submitBooking(){
       setStep(STEPS.length-1); // Go to confirmation
     } else {
       console.error('❌ Booking failed:', result.error);
-      alert('Failed to create booking. Please try again.');
+      setModalMessage('Failed to create booking. Please try again.');
+      setShowErrorModal(true);
     }
   } catch (error) {
     console.error('❌ Network error:', error);
-    alert('Network error. Please check your connection.');
+    setModalMessage('Network error. Please check your connection.');
+    setShowErrorModal(true);
   } finally {
     console.log('🏁 setBusy(false)');
     setBusy(false);
@@ -678,9 +686,43 @@ async function submitBooking(){
 
   return (
     <div className="min-h-screen w-full flex items-start justify-center p-4 md:p-8 pb-28 md:pb-32" style={{ backgroundColor: BRAND.cream }}>
+      {/* Modals */}
+      <Modal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onConfirm={() => {
+          setStep(0);
+          setServiceType("");
+          setServiceCategory("");
+          setServiceGroup("");
+          setService("");
+        }}
+        title="Start Over?"
+        message="Are you sure you want to restart? All your current selections will be lost."
+        type="warning"
+        confirmText="Yes, Start Over"
+        cancelText="Cancel"
+      />
+      
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Success!"
+        message={modalMessage}
+        type="success"
+      />
+      
+      <Modal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title="Error"
+        message={modalMessage}
+        type="error"
+      />
+
       <div className="w-full max-w-5xl">
         <div className="relative">
-          <Header onReset={()=>{ setStep(0); setServiceType(""); setServiceCategory(""); setServiceGroup(""); setService(""); }} />
+          <Header onReset={() => setShowResetModal(true)} />
         </div>
         <Stepper step={step} />
 
@@ -737,6 +779,9 @@ async function submitBooking(){
                 setVerificationCode={setVerificationCode}
                 sentCode={sentCode}
                 setSentCode={setSentCode}
+                setModalMessage={setModalMessage}
+                setShowSuccessModal={setShowSuccessModal}
+                setShowErrorModal={setShowErrorModal}
               />
             )}
 
@@ -789,13 +834,7 @@ async function submitBooking(){
 
               <Button 
                 variant="outline" 
-                onClick={() => {
-                  setStep(0);
-                  setServiceType("");
-                  setServiceCategory("");
-                  setServiceGroup("");
-                  setService("");
-                }}
+                onClick={() => setShowResetModal(true)}
                 className=""
               >
                 Start Over
@@ -838,6 +877,112 @@ async function submitBooking(){
 }
 
 // ---------- Subcomponents ----------
+
+// Modern Modal Component
+function Modal({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  title, 
+  message, 
+  type = "info",
+  confirmText = "Confirm",
+  cancelText = "Cancel"
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm?: () => void;
+  title: string;
+  message: string;
+  type?: "info" | "success" | "error" | "warning";
+  confirmText?: string;
+  cancelText?: string;
+}) {
+  if (!isOpen) return null;
+
+  const getIcon = () => {
+    switch (type) {
+      case "success":
+        return <CheckCircle2 className="w-12 h-12 text-green-500" />;
+      case "error":
+        return <XCircle className="w-12 h-12 text-red-500" />;
+      case "warning":
+        return <Info className="w-12 h-12 text-amber-500" />;
+      default:
+        return <Info className="w-12 h-12" style={{ color: BRAND.forest }} />;
+    }
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition"
+        >
+          <CloseIcon className="w-5 h-5 text-gray-500" />
+        </button>
+
+        {/* Icon */}
+        <div className="flex justify-center mb-4">
+          {getIcon()}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-xl font-semibold text-center mb-2" style={{ color: BRAND.charcoal }}>
+          {title}
+        </h3>
+
+        {/* Message */}
+        <p className="text-center text-gray-600 mb-6">
+          {message}
+        </p>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          {onConfirm ? (
+            <>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="flex-1"
+              >
+                {cancelText}
+              </Button>
+              <Button
+                onClick={() => {
+                  onConfirm();
+                  onClose();
+                }}
+                className="flex-1"
+                style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+              >
+                {confirmText}
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={onClose}
+              className="w-full"
+              style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+            >
+              Close
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Header({ onReset }:{ onReset: ()=>void }){
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
@@ -961,83 +1106,109 @@ const STEPS = [
 
 function Stepper({ step }:{ step:number }){
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
-      {/* Dock-style taskbar */}
-      <div 
-        className="mx-auto max-w-fit mb-4 px-3 py-2 rounded-full shadow-2xl border backdrop-blur-xl"
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          borderColor: 'rgba(11, 61, 46, 0.1)',
-        }}
-      >
-        <div className="flex items-center gap-1 md:gap-2">
+    <>
+      {/* Progress indicator on left side */}
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 hidden lg:block">
+        <div className="bg-white rounded-2xl shadow-lg border p-4 space-y-3" style={{ borderColor: 'rgba(11, 61, 46, 0.1)' }}>
           {STEPS.map((s, i) => {
-            const Icon = s.icon;
             const isActive = i === step;
             const isCompleted = i < step;
-            const isFuture = i > step;
             
             return (
               <div
                 key={i}
-                className="relative group"
+                className="flex items-center gap-3 group cursor-pointer"
               >
-                {/* Tooltip - shows on hover for desktop, always for active on mobile */}
+                {/* Step circle */}
                 <div 
                   className={cn(
-                    "absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-opacity",
-                    "md:opacity-0 md:group-hover:opacity-100",
-                    isActive ? "opacity-100" : "opacity-0"
+                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all",
+                    isActive && "ring-2 ring-offset-2"
                   )}
                   style={{
-                    backgroundColor: BRAND.forest,
-                    color: BRAND.white,
+                    backgroundColor: isActive ? BRAND.forest : isCompleted ? BRAND.forest : '#e5e7eb',
+                    color: isActive || isCompleted ? BRAND.white : '#9ca3af',
+                    ringColor: BRAND.forest,
+                  }}
+                >
+                  {isCompleted ? '✓' : i + 1}
+                </div>
+                
+                {/* Step label */}
+                <span 
+                  className={cn(
+                    "text-sm font-medium transition-all whitespace-nowrap",
+                    isActive ? "text-base" : "text-sm"
+                  )}
+                  style={{ 
+                    color: isActive ? BRAND.forest : isCompleted ? BRAND.charcoal : '#9ca3af' 
                   }}
                 >
                   {s.label}
-                  <div 
-                    className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-4 border-transparent"
-                    style={{ borderTopColor: BRAND.forest }}
-                  />
-                </div>
-                
-                {/* Icon button */}
-                <button
-                  className={cn(
-                    "relative flex items-center justify-center rounded-full transition-all duration-200",
-                    "w-10 h-10 md:w-12 md:h-12",
-                    isActive && "w-12 h-12 md:w-14 md:h-14 shadow-lg",
-                    !isActive && "hover:scale-110"
-                  )}
-                  style={{
-                    backgroundColor: isActive ? BRAND.forest : isCompleted ? BRAND.forest + '20' : '#f5f5f5',
-                    color: isActive ? BRAND.white : isCompleted ? BRAND.forest : '#9ca3af',
-                  }}
-                >
-                  <Icon className={cn(
-                    "transition-all",
-                    isActive ? "w-6 h-6 md:w-7 md:h-7" : "w-5 h-5 md:w-6 md:h-6"
-                  )} />
-                  
-                  {/* Step number badge for completed steps */}
-                  {isCompleted && (
-                    <div 
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
-                      style={{
-                        backgroundColor: BRAND.forest,
-                        color: BRAND.white,
-                      }}
-                    >
-                      ✓
-                    </div>
-                  )}
-                </button>
+                </span>
               </div>
             );
           })}
         </div>
       </div>
-    </div>
+
+      {/* Bottom navigation bar - styled like admin app */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
+        <div 
+          className="bg-white border-t shadow-2xl"
+          style={{ borderColor: 'rgba(11, 61, 46, 0.1)' }}
+        >
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="flex items-center justify-between gap-4">
+              {/* Navigation Links */}
+              <div className="flex items-center gap-4 md:gap-6 overflow-x-auto scrollbar-hide">
+                <button 
+                  onClick={() => window.location.href = '/'}
+                  className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition whitespace-nowrap"
+                  style={{ color: BRAND.charcoal }}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  <span className="hidden sm:inline">Book</span>
+                </button>
+                <button 
+                  onClick={() => window.location.href = '/my-bookings'}
+                  className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition whitespace-nowrap"
+                  style={{ color: BRAND.charcoal }}
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="hidden sm:inline">My Bookings</span>
+                </button>
+                <button 
+                  onClick={() => window.location.href = '/contact'}
+                  className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition whitespace-nowrap"
+                  style={{ color: BRAND.charcoal }}
+                >
+                  <Phone className="w-4 h-4" />
+                  <span className="hidden sm:inline">Contact</span>
+                </button>
+                <button 
+                  onClick={() => window.location.href = '/location'}
+                  className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition whitespace-nowrap"
+                  style={{ color: BRAND.charcoal }}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                  <span className="hidden sm:inline">Location</span>
+                </button>
+              </div>
+
+              {/* Current step indicator - mobile only */}
+              <div className="lg:hidden flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ backgroundColor: BRAND.forest + '15' }}>
+                <span className="text-xs font-semibold" style={{ color: BRAND.forest }}>
+                  Step {step + 1}/{STEPS.length}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -1547,8 +1718,11 @@ function StepCustomer(props: {
   setVerificationCode: (v: string) => void;
   sentCode: string;
   setSentCode: (v: string) => void;
+  setModalMessage: (v: string) => void;
+  setShowSuccessModal: (v: boolean) => void;
+  setShowErrorModal: (v: boolean) => void;
 }) {
-  const { firstName, lastName, email, phone, address, setFirst, setLast, setEmail, setPhone, setAddr, emailVerified, setEmailVerified, verificationCode, setVerificationCode, sentCode, setSentCode } = props;
+  const { firstName, lastName, email, phone, address, setFirst, setLast, setEmail, setPhone, setAddr, emailVerified, setEmailVerified, verificationCode, setVerificationCode, sentCode, setSentCode, setModalMessage, setShowSuccessModal, setShowErrorModal } = props;
   const [sendingCode, setSendingCode] = useState(false);
   const [emailError, setEmailError] = useState("");
 
@@ -1576,8 +1750,8 @@ function StepCustomer(props: {
 
     if (result.success) {
       setSentCode(result.code || 'SENT'); // Use 'SENT' placeholder if code not returned
-      // Change the alert to not show the code:
-      alert(`✅ Verification code sent to ${email}!\n\nPlease check your email inbox (and spam folder).`);
+      setModalMessage(`Verification code sent to ${email}! Please check your email inbox (and spam folder).`);
+      setShowSuccessModal(true);
     } else {
         setEmailError(result.error || 'Failed to send verification code');
       }
@@ -1597,10 +1771,12 @@ function StepCustomer(props: {
     if (verificationCode === sentCode) {
       console.log('✅ Setting emailVerified to TRUE');
       setEmailVerified(true);
-      alert('✅ Email verified successfully!');
+      setModalMessage('Email verified successfully!');
+      setShowSuccessModal(true);
     } else {
       console.log('❌ Codes do not match');
-      alert('❌ Invalid verification code. Please try again.');
+      setModalMessage('Invalid verification code. Please try again.');
+      setShowErrorModal(true);
     }
   }
 
