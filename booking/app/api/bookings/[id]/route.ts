@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyRecaptchaToken } from '@/lib/recaptcha';
+import { logAudit, createViewAudit, createUpdateAudit, createCancelAudit } from '@/lib/audit';
 
 /**
  * GET booking by ID
  * SECURITY: Requires email verification parameter to prevent unauthorized access
+ * Protected by reCAPTCHA v3 to prevent bot attacks
+ * AUDIT: Logs all view attempts
  */
 export async function GET(
   request: NextRequest,
@@ -19,6 +23,19 @@ export async function GET(
       { success: false, error: 'Email verification required' },
       { status: 401 }
     );
+  }
+
+  // reCAPTCHA verification
+  const recaptchaToken = request.headers.get('x-recaptcha-token');
+  if (recaptchaToken) {
+    const recaptchaResult = await verifyRecaptchaToken(recaptchaToken, 'verify_booking');
+    if (!recaptchaResult.success) {
+      console.warn('reCAPTCHA verification failed:', recaptchaResult.error);
+      return NextResponse.json(
+        { success: false, error: 'Security verification failed. Please try again.' },
+        { status: 403 }
+      );
+    }
   }
 
   try {
@@ -73,6 +90,9 @@ export async function GET(
     const data = await response.json();
 
     if (data.results.length === 0) {
+      // Audit: Failed view attempt
+      await logAudit(createViewAudit(request, bookingId, verifyEmail, 'failure', 'Booking not found or access denied'));
+      
       return NextResponse.json(
         { success: false, error: 'Booking not found or access denied' },
         { status: 404 }
@@ -81,6 +101,9 @@ export async function GET(
 
     const page = data.results[0];
     const props = page.properties;
+
+    // Audit: Successful view
+    await logAudit(createViewAudit(request, bookingId, verifyEmail, 'success'));
 
     // Return booking data
     return NextResponse.json({
@@ -189,6 +212,9 @@ export async function PUT(
 
     const verifyData = await verifyResponse.json();
     if (verifyData.results.length === 0) {
+      // Audit: Failed update attempt
+      await logAudit(createUpdateAudit(request, bookingId, verifyEmail, {}, updates, 'failure', 'Booking not found or access denied'));
+      
       return NextResponse.json(
         { success: false, error: 'Booking not found or access denied' },
         { status: 403 }
@@ -196,6 +222,13 @@ export async function PUT(
     }
 
     const notionPageId = verifyData.results[0].id;
+    const oldProps = verifyData.results[0].properties;
+    
+    // Store old values for audit
+    const oldData = {
+      date: oldProps.Date?.date?.start || '',
+      time: oldProps.Time?.rich_text?.[0]?.plain_text || '',
+    };
 
     // Update the booking
     const notionProperties: any = {};
@@ -217,6 +250,9 @@ export async function PUT(
       },
       body: JSON.stringify({ properties: notionProperties }),
     });
+    
+    // Audit: Successful update
+    await logAudit(createUpdateAudit(request, bookingId, verifyEmail, oldData, updates, 'success'));
     
     // Optionally notify via n8n
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
@@ -430,6 +466,9 @@ export async function DELETE(
 
     const verifyData = await verifyResponse.json();
     if (verifyData.results.length === 0) {
+      // Audit: Failed cancel attempt
+      await logAudit(createCancelAudit(request, bookingId, verifyEmail, 'failure', 'Booking not found or access denied'));
+      
       return NextResponse.json(
         { success: false, error: 'Booking not found or access denied' },
         { status: 403 }
@@ -452,6 +491,9 @@ export async function DELETE(
         },
       }),
     });
+    
+    // Audit: Successful cancellation
+    await logAudit(createCancelAudit(request, bookingId, verifyEmail, 'success'));
     
     // Optionally notify via n8n
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;

@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, User, Mail, Phone, Search, ArrowLeft, Package } from "lucide-react";
+import { Calendar, Clock, User, Mail, Phone, Search, ArrowLeft, Package, Shield } from "lucide-react";
+import { executeRecaptcha } from "@/lib/recaptcha";
 
 const BRAND = {
   charcoal: "#2C2C2C",
@@ -20,12 +21,35 @@ export default function MyBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+
+  // Load reCAPTCHA on mount
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+      import("@/lib/recaptcha")
+        .then(({ loadRecaptchaScript }) => loadRecaptchaScript())
+        .then(() => setRecaptchaReady(true))
+        .catch((err) => console.warn("reCAPTCHA load failed:", err));
+    } else {
+      setRecaptchaReady(true); // Allow without reCAPTCHA in dev
+    }
+  }, []);
 
   async function handleSearch() {
     setLoading(true);
     setSearched(true);
 
     try {
+      // Get reCAPTCHA token
+      let recaptchaToken = "";
+      if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+        try {
+          recaptchaToken = await executeRecaptcha("search_bookings");
+        } catch (error) {
+          console.warn("reCAPTCHA execution failed:", error);
+        }
+      }
+
       let url = "/api/bookings?";
       if (searchMethod === "email") {
         url += `email=${encodeURIComponent(email)}`;
@@ -33,7 +57,11 @@ export default function MyBookings() {
         url += `firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}`;
       }
 
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          "X-Recaptcha-Token": recaptchaToken,
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -156,6 +184,7 @@ export default function MyBookings() {
               onClick={handleSearch}
               disabled={
                 loading ||
+                !recaptchaReady ||
                 (searchMethod === "email" ? !email : !firstName || !lastName)
               }
               style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
@@ -172,6 +201,12 @@ export default function MyBookings() {
                 </>
               )}
             </Button>
+            {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+              <p className="text-xs text-center text-neutral-500 mt-2 flex items-center justify-center gap-1">
+                <Shield className="w-3 h-3" />
+                Protected by reCAPTCHA
+              </p>
+            )}
           </CardContent>
         </Card>
 

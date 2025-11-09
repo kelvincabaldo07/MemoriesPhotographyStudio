@@ -78,6 +78,8 @@
 //   }
 // }
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyRecaptchaToken } from '@/lib/recaptcha';
+import { logAudit, createSearchAudit } from '@/lib/audit';
 
 /**
  * GET /api/bookings - Search bookings by email or name
@@ -85,6 +87,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * 
  * SECURITY: Rate limited to prevent brute force attacks
  * Only returns bookings matching EXACT email/name combination
+ * Protected by reCAPTCHA v3 to prevent bot attacks
+ * AUDIT: Logs all search attempts
  */
 
 // Simple in-memory rate limiting (use Redis in production for distributed systems)
@@ -109,11 +113,16 @@ function checkRateLimit(identifier: string, maxRequests = 10, windowMs = 60000):
 }
 
 export async function GET(request: NextRequest) {
+  // Declare variables at top level for error handler access
+  let email: string | null = null;
+  let firstName: string | null = null;
+  let lastName: string | null = null;
+  
   try {
     const searchParams = request.nextUrl.searchParams;
-    const email = searchParams.get('email');
-    const firstName = searchParams.get('firstName');
-    const lastName = searchParams.get('lastName');
+    email = searchParams.get('email');
+    firstName = searchParams.get('firstName');
+    lastName = searchParams.get('lastName');
 
     // Rate limiting: max 10 requests per minute per IP
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
@@ -122,6 +131,19 @@ export async function GET(request: NextRequest) {
         { success: false, error: 'Too many requests. Please try again later.' },
         { status: 429 }
       );
+    }
+
+    // reCAPTCHA verification
+    const recaptchaToken = request.headers.get('x-recaptcha-token');
+    if (recaptchaToken) {
+      const recaptchaResult = await verifyRecaptchaToken(recaptchaToken, 'search_bookings');
+      if (!recaptchaResult.success) {
+        console.warn('reCAPTCHA verification failed:', recaptchaResult.error);
+        return NextResponse.json(
+          { success: false, error: 'Security verification failed. Please try again.' },
+          { status: 403 }
+        );
+      }
     }
 
     const notionApiKey = process.env.NOTION_API_KEY;
@@ -237,6 +259,9 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // Audit: Successful search
+    await logAudit(createSearchAudit(request, email || `${firstName} ${lastName}`, bookings.length, 'success'));
+
     return NextResponse.json({
       success: true,
       bookings,
@@ -244,6 +269,9 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
+    // Audit: Failed search
+    await logAudit(createSearchAudit(request, email || `${firstName} ${lastName}`, 0, 'failure', String(error)));
+    
     // Don't expose internal errors to client
     return NextResponse.json(
       { success: false, error: 'Failed to search bookings' },
