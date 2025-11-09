@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, User, Mail, Phone, Search, ArrowLeft, Package, Shield } from "lucide-react";
+import { Calendar, Clock, User, Mail, Phone, Search, ArrowLeft, Package, Shield, ShoppingBag, Globe } from "lucide-react";
 import { executeRecaptcha } from "@/lib/recaptcha";
 
 const BRAND = {
@@ -95,7 +95,7 @@ export default function MyBookings() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: BRAND.cream }}>
+    <div className="min-h-screen p-4 md:p-8 pb-24" style={{ backgroundColor: BRAND.cream }}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -334,6 +334,74 @@ export default function MyBookings() {
           © {new Date().getFullYear()} Memories Photography Studio — "Capture With Purpose.
           Create Change."
         </footer>
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50 safe-area-inset-bottom">
+        <div className="grid grid-cols-5 gap-0">
+          <button onClick={() => (window.location.href = "/")} className="flex flex-col items-center justify-center py-2 px-1 transition relative">
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className="rounded-lg p-1.5 transition"><ShoppingBag className="w-5 h-5 stroke-2" /></div>
+              <span className="text-[10px] mt-1 font-medium">Book</span>
+            </div>
+          </button>
+          <button onClick={() => (window.location.href = "/my-bookings")} className="flex flex-col items-center justify-center py-2 px-1 transition relative">
+            <div className="flex flex-col items-center justify-center text-white dark:text-white">
+              <div className="rounded-lg p-1.5 transition bg-[#0b3d2e] dark:bg-[#0b3d2e]"><Calendar className="w-5 h-5 stroke-[2.5]" /></div>
+              <span className="text-[10px] mt-1 font-semibold text-[#0b3d2e] dark:text-white">Bookings</span>
+            </div>
+          </button>
+          <button onClick={() => (window.location.href = "/contact")} className="flex flex-col items-center justify-center py-2 px-1 transition relative">
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className="rounded-lg p-1.5 transition"><Phone className="w-5 h-5 stroke-2" /></div>
+              <span className="text-[10px] mt-1 font-medium">Contact</span>
+            </div>
+          </button>
+          <button onClick={() => (window.location.href = "/location")} className="flex flex-col items-center justify-center py-2 px-1 transition relative">
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className="rounded-lg p-1.5 transition">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <span className="text-[10px] mt-1 font-medium">Location</span>
+            </div>
+          </button>
+          <button onClick={() => window.open("https://www.memories-studio.com", "_blank")} className="flex flex-col items-center justify-center py-2 px-1 transition relative">
+            <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+              <div className="rounded-lg p-1.5 transition"><Globe className="w-5 h-5 stroke-2" /></div>
+              <span className="text-[10px] mt-1 font-medium">Website</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div className="hidden lg:block fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-3">
+          <div className="flex items-center justify-center gap-6">
+            <button onClick={() => (window.location.href = "/")} className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+              <ShoppingBag className="w-4 h-4" />Book Now
+            </button>
+            <button onClick={() => (window.location.href = "/my-bookings")} className="flex items-center gap-2 text-sm font-semibold text-[#0b3d2e] dark:text-white transition">
+              <Calendar className="w-4 h-4" />My Bookings
+            </button>
+            <button onClick={() => (window.location.href = "/contact")} className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+              <Phone className="w-4 h-4" />Contact Us
+            </button>
+            <button onClick={() => (window.location.href = "/location")} className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+              Our Location
+            </button>
+            <button onClick={() => window.open("https://www.memories-studio.com", "_blank")} className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-opacity-80 transition">
+              <Globe className="w-4 h-4" />Website
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
