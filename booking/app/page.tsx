@@ -721,12 +721,27 @@ async function submitBooking(){
       />
 
       <div className="w-full max-w-5xl">
-        <div className="relative">
-          <Header onReset={() => setShowResetModal(true)} />
+        {/* Simple Logo/Title Header */}
+        <div className="text-center mb-6 pt-4">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <img 
+              src="/logo.png" 
+              alt="Memories Photography Studio" 
+              className="w-12 h-12 md:w-14 md:h-14"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <div>
+              <h1 className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: BRAND.forest }}>
+                Memories Photography Studio
+              </h1>
+              <p className="text-xs text-neutral-500">Capture With Purpose. Create Change.</p>
+            </div>
+          </div>
         </div>
+
         <Stepper step={step} />
 
-        <Card className="mt-4 shadow-lg border-0 relative overflow-visible">
+        <Card className="mt-8 shadow-lg border-0 relative overflow-visible">
           {/* Sticky mini-summary */}
           <div className="hidden md:flex items-center gap-3 absolute -top-3 right-3 bg-white/90 backdrop-blur rounded-xl border px-3 py-2 shadow-sm">
             <div className="text-xs text-neutral-500">Total</div>
@@ -980,115 +995,6 @@ function Modal({
         </div>
       </div>
     </div>
-  );
-}
-
-function Header({ onReset }:{ onReset: ()=>void }){
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  return (
-    <>
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-sm mb-8 -mx-4 md:-mx-8 px-4 md:px-8 py-4 relative z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.href = '/'}>
-            <img 
-              src="/logo.png" 
-              alt="Memories Photography Studio" 
-              className="w-12 h-12 md:w-14 md:h-14"
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <div className="hidden md:block">
-              <h2 className="font-semibold text-lg" style={{ color: BRAND.forest }}>
-                Memories Photography Studio
-              </h2>
-              <p className="text-xs text-neutral-500">Capture With Purpose. Create Change.</p>
-            </div>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-6">
-            <button 
-              onClick={() => window.location.href = '/my-bookings'}
-              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
-              style={{ color: BRAND.charcoal }}
-            >
-              <Calendar className="w-4 h-4" />
-              My Bookings
-            </button>
-            <button 
-              onClick={() => window.location.href = '/'}
-              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
-              style={{ color: BRAND.charcoal }}
-            >
-              <ShoppingBag className="w-4 h-4" />
-              Book Now
-            </button>
-            <button 
-              onClick={() => window.location.href = '/contact'}
-              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
-              style={{ color: BRAND.charcoal }}
-            >
-              <Phone className="w-4 h-4" />
-              Contact Us
-            </button>
-            <button 
-              onClick={() => window.location.href = '/location'}
-              className="flex items-center gap-2 text-sm font-medium hover:text-opacity-80 transition"
-              style={{ color: BRAND.charcoal }}
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-              </svg>
-              Our Location
-            </button>
-          </div>
-
-          {/* Mobile Icon Menu - Forest Green Bar */}
-          <div className="md:hidden flex items-center gap-4 px-4 py-2 rounded-xl" style={{ backgroundColor: BRAND.forest }}>
-            <button 
-              onClick={() => window.location.href = '/my-bookings'}
-              className="flex flex-col items-center gap-1"
-            >
-              <Calendar className="w-5 h-5" style={{ color: BRAND.white }} />
-              <span className="text-[9px]" style={{ color: BRAND.white }}>Bookings</span>
-            </button>
-            <button 
-              onClick={() => window.location.href = '/'}
-              className="flex flex-col items-center gap-1"
-            >
-              <ShoppingBag className="w-5 h-5" style={{ color: BRAND.white }} />
-              <span className="text-[9px]" style={{ color: BRAND.white }}>Book</span>
-            </button>
-            <button 
-              onClick={() => window.location.href = '/contact'}
-              className="flex flex-col items-center gap-1"
-            >
-              <Phone className="w-5 h-5" style={{ color: BRAND.white }} />
-              <span className="text-[9px]" style={{ color: BRAND.white }}>Contact</span>
-            </button>
-            <button 
-              onClick={() => window.location.href = '/location'}
-              className="flex flex-col items-center gap-1"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" style={{ color: BRAND.white }}>
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-              </svg>
-              <span className="text-[9px]" style={{ color: BRAND.white }}>Location</span>
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Page Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight" style={{ color: BRAND.forest }}>
-          Book Your Session
-        </h1>
-        <p className="text-neutral-600 mt-1">Create beautiful memories with us today</p>
-      </div>
-    </>
   );
 }
 
