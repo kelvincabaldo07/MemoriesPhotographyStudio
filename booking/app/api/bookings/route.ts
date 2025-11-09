@@ -80,6 +80,150 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
+ * GET /api/bookings - Search bookings by email or name
+ * Query params: ?email=xxx OR ?firstName=xxx&lastName=xxx
+ */
+export async function GET(request: NextRequest) {
+  console.log('🔍 GET bookings API called');
+  
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const email = searchParams.get('email');
+    const firstName = searchParams.get('firstName');
+    const lastName = searchParams.get('lastName');
+
+    console.log('Search params:', { email, firstName, lastName });
+
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
+
+    if (!notionApiKey || !databaseId) {
+      return NextResponse.json(
+        { success: false, error: 'Notion not configured' },
+        { status: 500 }
+      );
+    }
+
+    // Build filter based on search method
+    let filter: any;
+    
+    if (email) {
+      filter = {
+        property: 'Email',
+        email: {
+          equals: email,
+        },
+      };
+    } else if (firstName && lastName) {
+      filter = {
+        and: [
+          {
+            property: 'First Name',
+            rich_text: {
+              equals: firstName,
+            },
+          },
+          {
+            property: 'Last Name',
+            rich_text: {
+              equals: lastName,
+            },
+          },
+        ],
+      };
+    } else {
+      return NextResponse.json(
+        { success: false, error: 'Please provide email or both firstName and lastName' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Querying Notion with filter:', JSON.stringify(filter, null, 2));
+
+    // Query Notion database
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionApiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          filter,
+          sorts: [
+            {
+              property: 'Date',
+              direction: 'descending',
+            },
+          ],
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Notion query error:', errorText);
+      return NextResponse.json(
+        { success: false, error: 'Failed to query bookings' },
+        { status: 500 }
+      );
+    }
+
+    const data = await response.json();
+    console.log('Found bookings:', data.results.length);
+
+    // Transform Notion data to booking format
+    const bookings = data.results.map((page: any) => {
+      const props = page.properties;
+      return {
+        id: props['Booking ID']?.rich_text?.[0]?.plain_text || page.id,
+        notionPageId: page.id,
+        customer: {
+          firstName: props['First Name']?.rich_text?.[0]?.plain_text || '',
+          lastName: props['Last Name']?.rich_text?.[0]?.plain_text || '',
+          email: props['Email']?.email || '',
+          phone: props['Phone']?.phone_number || '',
+          address: props['Address']?.rich_text?.[0]?.plain_text || '',
+        },
+        selections: {
+          serviceType: props['Service Type']?.select?.name || '',
+          serviceCategory: props['Service Category']?.select?.name || '',
+          serviceGroup: props['Service Group']?.rich_text?.[0]?.plain_text || '',
+          service: props['Service']?.rich_text?.[0]?.plain_text || '',
+          duration: props['Duration']?.number || 0,
+        },
+        schedule: {
+          date: props['Date']?.date?.start || '',
+          time: props['Time']?.rich_text?.[0]?.plain_text || '',
+        },
+        totals: {
+          sessionPrice: props['Session Price']?.number || 0,
+          addonsTotal: props['Add-ons Total']?.number || 0,
+          grandTotal: props['Grand Total']?.number || 0,
+        },
+        status: props['Status']?.select?.name || 'Pending',
+        createdAt: page.created_time,
+      };
+    });
+
+    return NextResponse.json({
+      success: true,
+      bookings,
+      count: bookings.length,
+    });
+
+  } catch (error) {
+    console.error('GET bookings error:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to search bookings' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * Generate booking ID in format: MMRS-YYYYMMDDHH-XXXX
  * Example: MMRS-2024120114-A3B7
  */
