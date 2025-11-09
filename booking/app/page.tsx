@@ -1034,7 +1034,6 @@ function Stepper({ step }:{ step:number }){
                   style={{
                     backgroundColor: isActive ? BRAND.forest : isCompleted ? BRAND.forest : '#e5e7eb',
                     color: isActive || isCompleted ? BRAND.white : '#9ca3af',
-                    ringColor: BRAND.forest,
                   }}
                 >
                   {isCompleted ? '✓' : i + 1}
