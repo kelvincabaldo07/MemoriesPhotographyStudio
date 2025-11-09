@@ -379,6 +379,9 @@ export default function App(){
   
   // Dynamic service restrictions from API
   const [serviceRestrictions, setServiceRestrictions] = useState<Record<string, ServiceRestriction>>(SERVICE_RESTRICTIONS);
+  
+  // Dynamic service info from API (descriptions, prices)
+  const [serviceInfo, setServiceInfo] = useState<Record<string, { details: string; price: number; classicDetails?: string }>>(SERVICE_INFO);
 
   // Schedule
   const [date, setDate] = useState(offsetDate(0));
@@ -414,15 +417,16 @@ export default function App(){
   // Terms
   const [accepted, setAccepted] = useState(false);
 
-  // Load service restrictions from API on mount
+  // Load service data from API on mount
   useEffect(() => {
     fetch('/api/admin/services/config')
       .then(res => res.json())
       .then(data => {
         if (data.services) {
           const restrictions: Record<string, ServiceRestriction> = {};
+          const info: Record<string, { details: string; price: number; classicDetails?: string }> = {};
           
-          // Build restrictions from services data
+          // Build restrictions and info from services data
           data.services.forEach((svc: any) => {
             // Time-based restrictions (for "With Photographer")
             if (svc.availableFrom !== undefined && svc.availableUntil !== undefined) {
@@ -442,27 +446,39 @@ export default function App(){
               const existing = restrictions[svc.type].allowedDates || [];
               restrictions[svc.type].allowedDates = [...new Set([...existing, ...svc.specificDates])];
             }
+            
+            // Service descriptions and prices
+            if (svc.name) {
+              info[svc.name] = {
+                details: svc.description || "",
+                price: svc.basePrice || 0,
+                classicDetails: svc.category === "Classic" ? svc.description : undefined,
+              };
+            }
           });
           
-          // Update state with API restrictions
+          // Update state with API data
           if (Object.keys(restrictions).length > 0) {
             setServiceRestrictions(prev => ({ ...prev, ...restrictions }));
+          }
+          if (Object.keys(info).length > 0) {
+            setServiceInfo(prev => ({ ...prev, ...info }));
           }
         }
       })
       .catch(err => {
-        console.error('Failed to load service restrictions:', err);
-        // Keep using default SERVICE_RESTRICTIONS on error
+        console.error('Failed to load service data:', err);
+        // Keep using defaults on error
       });
   }, []);
 
   // Totals
   const sessionPrice = useMemo(() => {
-    const baseInfo = SERVICE_INFO[service];
+    const baseInfo = serviceInfo[service];
     if (!baseInfo) return 0;
     // Add ₱50 for Classic category
     return serviceCategory === "Classic" ? baseInfo.price + 50 : baseInfo.price;
-  }, [service, serviceCategory]);
+  }, [service, serviceCategory, serviceInfo]);
   const addonsTotal = useMemo(() => Object.entries(addons).reduce((sum,[id,qty])=>{
     const item = ADDONS.find(a=>a.id===id); return sum + (item ? (item.price * (qty||0)) : 0);
   },0), [addons]);
@@ -664,6 +680,7 @@ async function submitBooking(){
                 setServiceGroup={setServiceGroup}
                 service={service}
                 setService={(s:string)=>{ setService(s); }}
+                serviceInfo={serviceInfo}
               />
             )}
 
@@ -1003,11 +1020,12 @@ function Stepper({ step }:{ step:number }){
 }
 
 // Unified one-step service selector with explicit accordions + prices + thumbnails
-function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setServiceCategory, serviceGroup, setServiceGroup, service, setService }:{
+function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setServiceCategory, serviceGroup, setServiceGroup, service, setService, serviceInfo }:{
   serviceType:string; setServiceType:(v:string)=>void;
   serviceCategory:string; setServiceCategory:(v:string)=>void;
   serviceGroup:string; setServiceGroup:(v:string)=>void;
   service:string; setService:(v:string)=>void;
+  serviceInfo: Record<string, { details: string; price: number; classicDetails?: string }>;
 }){
   const [openType, setOpenType] = useState<string>(serviceType || "");
   const [openCategory, setOpenCategory] = useState<string>(serviceCategory || "");
@@ -1152,7 +1170,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     <div className="text-sm font-medium mb-2">Services</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {services.map((s: string)=> {
-                        const info = SERVICE_INFO[s] || { details: "", price: 0 };
+                        const info = serviceInfo[s] || { details: "", price: 0 };
                         // Use classic details if Classic category is selected, otherwise use digital details
                         const displayDetails = serviceCategory === "Classic" && info.classicDetails ? info.classicDetails : info.details;
                         const displayPrice = serviceCategory === "Classic" ? info.price + 50 : info.price;
