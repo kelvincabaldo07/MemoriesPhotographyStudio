@@ -91,7 +91,7 @@ export default function BookingsPage() {
   const updateBookingStatus = async (bookingId: string, newStatus: string) => {
     setUpdating(true);
     try {
-      const response = await fetch(`/api/bookings/${bookingId}`, {
+      const response = await fetch(`/api/admin/bookings/${bookingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -104,7 +104,8 @@ export default function BookingsPage() {
         }
         alert(`Booking ${newStatus.toLowerCase()} successfully!`);
       } else {
-        alert("Failed to update booking status");
+        const errorData = await response.json();
+        alert(`Failed to update booking status: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error updating booking:", error);
@@ -119,10 +120,21 @@ export default function BookingsPage() {
 
     setUpdating(true);
     try {
-      const response = await fetch(`/api/bookings/${editedBooking.id}`, {
+      // Admin update - send booking ID in URL and updates in body
+      const response = await fetch(`/api/admin/bookings/${editedBooking.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedBooking),
+        body: JSON.stringify({
+          name: editedBooking.name,
+          firstName: editedBooking.firstName,
+          lastName: editedBooking.lastName,
+          email: editedBooking.email,
+          phone: editedBooking.phone,
+          address: editedBooking.address,
+          date: editedBooking.date,
+          time: editedBooking.time,
+          status: editedBooking.status,
+        }),
       });
 
       if (response.ok) {
@@ -131,7 +143,8 @@ export default function BookingsPage() {
         setIsEditing(false);
         alert("Booking updated successfully!");
       } else {
-        alert("Failed to update booking");
+        const errorData = await response.json();
+        alert(`Failed to update booking: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error("Error saving booking:", error);
@@ -562,7 +575,7 @@ export default function BookingsPage() {
                   Booking Details
                 </h2>
                 <div className="flex items-center gap-2">
-                  {!isEditing && selectedBooking.status === "Pending" && (
+                  {!isEditing && selectedBooking.status !== "Completed" && selectedBooking.status !== "Cancelled" && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -758,15 +771,15 @@ export default function BookingsPage() {
                       Cancel
                     </Button>
                   </>
-                ) : selectedBooking.status === "Pending" ? (
+                ) : selectedBooking.status === "Confirmed" ? (
                   <>
                     <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      onClick={() => updateBookingStatus(selectedBooking.id, "Confirmed")}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      onClick={() => updateBookingStatus(selectedBooking.id, "Completed")}
                       disabled={updating}
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
-                      {updating ? "Confirming..." : "Confirm Booking"}
+                      {updating ? "Updating..." : "Mark as Completed"}
                     </Button>
                     <Button
                       className="flex-1 bg-red-600 hover:bg-red-700"
@@ -777,15 +790,6 @@ export default function BookingsPage() {
                       {updating ? "Cancelling..." : "Cancel Booking"}
                     </Button>
                   </>
-                ) : selectedBooking.status === "Confirmed" ? (
-                  <Button
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    onClick={() => updateBookingStatus(selectedBooking.id, "Completed")}
-                    disabled={updating}
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    {updating ? "Updating..." : "Mark as Completed"}
-                  </Button>
                 ) : null}
               </div>
             </div>

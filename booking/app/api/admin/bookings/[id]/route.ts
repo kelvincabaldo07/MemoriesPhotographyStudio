@@ -1,0 +1,190 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+/**
+ * PATCH (update) booking by ID - Admin endpoint
+ * No email verification required (admin authenticated via session)
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: bookingId } = await params;
+  
+  try {
+    const body = await request.json();
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
+
+    if (!notionApiKey || !databaseId) {
+      return NextResponse.json(
+        { error: "Notion API credentials not configured" },
+        { status: 500 }
+      );
+    }
+
+    // First, find the booking by Booking ID to get the Notion page ID
+    const queryResponse = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionApiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          filter: {
+            property: 'Booking ID',
+            rich_text: {
+              equals: bookingId,
+            },
+          },
+        }),
+      }
+    );
+
+    if (!queryResponse.ok) {
+      return NextResponse.json(
+        { error: "Failed to find booking" },
+        { status: 404 }
+      );
+    }
+
+    const queryData = await queryResponse.json();
+    
+    if (queryData.results.length === 0) {
+      return NextResponse.json(
+        { error: "Booking not found" },
+        { status: 404 }
+      );
+    }
+
+    const notionPageId = queryData.results[0].id;
+
+    // Build Notion properties update object
+    const notionProperties: any = {};
+
+    // Handle status update
+    if (body.status) {
+      notionProperties.Status = {
+        select: { name: body.status }
+      };
+    }
+
+    // Handle name update (updates both "Client Name" title and first/last name fields)
+    if (body.name) {
+      notionProperties["Client Name"] = {
+        title: [{ text: { content: body.name } }]
+      };
+      
+      // Split name into first and last if provided
+      const nameParts = body.name.split(' ');
+      if (nameParts.length >= 2) {
+        notionProperties["First Name"] = {
+          rich_text: [{ text: { content: nameParts[0] } }]
+        };
+        notionProperties["Last Name"] = {
+          rich_text: [{ text: { content: nameParts.slice(1).join(' ') } }]
+        };
+      }
+    }
+
+    // Handle individual first/last name updates
+    if (body.firstName) {
+      notionProperties["First Name"] = {
+        rich_text: [{ text: { content: body.firstName } }]
+      };
+    }
+
+    if (body.lastName) {
+      notionProperties["Last Name"] = {
+        rich_text: [{ text: { content: body.lastName } }]
+      };
+    }
+
+    if (body.email) {
+      notionProperties.Email = {
+        email: body.email
+      };
+    }
+
+    if (body.phone) {
+      notionProperties.Phone = {
+        phone_number: body.phone
+      };
+    }
+
+    if (body.address) {
+      notionProperties.Address = {
+        rich_text: [{ text: { content: body.address } }]
+      };
+    }
+
+    if (body.date) {
+      notionProperties.Date = {
+        date: { start: body.date }
+      };
+    }
+
+    if (body.time) {
+      notionProperties.Time = {
+        rich_text: [{ text: { content: body.time } }]
+      };
+    }
+
+    // Update Notion page
+    const updateResponse = await fetch(
+      `https://api.notion.com/v1/pages/${notionPageId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${notionApiKey}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          properties: notionProperties,
+        }),
+      }
+    );
+
+    if (!updateResponse.ok) {
+      const errorData = await updateResponse.json();
+      console.error('Notion update error:', errorData);
+      return NextResponse.json(
+        { error: "Failed to update booking in Notion", details: errorData },
+        { status: 500 }
+      );
+    }
+
+    // Optionally send to n8n webhook for notifications
+    const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL;
+    if (n8nWebhookUrl) {
+      try {
+        await fetch(n8nWebhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event: 'booking_updated',
+            bookingId,
+            updates: body,
+          }),
+        });
+      } catch (err) {
+        console.log('n8n webhook warning:', err);
+      }
+    }
+    
+    return NextResponse.json({
+      success: true,
+      message: 'Booking updated successfully',
+      bookingId,
+    });
+  } catch (error) {
+    console.error('❌ Update error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update booking', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}

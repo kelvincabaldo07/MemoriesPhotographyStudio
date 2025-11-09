@@ -366,7 +366,7 @@ export async function POST(request: NextRequest) {
         "Session Price": { number: bookingData.totals?.sessionPrice || 0 },
         "Add-ons Total": { number: bookingData.totals?.addonsTotal || 0 },
         "Grand Total": { number: bookingData.totals?.grandTotal || 0 },
-        "Status": { select: { name: "Pending" } },
+        "Status": { select: { name: "Confirmed" } },
         "Address": { rich_text: [{ text: { content: bookingData.customer.address || "" } }] },
       }
     };
