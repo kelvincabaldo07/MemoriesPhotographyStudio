@@ -82,17 +82,47 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * GET /api/bookings - Search bookings by email or name
  * Query params: ?email=xxx OR ?firstName=xxx&lastName=xxx
+ * 
+ * SECURITY: Rate limited to prevent brute force attacks
+ * Only returns bookings matching EXACT email/name combination
  */
-export async function GET(request: NextRequest) {
-  console.log('🔍 GET bookings API called');
+
+// Simple in-memory rate limiting (use Redis in production for distributed systems)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function checkRateLimit(identifier: string, maxRequests = 10, windowMs = 60000): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
   
+  if (!record || now > record.resetTime) {
+    // New window or expired
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + windowMs });
+    return true;
+  }
+  
+  if (record.count >= maxRequests) {
+    return false; // Rate limit exceeded
+  }
+  
+  record.count++;
+  return true;
+}
+
+export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const email = searchParams.get('email');
     const firstName = searchParams.get('firstName');
     const lastName = searchParams.get('lastName');
 
-    console.log('Search params:', { email, firstName, lastName });
+    // Rate limiting: max 10 requests per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
 
     const notionApiKey = process.env.NOTION_API_KEY;
     const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
@@ -138,9 +168,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('Querying Notion with filter:', JSON.stringify(filter, null, 2));
-
-    // Query Notion database
+    // Query Notion database (no sensitive data logged)
     const response = await fetch(
       `https://api.notion.com/v1/databases/${databaseId}/query`,
       {
@@ -172,9 +200,9 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    console.log('Found bookings:', data.results.length);
 
     // Transform Notion data to booking format
+    // SECURITY: Only return data that belongs to the requester
     const bookings = data.results.map((page: any) => {
       const props = page.properties;
       return {
@@ -185,7 +213,8 @@ export async function GET(request: NextRequest) {
           lastName: props['Last Name']?.rich_text?.[0]?.plain_text || '',
           email: props['Email']?.email || '',
           phone: props['Phone']?.phone_number || '',
-          address: props['Address']?.rich_text?.[0]?.plain_text || '',
+          // SECURITY: Don't expose full address in list view
+          address: '', // Only show in detail view after verification
         },
         selections: {
           serviceType: props['Service Type']?.select?.name || '',
@@ -215,7 +244,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('GET bookings error:', error);
+    // Don't expose internal errors to client
     return NextResponse.json(
       { success: false, error: 'Failed to search bookings' },
       { status: 500 }

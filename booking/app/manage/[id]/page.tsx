@@ -22,21 +22,23 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
   const [newDate, setNewDate] = useState("");
   const [newTime, setNewTime] = useState("");
 
-  useEffect(() => {
-    fetchBooking();
-  }, [bookingId]);
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
 
-  async function fetchBooking() {
+  async function fetchBooking(email: string) {
     try {
-      const response = await fetch(`/api/bookings/${bookingId}`);
+      const response = await fetch(`/api/bookings/${bookingId}?email=${encodeURIComponent(email)}`);
       const data = await response.json();
       if (data.success) {
         setBooking(data.booking);
         setNewDate(data.booking.schedule?.date || "");
         setNewTime(data.booking.schedule?.time || "");
+        setEmailVerified(true);
+      } else {
+        alert(data.error || 'Failed to fetch booking');
       }
     } catch (error) {
-      console.error('Failed to fetch booking:', error);
+      alert('Failed to fetch booking. Please check your email and try again.');
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,8 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          schedule: { date: newDate, time: newTime }
+          email: verifyEmail,
+          updates: { date: newDate, time: newTime }
         }),
       });
 
@@ -61,7 +64,7 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
       if (data.success) {
         alert('✅ Booking rescheduled successfully! You will receive a confirmation email.');
         setEditing(false);
-        fetchBooking();
+        fetchBooking(verifyEmail);
       }
     } catch (error) {
       alert('Failed to reschedule. Please try again.');
@@ -72,7 +75,7 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
     if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) return;
 
     try {
-      const response = await fetch(`/api/bookings/${bookingId}`, {
+      const response = await fetch(`/api/bookings/${bookingId}?email=${encodeURIComponent(verifyEmail)}`, {
         method: 'DELETE',
       });
 
@@ -86,13 +89,58 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
     }
   }
 
-  if (loading) {
+  // Email verification form
+  if (!emailVerified) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BRAND.cream }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: BRAND.forest }}></div>
-          <p style={{ color: BRAND.charcoal }}>Loading booking...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: BRAND.cream }}>
+        <Card className="max-w-md w-full">
+          <CardContent className="p-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold mb-2" style={{ color: BRAND.forest }}>Verify Your Email</h2>
+              <p className="text-neutral-600">
+                Please enter the email address used for this booking to continue.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Booking ID</label>
+                <Input value={bookingId} disabled className="bg-neutral-100" />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={verifyEmail}
+                  onChange={(e) => setVerifyEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && verifyEmail && fetchBooking(verifyEmail)}
+                />
+              </div>
+              <Button
+                onClick={() => fetchBooking(verifyEmail)}
+                disabled={!verifyEmail || loading}
+                style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+                className="w-full"
+              >
+                {loading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-4 h-4 mr-2" /> Verify & Continue
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="mt-6 text-center">
+              <Button variant="ghost" onClick={() => window.location.href = '/'}>
+                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

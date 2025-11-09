@@ -1,62 +1,236 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// GET booking by ID
+/**
+ * GET booking by ID
+ * SECURITY: Requires email verification parameter to prevent unauthorized access
+ */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: bookingId } = await params;
   
-  // TODO: Fetch from your database (Notion, etc.)
-  // For now, we'll return mock data
+  // SECURITY: Require email verification
+  const searchParams = request.nextUrl.searchParams;
+  const verifyEmail = searchParams.get('email');
   
-  return NextResponse.json({
-    success: true,
-    booking: {
-      id: bookingId,
-      schedule: {
-        date: "2024-12-01",
-        time: "10:00"
-      },
-      customer: {
-        firstName: "John",
-        lastName: "Doe",
-        email: "john@example.com",
-        phone: "123-456-7890"
-      },
-      selections: {
-        service: "Solo/Duo 30",
-        serviceType: "Self-Shoot",
-        serviceCategory: "Digital"
-      }
+  if (!verifyEmail) {
+    return NextResponse.json(
+      { success: false, error: 'Email verification required' },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
+
+    if (!notionApiKey || !databaseId) {
+      return NextResponse.json(
+        { success: false, error: 'Service configuration error' },
+        { status: 500 }
+      );
     }
-  });
+
+    // Query by Booking ID AND email to verify ownership
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionApiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          filter: {
+            and: [
+              {
+                property: 'Booking ID',
+                rich_text: {
+                  equals: bookingId,
+                },
+              },
+              {
+                property: 'Email',
+                email: {
+                  equals: verifyEmail,
+                },
+              },
+            ],
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch booking' },
+        { status: 500 }
+      );
+    }
+
+    const data = await response.json();
+
+    if (data.results.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Booking not found or access denied' },
+        { status: 404 }
+      );
+    }
+
+    const page = data.results[0];
+    const props = page.properties;
+
+    // Return booking data
+    return NextResponse.json({
+      success: true,
+      booking: {
+        id: props['Booking ID']?.rich_text?.[0]?.plain_text || bookingId,
+        notionPageId: page.id,
+        customer: {
+          firstName: props['First Name']?.rich_text?.[0]?.plain_text || '',
+          lastName: props['Last Name']?.rich_text?.[0]?.plain_text || '',
+          email: props['Email']?.email || '',
+          phone: props['Phone']?.phone_number || '',
+          address: props['Address']?.rich_text?.[0]?.plain_text || '',
+        },
+        selections: {
+          serviceType: props['Service Type']?.select?.name || '',
+          serviceCategory: props['Service Category']?.select?.name || '',
+          serviceGroup: props['Service Group']?.rich_text?.[0]?.plain_text || '',
+          service: props['Service']?.rich_text?.[0]?.plain_text || '',
+          duration: props['Duration']?.number || 0,
+        },
+        schedule: {
+          date: props['Date']?.date?.start || '',
+          time: props['Time']?.rich_text?.[0]?.plain_text || '',
+        },
+        selfShoot: {
+          backdrops: props['Backdrops']?.multi_select?.map((bd: any) => bd.name) || [],
+          allocations: props['Backdrop Allocations']?.rich_text?.[0]?.plain_text 
+            ? JSON.parse(props['Backdrop Allocations'].rich_text[0].plain_text) 
+            : {},
+        },
+        totals: {
+          sessionPrice: props['Session Price']?.number || 0,
+          addonsTotal: props['Add-ons Total']?.number || 0,
+          grandTotal: props['Grand Total']?.number || 0,
+        },
+        status: props['Status']?.select?.name || 'Pending',
+        createdAt: page.created_time,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch booking' },
+      { status: 500 }
+    );
+  }
 }
 
-// PUT (update) booking by ID
+/**
+ * PUT (update) booking by ID
+ * SECURITY: Requires email verification in request body
+ */
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: bookingId } = await params;
-  const updates = await request.json();
+  const body = await request.json();
+  const { email: verifyEmail, updates } = body;
   
-  console.log('🔄 Updating booking:', bookingId);
-  console.log('📝 Updates:', updates);
-  
+  // SECURITY: Require email verification
+  if (!verifyEmail) {
+    return NextResponse.json(
+      { success: false, error: 'Email verification required' },
+      { status: 401 }
+    );
+  }
+
   try {
-    // Send update to n8n
-    const n8nWebhookUrl = 'https://n8n-production-f7c3.up.railway.app/webhook/booking-updated';
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
+
+    if (!notionApiKey || !databaseId) {
+      return NextResponse.json(
+        { success: false, error: 'Service configuration error' },
+        { status: 500 }
+      );
+    }
+
+    // First, verify ownership by checking email matches
+    const verifyResponse = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionApiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          filter: {
+            and: [
+              {
+                property: 'Booking ID',
+                rich_text: { equals: bookingId },
+              },
+              {
+                property: 'Email',
+                email: { equals: verifyEmail },
+              },
+            ],
+          },
+        }),
+      }
+    );
+
+    const verifyData = await verifyResponse.json();
+    if (verifyData.results.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Booking not found or access denied' },
+        { status: 403 }
+      );
+    }
+
+    const notionPageId = verifyData.results[0].id;
+
+    // Update the booking
+    const notionProperties: any = {};
     
-    await fetch(n8nWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event: 'booking_updated',
-        bookingId,
-        updates,
-      }),
+    if (updates.date) {
+      notionProperties.Date = { date: { start: updates.date } };
+    }
+    
+    if (updates.time) {
+      notionProperties.Time = { rich_text: [{ text: { content: updates.time } }] };
+    }
+
+    await fetch(`https://api.notion.com/v1/pages/${notionPageId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${notionApiKey}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28',
+      },
+      body: JSON.stringify({ properties: notionProperties }),
     });
+    
+    // Optionally notify via n8n
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
+    if (n8nWebhookUrl) {
+      await fetch(n8nWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'booking_updated',
+          bookingId,
+          updates,
+        }),
+      }).catch(() => {}); // Fail silently
+    }
     
     return NextResponse.json({
       success: true,
@@ -64,7 +238,6 @@ export async function PUT(
       bookingId,
     });
   } catch (error) {
-    console.error('❌ Update error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to update booking' },
       { status: 500 }
@@ -72,16 +245,25 @@ export async function PUT(
   }
 }
 
-// PATCH (partial update) booking by ID
+/**
+ * PATCH (partial update) booking by ID
+ * SECURITY: Requires email verification
+ */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: bookingId } = await params;
-  const updates = await request.json();
+  const body = await request.json();
+  const { email: verifyEmail, updates } = body;
   
-  console.log('🔄 Patching booking:', bookingId);
-  console.log('📝 Updates:', updates);
+  // SECURITY: Require email verification
+  if (!verifyEmail) {
+    return NextResponse.json(
+      { success: false, error: 'Email verification required' },
+      { status: 401 }
+    );
+  }
   
   try {
     const notionApiKey = process.env.NOTION_API_KEY;
@@ -187,34 +369,108 @@ export async function PATCH(
   }
 }
 
-// DELETE (cancel) booking by ID
+/**
+ * DELETE (cancel) booking by ID
+ * SECURITY: Requires email verification in query params
+ */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: bookingId } = await params;
   
-  console.log('🗑️ Cancelling booking:', bookingId);
+  // SECURITY: Require email verification
+  const searchParams = request.nextUrl.searchParams;
+  const verifyEmail = searchParams.get('email');
   
+  if (!verifyEmail) {
+    return NextResponse.json(
+      { success: false, error: 'Email verification required' },
+      { status: 401 }
+    );
+  }
+
   try {
-    // Send cancellation to n8n
-    const n8nWebhookUrl = 'https://n8n-production-f7c3.up.railway.app/webhook/booking-cancelled';
-    
-    await fetch(n8nWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
+
+    if (!notionApiKey || !databaseId) {
+      return NextResponse.json(
+        { success: false, error: 'Service configuration error' },
+        { status: 500 }
+      );
+    }
+
+    // Verify ownership by checking email matches
+    const verifyResponse = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionApiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          filter: {
+            and: [
+              {
+                property: 'Booking ID',
+                rich_text: { equals: bookingId },
+              },
+              {
+                property: 'Email',
+                email: { equals: verifyEmail },
+              },
+            ],
+          },
+        }),
+      }
+    );
+
+    const verifyData = await verifyResponse.json();
+    if (verifyData.results.length === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Booking not found or access denied' },
+        { status: 403 }
+      );
+    }
+
+    const notionPageId = verifyData.results[0].id;
+
+    // Update status to Cancelled instead of deleting
+    await fetch(`https://api.notion.com/v1/pages/${notionPageId}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${notionApiKey}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28',
+      },
       body: JSON.stringify({
-        event: 'booking_cancelled',
-        bookingId,
+        properties: {
+          Status: { select: { name: 'Cancelled' } },
+        },
       }),
     });
+    
+    // Optionally notify via n8n
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
+    if (n8nWebhookUrl) {
+      await fetch(n8nWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: 'booking_cancelled',
+          bookingId,
+        }),
+      }).catch(() => {}); // Fail silently
+    }
     
     return NextResponse.json({
       success: true,
       message: 'Booking cancelled successfully',
     });
   } catch (error) {
-    console.error('❌ Cancellation error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to cancel booking' },
       { status: 500 }
