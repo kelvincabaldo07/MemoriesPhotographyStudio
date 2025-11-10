@@ -81,7 +81,9 @@ function isSlotAvailable(
   blockedRanges: [number, number][]
 ): boolean {
   const slotStart = toMinutes(slotHHMM);
-  const slotEnd = slotStart + duration;
+  // Include the 30-minute buffer in the slot duration check
+  // When a customer books this slot, it will occupy: start -> start + duration + buffer
+  const slotEnd = slotStart + duration + BUFFER_MINUTES;
   
   return blockedRanges.every(([blockStart, blockEnd]) => {
     return slotEnd <= blockStart || slotStart >= blockEnd;

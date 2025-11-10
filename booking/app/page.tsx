@@ -388,6 +388,7 @@ function to12Hour(hhmm: string) {
 export default function App(){
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
+  const bookingInProgress = useRef(false);
 
   // Selections
   const [serviceType, setServiceType] = useState("");
@@ -595,7 +596,16 @@ export default function App(){
 
 async function submitBooking(){
   console.log('🎯 submitBooking called!');
+  
+  // Prevent duplicate submissions
+  if (bookingInProgress.current) {
+    console.warn('⚠️ Booking already in progress, ignoring duplicate call');
+    return;
+  }
+  
+  bookingInProgress.current = true;
   setBusy(true);
+  
   const payload = {
     createdAt: new Date().toISOString(), 
     timezone: STUDIO_TZ,
@@ -639,6 +649,7 @@ async function submitBooking(){
   } finally {
     console.log('🏁 setBusy(false)');
     setBusy(false);
+    bookingInProgress.current = false;
   }
 }
 
