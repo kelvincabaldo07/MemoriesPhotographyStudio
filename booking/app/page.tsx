@@ -1435,17 +1435,52 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     return manilaTime.toISOString().split('T')[0];
   }, []);
 
+  // Auto-select today if no date is selected
+  useEffect(() => {
+    if (!date) {
+      setDate(today);
+    }
+  }, [date, today, setDate]);
+
   // Generate next 90 days (3 months) for calendar
   const next90Days = useMemo(() => {
     const days: string[] = [];
     const start = new Date(today);
     for (let i = 0; i < 90; i++) {
-      const date = new Date(start);
-      date.setDate(start.getDate() + i);
-      days.push(date.toISOString().split('T')[0]);
+      const dateObj = new Date(start);
+      dateObj.setDate(start.getDate() + i);
+      days.push(dateObj.toISOString().split('T')[0]);
     }
     return days;
   }, [today]);
+
+  // Current month view state
+  const [currentMonth, setCurrentMonth] = useState(new Date(today));
+  
+  // Get calendar grid for current month
+  const calendarDays = useMemo(() => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay(); // 0 = Sunday
+    
+    const days: (string | null)[] = [];
+    
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add all days in month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      days.push(dateStr);
+    }
+    
+    return days;
+  }, [currentMonth]);
 
   // Pre-fetch availability for next 30 days - OPTIMIZED: Single batch request
   useEffect(() => {
@@ -1528,30 +1563,63 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     return d.toLocaleDateString('en-US', { weekday: 'short' });
   };
 
-  return (
-    <div>
-      <h2 className="text-xl font-semibold">Select date & time</h2>
-      <p className="text-neutral-600 mb-4">
-        {usingMockData 
-          ? "⚠️ Showing mock availability (Google Calendar not configured)"
-          : "✅ Available times synced with Google Calendar in real-time"}
-      </p>
+  const formatMonthYear = (date: Date) => {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
 
-      {/* Custom Calendar Grid */}
-      <div className="mb-6">
-        <label className="text-sm font-medium mb-2 block">Select a Date</label>
-        {loadingDates && (
-          <div className="p-4 text-center text-neutral-500 border rounded-xl">
-            <Clock className="w-5 h-5 animate-spin mx-auto mb-2" />
-            Checking availability for next 30 days...
+  const goToPreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
+
+  return (
+    <div className="grid md:grid-cols-2 gap-6">
+      {/* Left: Calendar */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Select date & time</h2>
+        
+        {/* Calendar */}
+        <div className="border rounded-xl p-4 bg-white">
+          {/* Month Navigation */}
+          <div className="flex items-center justify-between mb-4">
+            <button 
+              onClick={goToPreviousMonth}
+              className="p-2 hover:bg-neutral-100 rounded-lg transition"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <h3 className="font-semibold">{formatMonthYear(currentMonth)}</h3>
+            <button 
+              onClick={goToNextMonth}
+              className="p-2 hover:bg-neutral-100 rounded-lg transition"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
-        )}
-        {!loadingDates && (
-          <div className="grid grid-cols-5 md:grid-cols-7 gap-2 p-4 border rounded-xl max-h-96 overflow-y-auto">
-            {next90Days.map((d) => {
+
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
+              <div key={day} className="text-center text-xs font-medium text-neutral-500 py-2">
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {calendarDays.map((d, idx) => {
+              if (!d) {
+                return <div key={`empty-${idx}`} className="aspect-square" />;
+              }
+
               const isDateAllowed = isDateAllowedForService(d, serviceType, serviceRestrictions);
               const availableCount = availabilityCache[d] || 0;
-              const isFullyBooked = availableCount === 0 || !isDateAllowed;
+              const isPastDate = d < today;
+              const isFullyBooked = availableCount === 0 || !isDateAllowed || isPastDate;
               const isSelected = date === d;
               const isToday = d === today;
 
@@ -1564,106 +1632,104 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
                       setTime('');
                     }
                   }}
-                  disabled={isFullyBooked || !isDateAllowed}
+                  disabled={isFullyBooked}
                   className={cn(
-                    "flex flex-col items-center justify-center p-2 rounded-lg border transition",
-                    isSelected && !isFullyBooked && "ring-2 ring-offset-1",
-                    isFullyBooked && "opacity-40 cursor-not-allowed",
-                    !isFullyBooked && "hover:shadow-md cursor-pointer"
+                    "aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition relative",
+                    isSelected && "bg-[#0b3d2e] text-white shadow-md",
+                    !isSelected && !isFullyBooked && "hover:bg-neutral-100 text-neutral-900",
+                    isFullyBooked && "text-neutral-300 cursor-not-allowed",
+                    isToday && !isSelected && "border-2 border-[#0b3d2e]"
                   )}
-                  style={{
-                    borderColor: isSelected ? BRAND.forest : isFullyBooked ? "#ccc" : "#e5e5e5",
-                    backgroundColor: isSelected ? BRAND.forest : isFullyBooked ? "#f5f5f5" : BRAND.white,
-                    color: isSelected ? BRAND.white : isFullyBooked ? "#999" : BRAND.charcoal,
-                  }}
                 >
-                  <div className="text-[10px] font-medium">{getDayName(d)}</div>
-                  <div className="text-lg font-semibold">{formatDateDisplay(d).split(' ')[1]}</div>
-                  <div className="text-[9px] opacity-75">
-                    {isToday ? "Today" : formatDateDisplay(d).split(' ')[0]}
-                  </div>
-                  {!isFullyBooked && (
-                    <div className="text-[8px] mt-1 px-1 py-0.5 rounded" style={{ backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : '#e8f5f0', color: isSelected ? BRAND.white : BRAND.forest }}>
-                      {availableCount} session{availableCount !== 1 ? 's' : ''} 
-                    </div>
-                  )}
-                  {isFullyBooked && availableCount > 0 && !isDateAllowed && (
-                    <div className="text-[8px] mt-1 px-1 py-0.5 rounded bg-amber-100 text-amber-700">
-                      Not available
-                    </div>
-                  )}
-                  {isFullyBooked && (availableCount === 0 || isDateAllowed) && (
-                    <div className="text-[8px] mt-1 px-1 py-0.5 rounded bg-red-100 text-red-600">
-                      Full
-                    </div>
+                  {d.split('-')[2]}
+                  {!isFullyBooked && availableCount > 0 && !isSelected && (
+                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-[#0b3d2e]" />
                   )}
                 </button>
               );
             })}
           </div>
-        )}
-        <p className="text-xs text-neutral-500 mt-2">
-          🟢 Green badge = available slots • 🔴 Red badge = fully booked
+
+          {/* Timezone */}
+          <p className="text-xs text-neutral-500 mt-4 text-center">
+            Time zone: Asia/Manila
+          </p>
+        </div>
+
+        <p className="text-xs text-neutral-500 mt-3">
+          {usingMockData 
+            ? "⚠️ Showing mock availability"
+            : "✅ Real-time Google Calendar sync"}
         </p>
       </div>
 
-      {/* Time Slots */}
-      {date && (
-        <div>
-          <label className="text-sm font-medium">Available times for {formatDateDisplay(date)} ({duration} mins) - Manila Time</label>
-          {loading && (
-            <div className="mt-1 p-4 text-center text-neutral-500 border rounded-xl">
-              <Clock className="w-5 h-5 animate-spin mx-auto mb-2" />
-              Loading time slots...
+      {/* Right: Time Slots */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">
+          {date ? formatDateDisplay(date) : 'Select a date'}
+        </h3>
+
+        {!date && (
+          <div className="border rounded-xl p-8 bg-neutral-50 text-center text-neutral-500">
+            <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-sm">Please select a date to view available times</p>
+          </div>
+        )}
+
+        {date && loading && (
+          <div className="border rounded-xl p-8 bg-white text-center">
+            <Clock className="w-8 h-8 animate-spin mx-auto mb-3 text-[#0b3d2e]" />
+            <p className="text-sm text-neutral-600">Loading available times...</p>
+          </div>
+        )}
+
+        {date && !loading && (
+          <div className="border rounded-xl bg-white overflow-hidden">
+            <div className="p-3 bg-neutral-50 border-b">
+              <p className="text-xs text-neutral-600">
+                {duration} minute session • Manila Time
+              </p>
             </div>
-          )}
-          {!loading && (
-            <div className="mt-1 grid grid-cols-3 md:grid-cols-6 gap-2 max-h-64 overflow-auto p-1 border rounded-xl">
-              {realAvailableSlots.length===0 && (
-                <div className="col-span-6 text-sm text-neutral-500 p-2">
-                  {date === today 
-                    ? "No more available times today. Please select a future date."
-                    : "No available times for this date. Please try another day."}
+
+            <div className="max-h-[400px] overflow-y-auto p-3 space-y-2">
+              {realAvailableSlots.length === 0 && (
+                <div className="text-center py-8 text-neutral-500">
+                  <XCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm font-medium">No available times</p>
+                  <p className="text-xs mt-1">
+                    {date === today 
+                      ? "Try selecting a future date"
+                      : "Please choose another day"}
+                  </p>
                 </div>
               )}
-              {filterSlotsByService(realAvailableSlots, serviceType, serviceRestrictions).map((s)=> (
+
+              {filterSlotsByService(realAvailableSlots, serviceType, serviceRestrictions).map((s) => (
                 <button
-                  key={s} 
-                  className="text-sm border rounded-xl px-2 py-1 flex items-center justify-center transition"
-                  style={{
-                    borderColor: time === s ? BRAND.forest : "#e5e5e5",
-                    backgroundColor: time === s ? BRAND.forest : BRAND.white,
-                    color: time === s ? BRAND.white : BRAND.charcoal
-                  }}
-                  onMouseEnter={(e) => {
-                    if (time !== s) {
-                      e.currentTarget.style.borderColor = BRAND.forest;
-                      e.currentTarget.style.backgroundColor = "#e8f5f0";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (time !== s) {
-                      e.currentTarget.style.borderColor = "#e5e5e5";
-                      e.currentTarget.style.backgroundColor = BRAND.white;
-                    }
-                  }}
-                  onClick={()=>setTime(s)}
+                  key={s}
+                  onClick={() => setTime(s)}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition border",
+                    time === s && "bg-[#0b3d2e] text-white border-[#0b3d2e] shadow-sm",
+                    time !== s && "bg-white text-neutral-900 border-neutral-200 hover:border-[#0b3d2e] hover:bg-neutral-50"
+                  )}
                 >
-                  <Clock className="w-4 h-4 mr-1"/> {to12Hour(s)}
+                  <Clock className="w-4 h-4" />
+                  {to12Hour(s)}
                 </button>
               ))}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
 
-      <p className="text-xs text-neutral-500 mt-3">
-        {usingMockData ? "⚠️ Using mock data - configure Google Calendar for real-time availability" : "✅ Real-time Google Calendar sync"} • 
-        Studio hours: Mon-Fri 8AM-8PM, Sat 10AM-8PM, Sun 1PM-8PM • Lunch break: 12PM-1PM (Mon-Sat) ({STUDIO_TZ})
-        {serviceRestrictions[serviceType]?.availableFrom !== undefined && serviceRestrictions[serviceType]?.availableUntil !== undefined && 
-          ` • ${serviceType} sessions: ${serviceRestrictions[serviceType].availableFrom}:00 ${serviceRestrictions[serviceType].availableFrom! >= 12 ? 'PM' : 'AM'} - ${serviceRestrictions[serviceType].availableUntil! > 12 ? serviceRestrictions[serviceType].availableUntil! - 12 : serviceRestrictions[serviceType].availableUntil}:00 ${serviceRestrictions[serviceType].availableUntil! >= 12 ? 'PM' : 'AM'} only`}
-        {serviceRestrictions[serviceType]?.allowedDates && ` • Available on specific dates only`}
-      </p>
+        {date && !loading && realAvailableSlots.length > 0 && (
+          <p className="text-xs text-neutral-500 mt-3">
+            {serviceRestrictions[serviceType]?.availableFrom !== undefined && 
+              serviceRestrictions[serviceType]?.availableUntil !== undefined && 
+              `${serviceType} sessions: ${serviceRestrictions[serviceType].availableFrom}:00 ${serviceRestrictions[serviceType].availableFrom! >= 12 ? 'PM' : 'AM'} - ${serviceRestrictions[serviceType].availableUntil! > 12 ? serviceRestrictions[serviceType].availableUntil! - 12 : serviceRestrictions[serviceType].availableUntil}:00 ${serviceRestrictions[serviceType].availableUntil! >= 12 ? 'PM' : 'AM'}`}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
