@@ -1629,7 +1629,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
       {/* Time Slots */}
       {date && (
         <div>
-          <label className="text-sm font-medium">Available times for {formatDateDisplay(date)} ({duration} mins)</label>
+          <label className="text-sm font-medium">Available times for {formatDateDisplay(date)} ({duration} mins) - Manila Time</label>
           {loading && (
             <div className="mt-1 p-4 text-center text-neutral-500 border rounded-xl">
               <Clock className="w-5 h-5 animate-spin mx-auto mb-2" />
@@ -2509,7 +2509,7 @@ function StepReview({ data }:{ data: {
           <Line label="Session Price" value={currency(session.price)}/>
           <Separator className="my-2"/>
           <Line label="Date" value={data.date}/>
-          <Line label="Time" value={data.time}/>
+          <Line label="Time" value={to12Hour(data.time)}/>
         </div>
         <div className="border rounded-2xl p-3">
           <h3 className="font-medium mb-2">Customer</h3>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, Clock, User, Mail, Phone, ArrowLeft, Shield } from "lucide-react";
 import { executeRecaptcha } from "@/lib/recaptcha";
+import { formatTimeTo12Hour, formatManilaDate } from "@/lib/time-utils";
 
 const BRAND = {
   charcoal: "#2C2C2C",
@@ -423,15 +424,23 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
                 <Calendar className="w-5 h-5 mt-1" style={{ color: BRAND.forest }} />
                 <div>
                   <p className="text-sm text-neutral-600 font-semibold">Date</p>
-                  <p className="font-medium text-lg">{booking.schedule?.date || 'N/A'}</p>
+                  <p className="font-medium text-lg">
+                    {booking.schedule?.date 
+                      ? formatManilaDate(booking.schedule.date, { month: 'long', day: 'numeric', year: 'numeric' })
+                      : 'N/A'}
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: BRAND.cream }}>
                 <Clock className="w-5 h-5 mt-1" style={{ color: BRAND.forest }} />
                 <div>
-                  <p className="text-sm text-neutral-600 font-semibold">Time</p>
-                  <p className="font-medium text-lg">{booking.schedule?.time || 'N/A'}</p>
+                  <p className="text-sm text-neutral-600 font-semibold">Time (Manila Time)</p>
+                  <p className="font-medium text-lg">
+                    {booking.schedule?.time 
+                      ? formatTimeTo12Hour(booking.schedule.time)
+                      : 'N/A'}
+                  </p>
                 </div>
               </div>
 

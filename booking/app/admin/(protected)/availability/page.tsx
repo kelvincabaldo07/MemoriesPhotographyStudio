@@ -52,7 +52,7 @@ export default function AvailabilityPage() {
   const [showBlockedDateForm, setShowBlockedDateForm] = useState(false);
   const [newBlockedDate, setNewBlockedDate] = useState<Partial<BlockedDate>>({ allDay: true });
   const [hasChanges, setHasChanges] = useState(false);
-  const [timezone] = useState("Asia/Taipei");
+  const [timezone] = useState("Asia/Manila");
 
   const updateDay = (day: string, field: keyof ShopHours, value: any) => {
     setSchedule({ ...schedule, [day]: { ...schedule[day], [field]: value } });

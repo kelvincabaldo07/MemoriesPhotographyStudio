@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { formatTimeTo12Hour, formatManilaDate } from "@/lib/time-utils";
 import { 
   Search, 
   Filter, 
@@ -230,8 +231,7 @@ export default function BookingsPage() {
   };
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
+    return formatManilaDate(dateStr, {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -477,7 +477,7 @@ export default function BookingsPage() {
                     <Calendar className="w-4 h-4 text-[#0b3d2e]" />
                     <span className="font-semibold">{formatDate(booking.date)}</span>
                     <Clock className="w-4 h-4 text-neutral-500 ml-2" />
-                    <span className="text-neutral-600">{booking.time}</span>
+                    <span className="text-neutral-600">{formatTimeTo12Hour(booking.time)}</span>
                   </div>
                   <Badge variant="outline" className={getStatusColor(booking.status)}>
                     {booking.status}
@@ -693,7 +693,7 @@ export default function BookingsPage() {
                       )}
                     </div>
                     <div>
-                      <label className="text-sm font-semibold text-neutral-700">Time</label>
+                      <label className="text-sm font-semibold text-neutral-700">Time (Manila Time)</label>
                       {isEditing ? (
                         <Input
                           type="time"
@@ -704,7 +704,7 @@ export default function BookingsPage() {
                           className="mt-1"
                         />
                       ) : (
-                        <p className="mt-1">{selectedBooking.time}</p>
+                        <p className="mt-1">{formatTimeTo12Hour(selectedBooking.time)}</p>
                       )}
                     </div>
                   </div>
