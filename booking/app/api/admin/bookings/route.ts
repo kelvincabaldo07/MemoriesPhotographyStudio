@@ -2,6 +2,29 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+/**
+ * Extract time from Notion date property
+ * Handles both old format (rich_text) and new format (date with time)
+ */
+function extractTimeFromNotion(timeProperty: any): string {
+  // New format: date property with start time
+  if (timeProperty?.date?.start) {
+    const dateTime = timeProperty.date.start;
+    // Extract HH:mm from ISO datetime (e.g., "2025-11-10T14:30:00.000+08:00")
+    const timeMatch = dateTime.match(/T(\d{2}:\d{2})/);
+    if (timeMatch) {
+      return timeMatch[1];
+    }
+  }
+  
+  // Old format: rich_text (fallback for backward compatibility)
+  if (timeProperty?.rich_text?.[0]?.plain_text) {
+    return timeProperty.rich_text[0].plain_text;
+  }
+  
+  return '';
+}
+
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   
@@ -66,7 +89,7 @@ export async function GET(request: Request) {
         serviceGroup: props["Service Group"]?.rich_text?.[0]?.plain_text || "",
         service: props.Service?.rich_text?.[0]?.plain_text || "",
         date: props.Date?.date?.start || "",
-        time: props.Time?.rich_text?.[0]?.plain_text || "",
+        time: extractTimeFromNotion(props.Time),
         duration: props.Duration?.number || 0,
         backdrops: props.Backdrops?.multi_select?.map((b: any) => b.name) || [],
         backdropAllocations: props["Backdrop Allocations"]?.rich_text?.[0]?.plain_text || "",

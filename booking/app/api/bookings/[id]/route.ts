@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyRecaptchaToken } from '@/lib/recaptcha';
 import { logAudit, createViewAudit, createUpdateAudit, createCancelAudit } from '@/lib/audit';
+import { calculateEndTime } from '@/lib/time-utils';
+
+/**
+ * Extract time from Notion date property
+ * Handles both old format (rich_text) and new format (date with time)
+ */
+function extractTimeFromNotion(timeProperty: any): string {
+  // New format: date property with start time
+  if (timeProperty?.date?.start) {
+    const dateTime = timeProperty.date.start;
+    // Extract HH:mm from ISO datetime (e.g., "2025-11-10T14:30:00.000+08:00")
+    const timeMatch = dateTime.match(/T(\d{2}:\d{2})/);
+    if (timeMatch) {
+      return timeMatch[1];
+    }
+  }
+  
+  // Old format: rich_text (fallback for backward compatibility)
+  if (timeProperty?.rich_text?.[0]?.plain_text) {
+    return timeProperty.rich_text[0].plain_text;
+  }
+  
+  return '';
+}
 
 /**
  * GET booking by ID
@@ -127,7 +151,7 @@ export async function GET(
         },
         schedule: {
           date: props['Date']?.date?.start || '',
-          time: props['Time']?.rich_text?.[0]?.plain_text || '',
+          time: extractTimeFromNotion(props['Time']),
         },
         selfShoot: {
           backdrops: props['Backdrops']?.multi_select?.map((bd: any) => bd.name) || [],
@@ -224,10 +248,14 @@ export async function PUT(
     const notionPageId = verifyData.results[0].id;
     const oldProps = verifyData.results[0].properties;
     
+    // Get duration and buffer for time calculation
+    const duration = oldProps.Duration?.number || 60;
+    const bufferMinutes = 30; // Standard buffer
+    
     // Store old values for audit
     const oldData = {
       date: oldProps.Date?.date?.start || '',
-      time: oldProps.Time?.rich_text?.[0]?.plain_text || '',
+      time: extractTimeFromNotion(oldProps.Time),
     };
 
     // Update the booking
@@ -238,7 +266,24 @@ export async function PUT(
     }
     
     if (updates.time) {
-      notionProperties.Time = { rich_text: [{ text: { content: updates.time } }] };
+      // Calculate end time including buffer
+      const totalDuration = duration + bufferMinutes;
+      const endTime = calculateEndTime(updates.time, totalDuration);
+      
+      // Use the date from updates or keep the old date
+      const dateForTime = updates.date || oldData.date;
+      
+      // Create datetime strings with Manila timezone
+      const startDateTime = `${dateForTime}T${updates.time}:00.000+08:00`;
+      const endDateTime = `${dateForTime}T${endTime}:00.000+08:00`;
+      
+      notionProperties.Time = {
+        date: {
+          start: startDateTime,
+          end: endDateTime,
+          time_zone: "Asia/Manila"
+        }
+      };
     }
 
     await fetch(`https://api.notion.com/v1/pages/${notionPageId}`, {

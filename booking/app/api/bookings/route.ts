@@ -80,6 +80,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyRecaptchaToken } from '@/lib/recaptcha';
 import { logAudit, createSearchAudit } from '@/lib/audit';
+import { calculateEndTime } from '@/lib/time-utils';
+
+/**
+ * Extract time from Notion date property
+ * Handles both old format (rich_text) and new format (date with time)
+ */
+function extractTimeFromNotion(timeProperty: any): string {
+  // New format: date property with start time
+  if (timeProperty?.date?.start) {
+    const dateTime = timeProperty.date.start;
+    // Extract HH:mm from ISO datetime (e.g., "2025-11-10T14:30:00.000+08:00")
+    const timeMatch = dateTime.match(/T(\d{2}:\d{2})/);
+    if (timeMatch) {
+      return timeMatch[1];
+    }
+  }
+  
+  // Old format: rich_text (fallback for backward compatibility)
+  if (timeProperty?.rich_text?.[0]?.plain_text) {
+    return timeProperty.rich_text[0].plain_text;
+  }
+  
+  return '';
+}
 
 /**
  * GET /api/bookings - Search bookings by email or name
@@ -247,7 +271,7 @@ export async function GET(request: NextRequest) {
         },
         schedule: {
           date: props['Date']?.date?.start || '',
-          time: props['Time']?.rich_text?.[0]?.plain_text || '',
+          time: extractTimeFromNotion(props['Time']),
         },
         totals: {
           sessionPrice: props['Session Price']?.number || 0,
@@ -337,6 +361,16 @@ export async function POST(request: NextRequest) {
     // Title field is "Client Name" (combines First Name + Last Name)
     const fullName = `${bookingData.customer.firstName} ${bookingData.customer.lastName}`.trim() || "Unknown Customer";
     
+    // Calculate end time including buffer (duration + 30 min buffer)
+    const sessionDuration = bookingData.selections.duration || 0;
+    const bufferMinutes = bookingData.schedule.buffer || 30;
+    const totalDuration = sessionDuration + bufferMinutes;
+    const endTime = calculateEndTime(bookingData.schedule.time, totalDuration);
+    
+    // Create datetime strings in ISO 8601 format with Manila timezone (+08:00)
+    const startDateTime = `${bookingData.schedule.date}T${bookingData.schedule.time}:00.000+08:00`;
+    const endDateTime = `${bookingData.schedule.date}T${endTime}:00.000+08:00`;
+    
     const notionPayload = {
       parent: { database_id: databaseId },
       properties: {
@@ -351,7 +385,13 @@ export async function POST(request: NextRequest) {
         "Service Group": { rich_text: [{ text: { content: bookingData.selections.serviceGroup || "" } }] },
         "Service": { rich_text: [{ text: { content: bookingData.selections.service || "" } }] },
         "Date": { date: bookingData.schedule.date ? { start: bookingData.schedule.date } : null },
-        "Time": { rich_text: [{ text: { content: bookingData.schedule.time || "" } }] },
+        "Time": { 
+          date: {
+            start: startDateTime,
+            end: endDateTime,
+            time_zone: "Asia/Manila"
+          }
+        },
         "Duration": { number: bookingData.selections.duration || 0 },
         "Backdrops": { multi_select: (bookingData.selfShoot?.backdrops || []).map((bd: string) => ({ name: bd })) },
         "Backdrop Allocations": { rich_text: [{ text: { content: JSON.stringify(bookingData.selfShoot?.allocations || {}) } }] },

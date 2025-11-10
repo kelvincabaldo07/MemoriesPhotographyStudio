@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { calculateEndTime } from '@/lib/time-utils';
 
 /**
  * PATCH (update) booking by ID - Admin endpoint
@@ -60,6 +61,11 @@ export async function PATCH(
     }
 
     const notionPageId = queryData.results[0].id;
+    const oldProps = queryData.results[0].properties;
+    
+    // Get duration for time calculation
+    const duration = oldProps.Duration?.number || 60;
+    const bufferMinutes = 30; // Standard buffer
 
     // Build Notion properties update object
     const notionProperties: any = {};
@@ -127,8 +133,23 @@ export async function PATCH(
     }
 
     if (body.time) {
+      // Calculate end time including buffer
+      const totalDuration = duration + bufferMinutes;
+      const endTime = calculateEndTime(body.time, totalDuration);
+      
+      // Use the provided date or get from old properties
+      const dateForTime = body.date || oldProps.Date?.date?.start || new Date().toISOString().split('T')[0];
+      
+      // Create datetime strings with Manila timezone
+      const startDateTime = `${dateForTime}T${body.time}:00.000+08:00`;
+      const endDateTime = `${dateForTime}T${endTime}:00.000+08:00`;
+      
       notionProperties.Time = {
-        rich_text: [{ text: { content: body.time } }]
+        date: {
+          start: startDateTime,
+          end: endDateTime,
+          time_zone: "Asia/Manila"
+        }
       };
     }
 

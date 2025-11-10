@@ -116,3 +116,17 @@ export function formatManilaDateTime(dateStr: string, timeStr: string): string {
   const timeFormatted = formatTimeTo12Hour(timeStr);
   return `${dateFormatted} at ${timeFormatted}`;
 }
+
+/**
+ * Calculate end time given start time and duration
+ * @param startTime - Start time in HH:mm format (e.g., "14:30")
+ * @param durationMinutes - Duration in minutes
+ * @returns End time in HH:mm format
+ */
+export function calculateEndTime(startTime: string, durationMinutes: number): string {
+  const [hours, minutes] = startTime.split(':').map(Number);
+  const totalMinutes = hours * 60 + minutes + durationMinutes;
+  const endHours = Math.floor(totalMinutes / 60) % 24;
+  const endMinutes = totalMinutes % 60;
+  return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+}
