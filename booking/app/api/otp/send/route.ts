@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createOTP, otpExists, getOTPConfig } from '@/lib/otp';
 import { verifyRecaptchaToken } from '@/lib/recaptcha';
 import { logAudit, createOTPRequestAudit } from '@/lib/audit';
+import { sendOTPEmail } from '@/lib/sendgrid';
 
 /**
  * POST /api/otp/send - Generate and send OTP via email
@@ -132,38 +133,42 @@ export async function POST(request: NextRequest) {
     // Audit: Successful OTP generation
     await logAudit(createOTPRequestAudit(request, bookingId, email, 'success'));
 
-    // Send OTP via n8n webhook
-    const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL;
-    
-    if (n8nWebhookUrl) {
-      try {
-        await fetch(n8nWebhookUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            event: 'otp_verification',
-            data: {
-              email,
-              bookingId,
-              otpCode: code,
-              expiresAt: new Date(expiresAt).toISOString(),
-              expiryMinutes: getOTPConfig().expiryMinutes,
-            },
-          }),
-        });
-        console.log(`[OTP] Sent code to ${email} via n8n webhook`);
-      } catch (error) {
-        console.error('[OTP] Failed to send via n8n webhook:', error);
-        // Continue anyway - in development, we can show the code in console
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[OTP] DEV MODE - Code for ${email}: ${code}`);
+    // Send OTP via SendGrid
+    try {
+      console.log(`[OTP] Sending verification code to ${email} via SendGrid...`);
+      await sendOTPEmail(email, code);
+      console.log(`[OTP] ✅ Verification code sent successfully to ${email}`);
+    } catch (error) {
+      console.error('[OTP] ❌ Failed to send via SendGrid:', error);
+      
+      // Try n8n as fallback if configured
+      const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL;
+      if (n8nWebhookUrl) {
+        try {
+          await fetch(n8nWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: 'otp_verification',
+              data: {
+                email,
+                bookingId,
+                otpCode: code,
+                expiresAt: new Date(expiresAt).toISOString(),
+                expiryMinutes: getOTPConfig().expiryMinutes,
+              },
+            }),
+          });
+          console.log(`[OTP] Sent via n8n fallback webhook`);
+        } catch (n8nError) {
+          console.error('[OTP] n8n fallback also failed:', n8nError);
         }
       }
-    } else {
-      // Development fallback - log to console
-      console.log(`[OTP] DEV MODE - Code for ${email}: ${code}`);
+      
+      // In development, always show the code in console
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[OTP] 🔑 DEV MODE - Code for ${email}: ${code}`);
+      }
     }
 
     return NextResponse.json({

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sendEmailVerificationCode } from '@/lib/sendgrid';
 
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -22,23 +23,32 @@ export async function POST(request: NextRequest) {
     const code = generateVerificationCode();
     console.log('✅ Generated code:', code);
 
-    const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL?.replace('booking-created', 'send-verification');
-    console.log('🔗 n8n URL:', n8nWebhookUrl);
-    
-    if (n8nWebhookUrl) {
-      try {
-        await fetch(n8nWebhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event: 'email_verification',
-            email,
-            code
-          }),
-        });
-        console.log('✅ Sent to n8n');
-      } catch (error) {
-        console.error('⚠️ n8n error:', error);
+    // Send verification email via SendGrid
+    try {
+      console.log('📧 Sending verification email via SendGrid...');
+      await sendEmailVerificationCode(email, code);
+      console.log('✅ Verification email sent successfully');
+    } catch (emailError) {
+      console.error('❌ SendGrid email failed:', emailError);
+      
+      // Try n8n as fallback if configured
+      const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL?.replace('booking-created', 'send-verification');
+      if (n8nWebhookUrl) {
+        try {
+          console.log('🔔 Attempting n8n fallback...');
+          await fetch(n8nWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: 'email_verification',
+              email,
+              code
+            }),
+          });
+          console.log('✅ Sent via n8n fallback');
+        } catch (n8nError) {
+          console.error('⚠️ n8n fallback also failed:', n8nError);
+        }
       }
     }
 

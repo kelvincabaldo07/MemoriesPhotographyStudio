@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
   // Generate auth URL
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+    scope: [
+      'https://www.googleapis.com/auth/calendar.readonly',
+      'https://www.googleapis.com/auth/calendar.events', // Allow creating/updating/deleting events
+    ],
     prompt: 'consent', // Force to get refresh token
   });
 

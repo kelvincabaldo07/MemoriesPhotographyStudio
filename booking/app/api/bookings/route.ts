@@ -81,6 +81,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyRecaptchaToken } from '@/lib/recaptcha';
 import { logAudit, createSearchAudit } from '@/lib/audit';
 import { calculateEndTime } from '@/lib/time-utils';
+import { sendBookingConfirmationEmail } from '@/lib/sendgrid';
+import { createCalendarEvent } from '@/lib/google-calendar';
 
 /**
  * Extract time from Notion date property
@@ -388,8 +390,7 @@ export async function POST(request: NextRequest) {
         "Time": { 
           date: {
             start: startDateTime,
-            end: endDateTime,
-            time_zone: "Asia/Manila"
+            end: endDateTime
           }
         },
         "Duration": { number: bookingData.selections.duration || 0 },
@@ -437,11 +438,74 @@ export async function POST(request: NextRequest) {
     const notionResult = await notionResponse.json();
     console.log('✅ Saved to Notion successfully!');
 
-    // Optionally: Also send to n8n webhook if configured (for emails, etc.)
+    // Send booking confirmation email via SendGrid
+    try {
+      console.log('📧 Sending booking confirmation email via SendGrid...');
+      await sendBookingConfirmationEmail({
+        bookingId,
+        customer: bookingData.customer,
+        selections: bookingData.selections,
+        schedule: bookingData.schedule,
+        totals: bookingData.totals,
+        addons: bookingData.addons,
+        selfShoot: bookingData.selfShoot,
+      });
+      console.log('✅ Booking confirmation email sent');
+    } catch (emailError) {
+      console.warn('⚠️ SendGrid email failed (non-critical):', emailError);
+      // Continue - don't fail the booking if email fails
+    }
+
+    // Create Google Calendar event
+    let calendarEventId: string | null = null;
+    try {
+      console.log('📅 Creating Google Calendar event...');
+      calendarEventId = await createCalendarEvent({
+        bookingId,
+        customer: bookingData.customer,
+        service: bookingData.selections.service,
+        serviceType: bookingData.selections.serviceType,
+        duration: bookingData.selections.duration,
+        date: bookingData.schedule.date,
+        time: bookingData.schedule.time,
+        description: bookingData.selections.description,
+        backdrops: bookingData.selfShoot?.backdrops,
+        addons: bookingData.addons,
+      });
+      
+      if (calendarEventId) {
+        console.log('✅ Calendar event created and invitation sent:', calendarEventId);
+        
+        // Store calendar event ID in Notion for future updates/deletions
+        try {
+          await fetch(`https://api.notion.com/v1/pages/${notionResult.id}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${notionApiKey}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28',
+            },
+            body: JSON.stringify({
+              properties: {
+                "Calendar Event ID": { rich_text: [{ text: { content: calendarEventId } }] }
+              }
+            }),
+          });
+          console.log('✅ Calendar event ID stored in Notion');
+        } catch (updateError) {
+          console.warn('⚠️ Failed to store calendar event ID in Notion:', updateError);
+        }
+      }
+    } catch (calendarError) {
+      console.warn('⚠️ Google Calendar event creation failed (non-critical):', calendarError);
+      // Continue - don't fail the booking if calendar fails
+    }
+
+    // Optionally: Also send to n8n webhook if still configured (for other automations)
     const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL;
     if (n8nWebhookUrl) {
       try {
-        console.log('� Sending notification to n8n...');
+        console.log('🔔 Sending notification to n8n...');
         await fetch(n8nWebhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
