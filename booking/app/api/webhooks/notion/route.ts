@@ -14,12 +14,16 @@ import { sendBookingConfirmationEmail } from '@/lib/sendgrid';
 const WEBHOOK_SECRET = process.env.NOTION_WEBHOOK_SECRET;
 
 interface NotionWebhookPayload {
-  object: string;
-  event: 'page.created' | 'page.updated' | 'page.deleted';
-  data: {
+  type: 'page.created' | 'page.properties_updated' | 'page.deleted' | 'url_verification';
+  entity?: {
     id: string;
-    properties: any;
+    type: string;
   };
+  data?: {
+    parent: any;
+    updated_properties?: string[];
+  };
+  challenge?: string;
 }
 
 // Handle GET requests (for webhook verification)
@@ -51,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ challenge: payload.challenge });
     }
     
-    console.log('[Notion Webhook] Received event:', payload.event);
+    console.log('[Notion Webhook] Received event:', payload.type);
     console.log('[Notion Webhook] Payload:', JSON.stringify(payload, null, 2));
     
     // Optional: Check auth if WEBHOOK_SECRET is set
@@ -67,42 +71,54 @@ export async function POST(request: NextRequest) {
       console.warn('[Notion Webhook] ⚠️  NOTION_WEBHOOK_SECRET not set - accepting all requests');
     }
 
-    // Only process booking-related events
-    if (payload.object !== 'page') {
+    // Only process page-related events
+    if (!payload.entity || payload.entity.type !== 'page') {
       return NextResponse.json({ success: true, message: 'Ignored non-page event' });
     }
 
-    const { event, data } = payload;
-    const props = data.properties;
+    const eventType = payload.type;
+    const pageId = payload.entity.id;
 
-    // Extract booking data from Notion properties
-    const bookingId = props['Booking ID']?.title?.[0]?.plain_text || props['Booking ID']?.rich_text?.[0]?.plain_text;
-    const status = props['Status']?.status?.name || props['Status']?.select?.name;
+    console.log(`[Notion Webhook] Processing ${eventType} for page ${pageId}`);
+
+    // Fetch the full page data from Notion to get all properties
+    const pageData = await fetchNotionPage(pageId);
     
-    if (!bookingId) {
-      console.error('[Notion Webhook] No booking ID found');
-      return NextResponse.json({ error: 'No booking ID' }, { status: 400 });
+    if (!pageData || !pageData.properties) {
+      console.error('[Notion Webhook] Could not fetch page data');
+      return NextResponse.json({ error: 'Could not fetch page data' }, { status: 500 });
     }
 
-    console.log(`[Notion Webhook] Processing ${event} for booking ${bookingId}`);
+    const props = pageData.properties;
 
-    switch (event) {
+    // Extract booking data from Notion properties
+    const bookingId = extractText(props['Booking ID']);
+    const status = extractSelect(props['Status']);
+    
+    if (!bookingId) {
+      console.error('[Notion Webhook] No booking ID found - not a booking page');
+      return NextResponse.json({ success: true, message: 'Ignored non-booking page' });
+    }
+
+    console.log(`[Notion Webhook] Processing ${eventType} for booking ${bookingId} (status: ${status})`);
+
+    switch (eventType) {
       case 'page.created':
-        await handleBookingCreated(data, props);
+        await handleBookingCreated(pageId, props);
         break;
       
-      case 'page.updated':
-        await handleBookingUpdated(data, props);
+      case 'page.properties_updated':
+        await handleBookingUpdated(pageId, props);
         break;
       
       case 'page.deleted':
-        await handleBookingDeleted(data, props);
+        await handleBookingDeleted(pageId, props);
         break;
     }
-
+    
     return NextResponse.json({ 
       success: true, 
-      message: `Processed ${event} for booking ${bookingId}` 
+      message: `Processed ${eventType} for booking ${bookingId}` 
     });
 
   } catch (error) {
@@ -114,51 +130,110 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleBookingCreated(data: any, props: any) {
-  // Extract all booking details
-  const bookingId = props['Booking ID']?.title?.[0]?.plain_text || props['Booking ID']?.rich_text?.[0]?.plain_text;
-  const firstName = props['First Name']?.rich_text?.[0]?.plain_text || '';
-  const lastName = props['Last Name']?.rich_text?.[0]?.plain_text || '';
-  const email = props['Email']?.email || '';
-  const phone = props['Phone']?.phone_number || '';
-  const service = props['Service']?.select?.name || '';
-  const serviceType = props['Service Type']?.select?.name || '';
-  const duration = parseInt(props['Duration']?.number || '45');
-  const date = props['Date']?.date?.start || '';
-  const time = extractTime(props['Time']);
-  const calendarEventId = props['Calendar Event ID']?.rich_text?.[0]?.plain_text;
+// Helper functions to extract data from Notion properties
+function extractText(property: any): string {
+  if (!property) return '';
+  if (property.title?.[0]?.plain_text) return property.title[0].plain_text;
+  if (property.rich_text?.[0]?.plain_text) return property.rich_text[0].plain_text;
+  return '';
+}
 
-  // Only create calendar event if it doesn't exist yet
-  if (!calendarEventId && email && date && time) {
-    console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
-    
-    const eventId = await createCalendarEvent({
-      bookingId,
-      customer: { firstName, lastName, email, phone },
-      service,
-      serviceType,
-      duration,
-      date,
-      time,
+function extractEmail(property: any): string {
+  return property?.email || '';
+}
+
+function extractPhone(property: any): string {
+  return property?.phone_number || '';
+}
+
+function extractSelect(property: any): string {
+  return property?.select?.name || property?.status?.name || '';
+}
+
+function extractNumber(property: any): number {
+  return property?.number || 0;
+}
+
+function extractDate(property: any): string {
+  return property?.date?.start || '';
+}
+
+async function fetchNotionPage(pageId: string) {
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${process.env.NOTION_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28',
+      },
     });
 
-    if (eventId) {
-      // Update Notion with calendar event ID
-      await updateNotionPage(data.id, {
-        'Calendar Event ID': {
-          rich_text: [{ text: { content: eventId } }]
-        }
-      });
-      
-      console.log(`[Notion Webhook] ✅ Calendar event created: ${eventId}`);
+    if (!response.ok) {
+      throw new Error(`Notion API error: ${response.statusText}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('[Notion Webhook] Error fetching Notion page:', error);
+    return null;
   }
 }
 
-async function handleBookingUpdated(data: any, props: any) {
-  const bookingId = props['Booking ID']?.title?.[0]?.plain_text || props['Booking ID']?.rich_text?.[0]?.plain_text;
-  const calendarEventId = props['Calendar Event ID']?.rich_text?.[0]?.plain_text;
-  const status = props['Status']?.status?.name || props['Status']?.select?.name;
+async function handleBookingCreated(pageId: string, props: any) {
+  // Extract all booking details
+  const bookingId = extractText(props['Booking ID']);
+  const firstName = extractText(props['First Name']);
+  const lastName = extractText(props['Last Name']);
+  const email = extractEmail(props['Email']);
+  const phone = extractPhone(props['Phone']);
+  const service = extractSelect(props['Service']);
+  const serviceType = extractSelect(props['Service Type']);
+  const duration = extractNumber(props['Duration']) || 45;
+  const date = extractDate(props['Date']);
+  const time = extractTime(props['Time']);
+  const calendarEventId = extractText(props['Calendar Event ID']);
+  const status = extractSelect(props['Status']);
+
+  // Only create calendar event if booking is confirmed and doesn't have event yet
+  if (status === 'Confirmed' && !calendarEventId && email && date && time) {
+    console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
+    console.log(`[Notion Webhook] Details: ${firstName} ${lastName}, ${email}, ${date} ${time}, ${service} (${duration}min)`);
+    
+    try {
+      const eventId = await createCalendarEvent({
+        bookingId,
+        customer: { firstName, lastName, email, phone },
+        service,
+        serviceType,
+        duration,
+        date,
+        time,
+      });
+
+      if (eventId) {
+        // Update Notion with calendar event ID
+        await updateNotionPage(pageId, {
+          'Calendar Event ID': {
+            rich_text: [{ text: { content: eventId } }]
+          }
+        });
+        
+        console.log(`[Notion Webhook] ✅ Calendar event created: ${eventId}`);
+      }
+    } catch (error) {
+      console.error('[Notion Webhook] Error creating calendar event:', error);
+      throw error;
+    }
+  } else {
+    console.log(`[Notion Webhook] Skipping calendar creation: status=${status}, hasEventId=${!!calendarEventId}, hasEmail=${!!email}, hasDate=${!!date}, hasTime=${!!time}`);
+  }
+}
+
+async function handleBookingUpdated(pageId: string, props: any) {
+  const bookingId = extractText(props['Booking ID']);
+  const calendarEventId = extractText(props['Calendar Event ID']);
+  const status = extractSelect(props['Status']);
   
   // If status changed to cancelled, delete calendar event
   if (status === 'Cancelled' && calendarEventId) {
@@ -167,18 +242,25 @@ async function handleBookingUpdated(data: any, props: any) {
     return;
   }
 
+  // If status changed to confirmed and no calendar event exists, create one
+  if (status === 'Confirmed' && !calendarEventId) {
+    console.log(`[Notion Webhook] Status changed to Confirmed - creating calendar event`);
+    await handleBookingCreated(pageId, props);
+    return;
+  }
+
   // If date/time changed, update calendar event
   if (calendarEventId) {
-    const date = props['Date']?.date?.start;
+    const date = extractDate(props['Date']);
     const time = extractTime(props['Time']);
-    const duration = parseInt(props['Duration']?.number || '45');
+    const duration = extractNumber(props['Duration']) || 45;
     
     if (date && time) {
       console.log(`[Notion Webhook] Updating calendar event ${calendarEventId}`);
       await updateCalendarEvent(calendarEventId, { date, time, duration } as any);
       
       // Send update notification email
-      const email = props['Email']?.email;
+      const email = extractEmail(props['Email']);
       if (email) {
         // TODO: Create sendBookingUpdateEmail function
         console.log(`[Notion Webhook] TODO: Send update email to ${email}`);
@@ -187,8 +269,8 @@ async function handleBookingUpdated(data: any, props: any) {
   }
 }
 
-async function handleBookingDeleted(data: any, props: any) {
-  const calendarEventId = props['Calendar Event ID']?.rich_text?.[0]?.plain_text;
+async function handleBookingDeleted(pageId: string, props: any) {
+  const calendarEventId = extractText(props['Calendar Event ID']);
   
   if (calendarEventId) {
     console.log(`[Notion Webhook] Deleting calendar event ${calendarEventId}`);
