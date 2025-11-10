@@ -1445,23 +1445,6 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     return days;
   }, [today]);
 
-  // Filter out past time slots if selected date is today
-  const filterPastSlots = (slots: string[], checkDate: string) => {
-    if (checkDate !== today) return slots;
-    
-    const now = new Date();
-    const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-    const currentHour = manilaTime.getHours();
-    const currentMinute = manilaTime.getMinutes();
-    const currentTimeInMinutes = currentHour * 60 + currentMinute;
-    
-    return slots.filter(slot => {
-      const [hours, minutes] = slot.split(':').map(Number);
-      const slotTimeInMinutes = hours * 60 + minutes;
-      return slotTimeInMinutes > currentTimeInMinutes + 30;
-    });
-  };
-
   // Pre-fetch availability for next 30 days - OPTIMIZED: Single batch request
   useEffect(() => {
     if (!duration) return;
@@ -1505,8 +1488,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     // Check if we already fetched this date + duration
     const cachedSlots = sessionStorage.getItem(cacheKey);
     if (cachedSlots) {
-      const filteredSlots = filterPastSlots(JSON.parse(cachedSlots), date);
-      setRealAvailableSlots(filteredSlots);
+      setRealAvailableSlots(JSON.parse(cachedSlots));
       setLoading(false);
       return;
     }
@@ -1515,22 +1497,19 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          // Cache the raw slots for 5 minutes
+          // Cache the filtered slots (API already filtered past times)
           sessionStorage.setItem(cacheKey, JSON.stringify(data.availableSlots));
-          const filteredSlots = filterPastSlots(data.availableSlots, date);
-          setRealAvailableSlots(filteredSlots);
+          setRealAvailableSlots(data.availableSlots);
           setUsingMockData(data.usingMockData || false);
         } else {
           console.error('Failed to fetch availability:', data.error);
-          const filteredSlots = filterPastSlots(availableSlots, date);
-          setRealAvailableSlots(filteredSlots);
+          setRealAvailableSlots(availableSlots);
           setUsingMockData(true);
         }
       })
       .catch(err => {
         console.error('Error fetching availability:', err);
-        const filteredSlots = filterPastSlots(availableSlots, date);
-        setRealAvailableSlots(filteredSlots);
+        setRealAvailableSlots(availableSlots);
         setUsingMockData(true);
       })
       .finally(() => setLoading(false));

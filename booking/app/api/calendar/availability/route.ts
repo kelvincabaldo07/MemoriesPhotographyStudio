@@ -112,6 +112,26 @@ function calculateRealSlots(availableSlots: string[], duration: number): number 
   return Math.max(0, sessionsWithBuffer);
 }
 
+// Filter out past time slots if date is today
+function filterPastSlots(slots: string[], dateStr: string): string[] {
+  const today = new Date().toLocaleDateString('en-US', { timeZone: STUDIO_TZ }).split('/');
+  const todayStr = `${today[2]}-${today[0].padStart(2, '0')}-${today[1].padStart(2, '0')}`;
+  
+  if (dateStr !== todayStr) return slots;
+  
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: STUDIO_TZ }));
+  const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+  
+  // Add minimum advance booking time (e.g., 2 hours)
+  const minAdvanceHours = 2;
+  const minBookingTime = currentTimeInMinutes + (minAdvanceHours * 60);
+  
+  return slots.filter(slot => {
+    const slotTimeInMinutes = toMinutes(slot);
+    return slotTimeInMinutes >= minBookingTime;
+  });
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -128,15 +148,16 @@ export async function GET(request: NextRequest) {
     // Check if refresh token exists
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.warn('Google Calendar not configured. Using mock data.');
-      const allSlots = generateDailySlots(undefined, duration, BUFFER_MINUTES);
-      const realSlots = calculateRealSlots(allSlots, duration);
+      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES);
+      const filteredSlots = filterPastSlots(allSlots, date);
+      const realSlots = calculateRealSlots(filteredSlots, duration);
       
       return NextResponse.json({
         success: true,
         date,
         duration,
-        availableSlots: allSlots,
-        totalSlots: allSlots.length,
+        availableSlots: filteredSlots,
+        totalSlots: filteredSlots.length,
         realBookableSlots: realSlots, // Actual sessions that can be booked
         bookedEvents: 0,
         usingMockData: true,
@@ -193,14 +214,15 @@ export async function GET(request: NextRequest) {
     const availableSlots = allSlots.filter((slot) =>
       isSlotAvailable(slot, duration, blockedRanges)
     );
+    const filteredSlots = filterPastSlots(availableSlots, date);
     
-    const realSlots = calculateRealSlots(availableSlots, duration);
+    const realSlots = calculateRealSlots(filteredSlots, duration);
 
     return NextResponse.json({
       success: true,
       date,
       duration,
-      availableSlots,
+      availableSlots: filteredSlots,
       totalSlots: allSlots.length,
       realBookableSlots: realSlots, // Actual sessions that can be booked
       bookedEvents: events.length,
@@ -213,14 +235,15 @@ export async function GET(request: NextRequest) {
     const dateParam = request.nextUrl.searchParams.get('date') || '';
     const durationParam = parseInt(request.nextUrl.searchParams.get('duration') || '45');
     const allSlots = generateDailySlots(dateParam, durationParam, BUFFER_MINUTES);
-    const realSlots = calculateRealSlots(allSlots, durationParam);
+    const filteredSlots = filterPastSlots(allSlots, dateParam);
+    const realSlots = calculateRealSlots(filteredSlots, durationParam);
     
     return NextResponse.json({
       success: true,
       date: request.nextUrl.searchParams.get('date'),
       duration: parseInt(request.nextUrl.searchParams.get('duration') || '45'),
-      availableSlots: allSlots,
-      totalSlots: allSlots.length,
+      availableSlots: filteredSlots,
+      totalSlots: filteredSlots.length,
       realBookableSlots: realSlots,
       bookedEvents: 0,
       usingMockData: true,
