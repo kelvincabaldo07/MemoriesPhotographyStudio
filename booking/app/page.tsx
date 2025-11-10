@@ -267,11 +267,27 @@ const EXISTING_BOOKINGS = [
 ];
 
 function offsetDate(days = 0) {
-  // Use Manila timezone to get the correct date
+  // Get Manila date directly using Intl API
   const now = new Date();
-  const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: STUDIO_TZ }));
-  manilaTime.setDate(manilaTime.getDate() + days);
-  return manilaTime.toISOString().slice(0, 10);
+  const formatter = new Intl.DateTimeFormat('en-CA', { 
+    timeZone: STUDIO_TZ, 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit' 
+  });
+  const parts = formatter.formatToParts(now);
+  const year = parts.find(p => p.type === 'year')?.value;
+  const month = parts.find(p => p.type === 'month')?.value;
+  const day = parts.find(p => p.type === 'day')?.value;
+  
+  if (days === 0) {
+    return `${year}-${month}-${day}`;
+  }
+  
+  // For offset days, use the Manila date as base
+  const manilaDate = new Date(`${year}-${month}-${day}T00:00:00`);
+  manilaDate.setDate(manilaDate.getDate() + days);
+  return manilaDate.toISOString().slice(0, 10);
 }
 
 // ---------- Utils ----------
@@ -1431,8 +1447,17 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
   // Get today's date in YYYY-MM-DD format (Manila timezone)
   const today = useMemo(() => {
     const now = new Date();
-    const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
-    return manilaTime.toISOString().split('T')[0];
+    const formatter = new Intl.DateTimeFormat('en-CA', { 
+      timeZone: 'Asia/Manila', 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    });
+    const parts = formatter.formatToParts(now);
+    const year = parts.find(p => p.type === 'year')?.value;
+    const month = parts.find(p => p.type === 'month')?.value;
+    const day = parts.find(p => p.type === 'day')?.value;
+    return `${year}-${month}-${day}`;
   }, []);
 
   // Auto-select today if no date is selected
