@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User, Phone, Mail, X as CloseIcon, Globe } from 'lucide-react';
 // import React, { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
