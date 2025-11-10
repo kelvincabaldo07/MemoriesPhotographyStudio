@@ -41,7 +41,16 @@ export async function POST(request: NextRequest) {
     console.log('[Notion Webhook] Headers:', Object.fromEntries(request.headers.entries()));
     
     // Parse payload first
-    const payload: NotionWebhookPayload = await request.json();
+    const payload: any = await request.json();
+    
+    // Check if this is a verification challenge from Notion
+    if (payload.type === 'url_verification' && payload.challenge) {
+      console.log('[Notion Webhook] 🔐 Verification challenge received');
+      console.log('[Notion Webhook] Challenge:', payload.challenge);
+      // Return the challenge value to verify the webhook
+      return NextResponse.json({ challenge: payload.challenge });
+    }
+    
     console.log('[Notion Webhook] Received event:', payload.event);
     console.log('[Notion Webhook] Payload:', JSON.stringify(payload, null, 2));
     
