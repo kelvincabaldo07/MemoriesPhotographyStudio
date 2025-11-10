@@ -192,20 +192,42 @@ export async function GET(request: NextRequest) {
 
     const events = response.data.items || [];
 
+    console.log(`[Availability] Found ${events.length} events for ${date}`);
+
     // Build blocked ranges
     const blockedRanges: [number, number][] = [];
 
     events.forEach((event) => {
       if (!event.start?.dateTime || !event.end?.dateTime) return;
 
+      // Convert to Manila timezone
       const eventStart = new Date(event.start.dateTime);
       const eventEnd = new Date(event.end.dateTime);
+      
+      // Get Manila time hours and minutes
+      const manilaStartStr = eventStart.toLocaleString('en-US', { 
+        timeZone: STUDIO_TZ, 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+      const manilaEndStr = eventEnd.toLocaleString('en-US', { 
+        timeZone: STUDIO_TZ, 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+      });
+      
+      const [startHour, startMin] = manilaStartStr.split(':').map(Number);
+      const [endHour, endMin] = manilaEndStr.split(':').map(Number);
 
-      const startMins = eventStart.getHours() * 60 + eventStart.getMinutes() - BUFFER_MINUTES;
-      const endMins = eventEnd.getHours() * 60 + eventEnd.getMinutes() + BUFFER_MINUTES;
+      const startMins = (startHour * 60 + startMin) - BUFFER_MINUTES;
+      const endMins = (endHour * 60 + endMin) + BUFFER_MINUTES;
 
       const clampedStart = Math.max(startMins, SHOP_HOURS.open * 60);
       const clampedEnd = Math.min(endMins, SHOP_HOURS.close * 60);
+
+      console.log(`[Availability] Blocking ${event.summary}: ${toHHMM(clampedStart)} - ${toHHMM(clampedEnd)} (with ${BUFFER_MINUTES}min buffers)`);
 
       blockedRanges.push([clampedStart, clampedEnd]);
     });

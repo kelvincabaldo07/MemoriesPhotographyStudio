@@ -267,9 +267,11 @@ const EXISTING_BOOKINGS = [
 ];
 
 function offsetDate(days = 0) {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  // Use Manila timezone to get the correct date
+  const now = new Date();
+  const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: STUDIO_TZ }));
+  manilaTime.setDate(manilaTime.getDate() + days);
+  return manilaTime.toISOString().slice(0, 10);
 }
 
 // ---------- Utils ----------
