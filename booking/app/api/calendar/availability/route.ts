@@ -221,13 +221,14 @@ export async function GET(request: NextRequest) {
       const [startHour, startMin] = manilaStartStr.split(':').map(Number);
       const [endHour, endMin] = manilaEndStr.split(':').map(Number);
 
-      const startMins = (startHour * 60 + startMin) - BUFFER_MINUTES;
-      const endMins = (endHour * 60 + endMin) + BUFFER_MINUTES;
+      // Calendar events already include the buffer in their duration, so don't add extra buffer
+      const startMins = startHour * 60 + startMin;
+      const endMins = endHour * 60 + endMin;
 
       const clampedStart = Math.max(startMins, SHOP_HOURS.open * 60);
       const clampedEnd = Math.min(endMins, SHOP_HOURS.close * 60);
 
-      console.log(`[Availability] Blocking ${event.summary}: ${toHHMM(clampedStart)} - ${toHHMM(clampedEnd)} (with ${BUFFER_MINUTES}min buffers)`);
+      console.log(`[Availability] Blocking ${event.summary}: ${toHHMM(clampedStart)} - ${toHHMM(clampedEnd)} (buffer already included in calendar event)`);
 
       blockedRanges.push([clampedStart, clampedEnd]);
     });
