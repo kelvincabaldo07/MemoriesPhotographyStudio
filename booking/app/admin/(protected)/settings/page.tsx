@@ -20,6 +20,8 @@ import {
 
 export default function SettingsPage() {
   const [hasChanges, setHasChanges] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncResult, setSyncResult] = useState<any>(null);
   const [emailSettings, setEmailSettings] = useState({
     notifyOnBooking: true,
     notifyOnCancellation: true,
@@ -64,6 +66,23 @@ export default function SettingsPage() {
     console.log("Saving settings...");
     setHasChanges(false);
     alert("Settings saved successfully!");
+  };
+
+  const runSync = async () => {
+    setSyncing(true);
+    setSyncResult(null);
+    try {
+      const response = await fetch('/api/admin/sync', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      setSyncResult(data);
+      alert(`Sync complete! Created: ${data.summary?.created}, Skipped: ${data.summary?.skipped}, Errors: ${data.summary?.errors}`);
+    } catch (error) {
+      alert('Sync failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setSyncing(false);
+    }
   };
 
   return (
@@ -193,6 +212,42 @@ export default function SettingsPage() {
                 </>
               )}
             </Badge>
+          </div>
+        </div>
+
+        {/* Sync Button */}
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-semibold text-neutral-900 mb-1">🔄 Manual Sync</h3>
+              <p className="text-sm text-neutral-600">
+                Sync all Notion bookings to Google Calendar. Run this after manually adding bookings in Notion.
+              </p>
+              {syncResult && (
+                <div className="mt-3 text-xs">
+                  <p className="font-medium text-green-700">
+                    ✓ Last sync: {syncResult.summary?.created} created, {syncResult.summary?.skipped} skipped, {syncResult.summary?.errors} errors
+                  </p>
+                </div>
+              )}
+            </div>
+            <Button
+              onClick={runSync}
+              disabled={syncing}
+              className="bg-blue-600 hover:bg-blue-700 text-white ml-4"
+            >
+              {syncing ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  Syncing...
+                </>
+              ) : (
+                <>
+                  <Database className="w-4 h-4 mr-2" />
+                  Sync Now
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </Card>
