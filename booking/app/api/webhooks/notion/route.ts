@@ -35,29 +35,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Log request for debugging
-    console.log('[Notion Webhook] Received request');
+    console.log('[Notion Webhook] ========================================');
+    console.log('[Notion Webhook] Received POST request');
+    console.log('[Notion Webhook] Timestamp:', new Date().toISOString());
     console.log('[Notion Webhook] Headers:', Object.fromEntries(request.headers.entries()));
     
-    // For now, accept all requests if WEBHOOK_SECRET is not set (development mode)
-    // In production, Notion will verify the webhook through their signature system
-    const authHeader = request.headers.get('authorization');
-    
-    if (WEBHOOK_SECRET && authHeader) {
-      // If secret is set and auth header provided, verify it
-      if (authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
-        console.error('[Notion Webhook] Invalid authorization token');
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-    }
-    
-    // If no secret is set, log warning but continue (for initial testing)
-    if (!WEBHOOK_SECRET) {
-      console.warn('[Notion Webhook] WARNING: NOTION_WEBHOOK_SECRET not set - accepting all requests');
-    }
-
+    // Parse payload first
     const payload: NotionWebhookPayload = await request.json();
     console.log('[Notion Webhook] Received event:', payload.event);
     console.log('[Notion Webhook] Payload:', JSON.stringify(payload, null, 2));
+    
+    // Optional: Check auth if WEBHOOK_SECRET is set
+    // For now, we skip auth to make testing easier
+    if (WEBHOOK_SECRET) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader !== `Bearer ${WEBHOOK_SECRET}`) {
+        console.error('[Notion Webhook] Invalid authorization token');
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      console.log('[Notion Webhook] Auth check passed (or no auth header provided)');
+    } else {
+      console.warn('[Notion Webhook] ⚠️  NOTION_WEBHOOK_SECRET not set - accepting all requests');
+    }
 
     // Only process booking-related events
     if (payload.object !== 'page') {

@@ -1,7 +1,10 @@
 # Notion Webhook Setup Guide
 
-## Step 1: Add Environment Variable to Vercel
+## Step 1: Add Environment Variable to Vercel (OPTIONAL - For Testing, Skip for Now)
 
+**Note**: The webhook will work WITHOUT this for initial testing. Add it later for production security.
+
+If you want to add it now:
 1. Go to https://vercel.com/dashboard
 2. Select your project: `MemoriesPhotographyStudio`
 3. Go to **Settings** → **Environment Variables**
@@ -11,6 +14,8 @@
    - **Environment**: Select all (Production, Preview, Development)
 5. Click **Save**
 6. **Redeploy** your app for changes to take effect
+
+**For now**: Skip this step and proceed to Step 2. The webhook will accept requests without authentication for easier testing.
 
 ---
 
