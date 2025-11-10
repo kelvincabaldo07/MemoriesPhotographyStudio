@@ -99,7 +99,7 @@ export async function createCalendarEvent(eventData: CalendarEventData): Promise
     eventDescription += `Location: Indang, Cavite\n`;
     eventDescription += `Google Maps: https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9`;
 
-    // Create event
+    // Create event with proper organizer information
     const event = {
       summary: `📸 ${service} - ${customer.firstName} ${customer.lastName}`,
       description: eventDescription,
@@ -112,9 +112,13 @@ export async function createCalendarEvent(eventData: CalendarEventData): Promise
         timeZone: 'Asia/Manila',
       },
       location: 'Memories Photography Studio, Indang, Cavite',
+      organizer: {
+        email: CALENDAR_ID,
+        displayName: 'Memories Photography Studio',
+        self: true,
+      },
       attendees: [
-        { email: customer.email, displayName: `${customer.firstName} ${customer.lastName}` },
-        { email: CALENDAR_ID },
+        { email: customer.email, displayName: `${customer.firstName} ${customer.lastName}`, responseStatus: 'needsAction' },
       ],
       reminders: {
         useDefault: false,

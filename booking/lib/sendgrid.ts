@@ -109,8 +109,8 @@ export async function sendOTPEmail(email: string, otpCode: string): Promise<bool
                       <p style="margin: 0 0 10px 0; color: #666; font-size: 12px;">
                         Memories Photography Studio<br>
                         Indang, Cavite<br>
-                        📧 Email: <a href="mailto:memoriesphotostudio07@gmail.com" style="color: #0b3d2e; text-decoration: none;">memoriesphotostudio07@gmail.com</a><br>
-                        📱 Phone: 0961 553 2335
+                        📧 Email: <a href="mailto:smile@memories-studio.com" style="color: #0b3d2e; text-decoration: none;">smile@memories-studio.com</a><br>
+                        📱 Phone: 0906 469 4122
                       </p>
                       <p style="margin: 15px 0 0 0; color: #999; font-size: 11px;">
                         © ${new Date().getFullYear()} Memories Photography Studio. All rights reserved.
@@ -201,23 +201,54 @@ IMPORTANT REMINDERS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📸 PHOTO DELIVERY:
-• Your photos will be delivered via Adobe Lightroom
+• Your photos will be delivered ONLY via Adobe Lightroom
+• We do not send photos through any other platform (Google Drive, Dropbox, Messenger)
 • Please ensure you have an Adobe Lightroom account (free)
-• Download the Lightroom mobile app if accessing via mobile/tablet
+• Download the Lightroom Mobile App if accessing via mobile/tablet
 
-📍 LOCATION & ARRIVAL:
-• Studio location: Indang, Cavite
+📍 LOCATION & PARKING:
+Studio Address:
+• Located inside Green Valley Field Subdivision, between Lintiw Road and Indang Central Elementary School
+• Enter the subdivision, go straight to the dead end, then turn right
+• We're the fourth gate on the left, with a Memories Photography Studio tarpaulin near the gate
+• Our studio is at the back of the property — the dark gray and blue painted house (not the house at the front)
 • Google Maps: https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9
-• Please arrive at least 5 minutes early or on time
-• Sessions end on time regardless of arrival time
 
-🚗 PARKING GUIDELINES:
-• Park under the rambutan tree only (designated parking area)
+Respect the Neighborhood:
+• Please be courteous to the residents in front of the property
+• Avoid being noisy, nosy, or disruptive while waiting or shooting
+
+Parking:
+• Park under the rambutan tree (designated parking area), OR on the vacant corner lot to the left
 • DO NOT block the gate or driveway at any time
 
-📅 BOOKING POLICY:
-• Reschedule/cancel at least 2 hours before your session with a valid reason
-• Maximum of 2 reschedules allowed per booking
+📅 ARRIVAL & BOOKING POLICY:
+Arrival Guidelines:
+• Arrive at least 5 minutes before your scheduled time
+• Late arrivals will have the lost time deducted from their session
+• We provide 5 minutes of extra time for outfit or backdrop changes
+• Our timer starts at your session time plus 5 minutes (for setup and backdrop transitions)
+• Timers are set per backdrop
+• Timer stoppage or pauses are solely under the studio's discretion
+
+Tardy Penalties:
+🕒 Sessions 30 Minutes and Below:
+  • 5-minute grace period
+  • More than 5 minutes late: Time reduced + Limited to 1 backdrop
+  • 10+ minutes late: Booking will be CANCELLED
+
+🕓 1-Hour Sessions:
+  • 5-20 minutes late: Time reduced + Limited to 2 backdrops
+  • 30+ minutes late: Booking will be CANCELLED
+
+📷 With Photographer / Occasional:
+  • 10-minute grace period
+  • 10-25 minutes late: Time reduced
+  • 25+ minutes late: Booking will be CANCELLED
+
+Reschedule & Cancellation:
+• Reschedule/cancel at least 2 hours before with a valid reason
+• Maximum of 2 reschedules per booking
 • Late cancellation or no-show may result in a ban from future bookings
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -231,8 +262,8 @@ Best regards,
 Memories Photography Studio Team
 
 Indang, Cavite
-Email: memoriesphotostudio07@gmail.com
-Phone: 0961 553 2335
+Email: smile@memories-studio.com
+Phone: 0906 469 4122
       `,
       html: `
         <!DOCTYPE html>
@@ -367,35 +398,55 @@ Phone: 0961 553 2335
                         <div style="margin-bottom: 15px;">
                           <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📸 Photo Delivery:</p>
                           <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 13px; line-height: 1.6;">
-                            <li>Your photos will be delivered via <strong>Adobe Lightroom</strong></li>
+                            <li>Your photos will be delivered <strong>ONLY via Adobe Lightroom</strong></li>
+                            <li><strong>We do not send photos through any other platform</strong> (Google Drive, Dropbox, Messenger)</li>
                             <li>Please ensure you have an <strong>Adobe Lightroom account</strong> (free)</li>
-                            <li>Download the <strong>Lightroom mobile app</strong> if accessing via mobile/tablet</li>
+                            <li>Download the <strong>Lightroom Mobile App</strong> if accessing via mobile/tablet</li>
                           </ul>
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📍 Location & Arrival:</p>
-                          <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 13px; line-height: 1.6;">
-                            <li>Studio location: <a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" style="color: #0b3d2e; font-weight: bold;">Indang, Cavite (Google Maps)</a></li>
-                            <li>Please arrive <strong>at least 5 minutes early or on time</strong></li>
-                            <li>Sessions end on time regardless of arrival time</li>
+                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📍 Location & Parking:</p>
+                          <p style="margin: 0 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Studio Address:</strong></p>
+                          <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
+                            <li>Located inside <strong>Green Valley Field Subdivision</strong>, between Lintiw Road and Indang Central Elementary School</li>
+                            <li>Enter the subdivision, go straight to the dead end, then turn right</li>
+                            <li>We're the <strong>fourth gate on the left</strong>, with a <strong>Memories Photography Studio tarpaulin</strong></li>
+                            <li>Our studio is at the back — the <strong>dark gray and blue painted house</strong> (not the house at the front)</li>
+                            <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" style="color: #0b3d2e; font-weight: bold;">View on Google Maps</a></li>
                           </ul>
-                        </div>
-                        
-                        <div style="margin-bottom: 15px;">
-                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">🚗 Parking Guidelines:</p>
-                          <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 13px; line-height: 1.6;">
-                            <li>Park <strong>under the rambutan tree only</strong> (designated parking area)</li>
-                            <li><strong>DO NOT block the gate or driveway</strong> at any time</li>
+                          <p style="margin: 8px 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Respect the Neighborhood:</strong></p>
+                          <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
+                            <li>Be courteous to the residents in front of the property</li>
+                            <li>Avoid being noisy, nosy, or disruptive</li>
+                          </ul>
+                          <p style="margin: 8px 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Parking:</strong></p>
+                          <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
+                            <li>Park <strong>under the rambutan tree</strong> OR <strong>on the vacant corner lot to the left</strong></li>
+                            <li><strong>DO NOT block the gate or driveway at any time</strong></li>
                           </ul>
                         </div>
                         
                         <div>
-                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📅 Booking Policy:</p>
-                          <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 13px; line-height: 1.6;">
-                            <li>Reschedule/cancel at least <strong>2 hours before</strong> your session with a valid reason</li>
-                            <li>Maximum of <strong>2 reschedules allowed</strong> per booking</li>
-                            <li>Late cancellation or no-show may result in a ban from future bookings</li>
+                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">� Arrival & Booking Policy:</p>
+                          <p style="margin: 0 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Arrival Guidelines:</strong></p>
+                          <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
+                            <li>Arrive <strong>at least 5 minutes before</strong> your scheduled time</li>
+                            <li>Late arrivals will have the lost time deducted from their session</li>
+                            <li>We provide 5 minutes extra time for outfit/backdrop changes</li>
+                            <li>Timer starts at your session time + 5 minutes</li>
+                          </ul>
+                          <p style="margin: 8px 0 4px 0; padding-left: 20px; color: #dc3545; font-size: 13px;"><strong>Tardy Penalties:</strong></p>
+                          <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 11px; line-height: 1.4;">
+                            <li><strong>30-min sessions:</strong> 5-min grace; &gt;5 min late = time reduced + 1 backdrop only; 10+ min = CANCELLED</li>
+                            <li><strong>1-hour sessions:</strong> 5-20 min late = time reduced + 2 backdrops max; 30+ min = CANCELLED</li>
+                            <li><strong>With Photographer:</strong> 10-min grace; 10-25 min late = time reduced; 25+ min = CANCELLED</li>
+                          </ul>
+                          <p style="margin: 8px 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Reschedule & Cancellation:</strong></p>
+                          <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
+                            <li>Reschedule/cancel at least <strong>2 hours before</strong> with a valid reason</li>
+                            <li>Maximum of <strong>2 reschedules</strong> per booking</li>
+                            <li>Late cancellation or no-show may result in a ban</li>
                           </ul>
                         </div>
                       </div>
@@ -417,7 +468,7 @@ Phone: 0961 553 2335
                         "Capture With Purpose. Create Change."<br>
                         Indang, Cavite<br>
                         📧 <a href="mailto:smile@memories-studio.com" style="color: #0b3d2e; text-decoration: none;">smile@memories-studio.com</a><br>
-                        📱 0961 553 2335
+                        📱 0906 469 4122
                       </p>
                       <p style="margin: 15px 0 0 0; color: #999; font-size: 11px;">
                         © ${new Date().getFullYear()} Memories Photography Studio. All rights reserved.
