@@ -31,11 +31,11 @@ export default function SettingsPage() {
 
   const [bookingSettings, setBookingSettings] = useState({
     leadTime: 2,
-    leadTimeUnit: 'hours' as 'hours' | 'minutes',
+    leadTimeUnit: 'hours' as 'minutes' | 'hours' | 'days',
     bookingSlotSize: 15,
-    bookingSlotUnit: 'minutes' as 'minutes',
+    bookingSlotUnit: 'minutes' as 'minutes' | 'hours',
     schedulingWindow: 90,
-    schedulingWindowUnit: 'days' as 'days',
+    schedulingWindowUnit: 'days' as 'days' | 'months',
     cancellationPolicy: 2,
     cancellationPolicyUnit: 'hours' as 'hours' | 'days',
   });
@@ -77,16 +77,17 @@ export default function SettingsPage() {
       const response = await fetch('/api/admin/booking-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for NextAuth session
         body: JSON.stringify(bookingSettings),
       });
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setHasChanges(false);
         alert("Settings saved successfully!");
       } else {
-        alert("Failed to save settings: " + data.error);
+        alert("Failed to save settings: " + (data.error || 'Unknown error'));
       }
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -115,7 +116,9 @@ export default function SettingsPage() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch('/api/admin/booking-settings');
+        const response = await fetch('/api/admin/booking-settings', {
+          credentials: 'include', // Include cookies for NextAuth session
+        });
         const data = await response.json();
         if (data.success && data.settings) {
           setBookingSettings(data.settings);
@@ -400,12 +403,13 @@ export default function SettingsPage() {
                 className="px-3 py-2 border rounded-lg bg-white"
                 value={bookingSettings.leadTimeUnit}
                 onChange={(e) => {
-                  setBookingSettings({ ...bookingSettings, leadTimeUnit: e.target.value as 'hours' | 'minutes' });
+                  setBookingSettings({ ...bookingSettings, leadTimeUnit: e.target.value as 'minutes' | 'hours' | 'days' });
                   setHasChanges(true);
                 }}
               >
                 <option value="minutes">Minutes</option>
                 <option value="hours">Hours</option>
+                <option value="days">Days</option>
               </select>
             </div>
           </div>
@@ -421,8 +425,7 @@ export default function SettingsPage() {
             <div className="flex gap-2">
               <Input
                 type="number"
-                min="5"
-                step="5"
+                min="1"
                 value={bookingSettings.bookingSlotSize}
                 onChange={(e) => {
                   setBookingSettings({ ...bookingSettings, bookingSlotSize: parseInt(e.target.value) || 15 });
@@ -431,8 +434,16 @@ export default function SettingsPage() {
                 className="flex-1"
                 placeholder="15"
               />
-              <select className="px-3 py-2 border rounded-lg bg-white" disabled>
+              <select 
+                className="px-3 py-2 border rounded-lg bg-white"
+                value={bookingSettings.bookingSlotUnit}
+                onChange={(e) => {
+                  setBookingSettings({ ...bookingSettings, bookingSlotUnit: e.target.value as 'minutes' | 'hours' });
+                  setHasChanges(true);
+                }}
+              >
                 <option value="minutes">Minutes</option>
+                <option value="hours">Hours</option>
               </select>
             </div>
           </div>
@@ -457,8 +468,16 @@ export default function SettingsPage() {
                 className="flex-1"
                 placeholder="90"
               />
-              <select className="px-3 py-2 border rounded-lg bg-white" disabled>
+              <select 
+                className="px-3 py-2 border rounded-lg bg-white"
+                value={bookingSettings.schedulingWindowUnit}
+                onChange={(e) => {
+                  setBookingSettings({ ...bookingSettings, schedulingWindowUnit: e.target.value as 'days' | 'months' });
+                  setHasChanges(true);
+                }}
+              >
                 <option value="days">Days</option>
+                <option value="months">Months</option>
               </select>
             </div>
           </div>

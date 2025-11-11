@@ -137,8 +137,11 @@ export async function GET(request: NextRequest) {
   // Fetch booking policies from settings (declare outside try for catch access)
   let bookingPolicies = {
     leadTime: 2,
-    leadTimeUnit: 'hours' as 'hours' | 'minutes',
+    leadTimeUnit: 'hours' as 'minutes' | 'hours' | 'days',
     bookingSlotSize: 15,
+    bookingSlotUnit: 'minutes' as 'minutes' | 'hours',
+    schedulingWindow: 90,
+    schedulingWindowUnit: 'days' as 'days' | 'months',
   };
   
   try {
@@ -165,14 +168,23 @@ export async function GET(request: NextRequest) {
     }
 
     // Convert lead time to minutes
-    const leadTimeMinutes = bookingPolicies.leadTimeUnit === 'hours' 
-      ? bookingPolicies.leadTime * 60 
-      : bookingPolicies.leadTime;
+    let leadTimeMinutes = bookingPolicies.leadTime;
+    if (bookingPolicies.leadTimeUnit === 'hours') {
+      leadTimeMinutes = bookingPolicies.leadTime * 60;
+    } else if (bookingPolicies.leadTimeUnit === 'days') {
+      leadTimeMinutes = bookingPolicies.leadTime * 24 * 60;
+    }
+
+    // Convert slot size to minutes
+    let slotSizeMinutes = bookingPolicies.bookingSlotSize;
+    if (bookingPolicies.bookingSlotUnit === 'hours') {
+      slotSizeMinutes = bookingPolicies.bookingSlotSize * 60;
+    }
 
     // Check if refresh token exists
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.warn('Google Calendar not configured. Using mock data.');
-      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, bookingPolicies.bookingSlotSize);
+      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, slotSizeMinutes);
       const filteredSlots = filterPastSlots(allSlots, date, leadTimeMinutes);
       const realSlots = calculateRealSlots(filteredSlots, duration);
       
@@ -257,7 +269,7 @@ export async function GET(request: NextRequest) {
       blockedRanges.push([clampedStart, clampedEnd]);
     });
 
-    const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, bookingPolicies.bookingSlotSize);
+    const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, slotSizeMinutes);
     const availableSlots = allSlots.filter((slot) =>
       isSlotAvailable(slot, duration, blockedRanges)
     );
@@ -283,11 +295,21 @@ export async function GET(request: NextRequest) {
     const durationParam = parseInt(request.nextUrl.searchParams.get('duration') || '45');
     
     // Use settings that were loaded earlier (or defaults if load failed)
-    const leadTimeMinutes = bookingPolicies.leadTimeUnit === 'hours' 
-      ? bookingPolicies.leadTime * 60 
-      : bookingPolicies.leadTime;
+    // Convert lead time to minutes
+    let leadTimeMinutes = bookingPolicies.leadTime;
+    if (bookingPolicies.leadTimeUnit === 'hours') {
+      leadTimeMinutes = bookingPolicies.leadTime * 60;
+    } else if (bookingPolicies.leadTimeUnit === 'days') {
+      leadTimeMinutes = bookingPolicies.leadTime * 24 * 60;
+    }
+
+    // Convert slot size to minutes
+    let slotSizeMinutes = bookingPolicies.bookingSlotSize;
+    if (bookingPolicies.bookingSlotUnit === 'hours') {
+      slotSizeMinutes = bookingPolicies.bookingSlotSize * 60;
+    }
     
-    const allSlots = generateDailySlots(dateParam, durationParam, BUFFER_MINUTES, bookingPolicies.bookingSlotSize);
+    const allSlots = generateDailySlots(dateParam, durationParam, BUFFER_MINUTES, slotSizeMinutes);
     const filteredSlots = filterPastSlots(allSlots, dateParam, leadTimeMinutes);
     const realSlots = calculateRealSlots(filteredSlots, durationParam);
     

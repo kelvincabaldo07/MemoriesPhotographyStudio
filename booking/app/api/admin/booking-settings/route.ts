@@ -10,22 +10,22 @@ import { authOptions } from '@/lib/auth';
 // Default settings
 const DEFAULT_SETTINGS = {
   leadTime: 2, // hours
-  leadTimeUnit: 'hours' as 'hours' | 'minutes',
+  leadTimeUnit: 'hours' as 'minutes' | 'hours' | 'days',
   bookingSlotSize: 15, // minutes
-  bookingSlotUnit: 'minutes' as 'minutes',
+  bookingSlotUnit: 'minutes' as 'minutes' | 'hours',
   schedulingWindow: 90, // days
-  schedulingWindowUnit: 'days' as 'days',
+  schedulingWindowUnit: 'days' as 'days' | 'months',
   cancellationPolicy: 2, // hours
   cancellationPolicyUnit: 'hours' as 'hours' | 'days',
 };
 
 interface BookingSettings {
   leadTime: number;
-  leadTimeUnit: 'hours' | 'minutes';
+  leadTimeUnit: 'minutes' | 'hours' | 'days';
   bookingSlotSize: number;
-  bookingSlotUnit: 'minutes';
+  bookingSlotUnit: 'minutes' | 'hours';
   schedulingWindow: number;
-  schedulingWindowUnit: 'days';
+  schedulingWindowUnit: 'days' | 'months';
   cancellationPolicy: number;
   cancellationPolicyUnit: 'hours' | 'days';
 }
