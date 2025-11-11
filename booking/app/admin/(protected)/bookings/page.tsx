@@ -794,11 +794,11 @@ export default function BookingsPage() {
                               duration: 30 // Reset duration
                             });
                           }}
-                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                          className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
                         >
                           <option value="">Select Type</option>
                           {serviceOptions.types.map((type) => (
-                            <option key={type} value={type}>{type}</option>
+                            <option key={type} value={type} className="text-sm">{type}</option>
                           ))}
                         </select>
                       ) : (
@@ -826,12 +826,12 @@ export default function BookingsPage() {
                                   duration: 30
                                 });
                               }}
-                              className="mt-1 w-full px-3 py-2 border rounded-lg"
+                              className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
                               disabled={!editedBooking?.serviceType}
                             >
                               <option value="">Select Category</option>
                               {serviceOptions.categories.map((category) => (
-                                <option key={category} value={category}>{category}</option>
+                                <option key={category} value={category} className="text-sm">{category}</option>
                               ))}
                             </select>
                           )}
@@ -854,7 +854,7 @@ export default function BookingsPage() {
                               duration: 30 // Reset duration
                             });
                           }}
-                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                          className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
                           disabled={!editedBooking?.serviceType || !editedBooking?.serviceCategory}
                         >
                           <option value="">Select Group</option>
@@ -866,7 +866,7 @@ export default function BookingsPage() {
                                 return servicesInGroup.some(s => s.category === editedBooking.serviceCategory);
                               })
                               .map((group) => (
-                                <option key={group} value={group}>{group}</option>
+                                <option key={group} value={group} className="text-sm">{group}</option>
                               ))
                           }
                         </select>
@@ -902,7 +902,7 @@ export default function BookingsPage() {
                               checkAvailability(editedBooking.date, serviceData.duration);
                             }
                           }}
-                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                          className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
                           disabled={!editedBooking?.serviceGroup || !editedBooking?.serviceCategory}
                         >
                           <option value="">Select Service</option>
@@ -910,7 +910,7 @@ export default function BookingsPage() {
                             serviceOptions.servicesByGroup[editedBooking.serviceGroup]
                               ?.filter(service => service.category === editedBooking.serviceCategory)
                               .map((service) => (
-                                <option key={service.name} value={service.name}>
+                                <option key={service.name} value={service.name} className="text-sm">
                                   {service.name} ({service.duration} min - ₱{service.price})
                                 </option>
                               ))
@@ -1005,11 +1005,11 @@ export default function BookingsPage() {
                                     });
                                   }}
                                   disabled={currentQty === 0}
-                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30"
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30 text-sm"
                                 >
                                   -
                                 </button>
-                                <span className="w-8 text-center font-medium">{currentQty}</span>
+                                <span className="w-8 text-center font-medium text-sm">{currentQty}</span>
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1018,7 +1018,7 @@ export default function BookingsPage() {
                                       return { ...prev!, addons: newAddons };
                                     });
                                   }}
-                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50"
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 text-sm"
                                 >
                                   +
                                 </button>
