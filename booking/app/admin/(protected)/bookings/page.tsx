@@ -941,11 +941,11 @@ export default function BookingsPage() {
                         selectedTime={editedBooking?.time || ""}
                         onDateChange={(date) => {
                           console.log('📆 Admin onDateChange called:', { date, currentDate: editedBooking?.date });
-                          setEditedBooking({ ...editedBooking!, date });
+                          setEditedBooking(prev => ({ ...prev!, date }));
                         }}
                         onTimeChange={(time) => {
                           console.log('⏰ Admin onTimeChange called:', { time });
-                          setEditedBooking({ ...editedBooking!, time });
+                          setEditedBooking(prev => ({ ...prev!, time }));
                         }}
                         duration={editedBooking?.duration || 30}
                         serviceType={editedBooking?.serviceType || ""}
@@ -995,12 +995,14 @@ export default function BookingsPage() {
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    const newAddons = [...(editedBooking?.addons || [])];
-                                    const index = newAddons.lastIndexOf(addon.id);
-                                    if (index > -1) {
-                                      newAddons.splice(index, 1);
-                                      setEditedBooking({ ...editedBooking!, addons: newAddons });
-                                    }
+                                    setEditedBooking(prev => {
+                                      const newAddons = [...(prev?.addons || [])];
+                                      const index = newAddons.lastIndexOf(addon.id);
+                                      if (index > -1) {
+                                        newAddons.splice(index, 1);
+                                      }
+                                      return { ...prev!, addons: newAddons };
+                                    });
                                   }}
                                   disabled={currentQty === 0}
                                   className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30"
@@ -1011,8 +1013,10 @@ export default function BookingsPage() {
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    const newAddons = [...(editedBooking?.addons || []), addon.id];
-                                    setEditedBooking({ ...editedBooking!, addons: newAddons });
+                                    setEditedBooking(prev => {
+                                      const newAddons = [...(prev?.addons || []), addon.id];
+                                      return { ...prev!, addons: newAddons };
+                                    });
                                   }}
                                   className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50"
                                 >
@@ -1061,11 +1065,20 @@ export default function BookingsPage() {
                                 key={backdrop.key}
                                 type="button"
                                 onClick={() => {
-                                  const newBackdrops = isSelected
-                                    ? editedBooking.backdrops.filter(b => b !== backdrop.key)
-                                    : [...(editedBooking?.backdrops || []), backdrop.key];
-                                  console.log('Backdrop click:', { backdrop: backdrop.key, isSelected, currentCount, maxBackdrops, newCount: newBackdrops.length });
-                                  setEditedBooking({ ...editedBooking!, backdrops: newBackdrops });
+                                  console.log('Backdrop click START:', { 
+                                    backdrop: backdrop.key, 
+                                    isSelected, 
+                                    currentBackdrops: editedBooking?.backdrops,
+                                    currentCount, 
+                                    maxBackdrops 
+                                  });
+                                  setEditedBooking(prev => {
+                                    const newBackdrops = isSelected
+                                      ? prev!.backdrops.filter(b => b !== backdrop.key)
+                                      : [...(prev?.backdrops || []), backdrop.key];
+                                    console.log('Backdrop click END:', { newBackdrops, newCount: newBackdrops.length });
+                                    return { ...prev!, backdrops: newBackdrops };
+                                  });
                                 }}
                                 disabled={isDisabled}
                                 className={`p-3 text-sm rounded-lg border-2 transition ${
