@@ -82,7 +82,7 @@ export default function BookingsPage() {
     types: string[];
     categories: string[];
     groupsByType: Record<string, string[]>;
-    servicesByGroup: Record<string, Array<{ name: string; duration: number; price: number }>>;
+    servicesByGroup: Record<string, Array<{ name: string; duration: number; price: number; category?: string }>>;
   }>({
     types: [],
     categories: [],
