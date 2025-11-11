@@ -44,20 +44,6 @@ export function BookingCalendar({
   const [availabilityCache, setAvailabilityCache] = useState<Record<string, number>>({});
   const [loadingDates, setLoadingDates] = useState(false);
 
-  // Clear cache when duration changes or component mounts for editing
-  useEffect(() => {
-    if (duration) {
-      console.log('🗑️ Calendar: Clearing sessionStorage cache for duration change');
-      // Clear all calendar cache entries
-      const keys = Object.keys(sessionStorage);
-      keys.forEach(key => {
-        if (key.includes('-') && !isNaN(parseInt(key.split('-').pop() || ''))) {
-          sessionStorage.removeItem(key);
-        }
-      });
-    }
-  }, [duration]);
-
   // Get today's date in YYYY-MM-DD format (Manila timezone)
   const today = useMemo(() => {
     const now = new Date();
@@ -162,21 +148,11 @@ export function BookingCalendar({
     console.log('🔍 Calendar: Fetching slots for', { selectedDate, duration });
     setLoading(true);
 
-    const cacheKey = `${selectedDate}-${duration}`;
-    const cachedSlots = sessionStorage.getItem(cacheKey);
-    if (cachedSlots) {
-      console.log('✅ Calendar: Using cached slots', JSON.parse(cachedSlots).length);
-      setAvailableSlots(JSON.parse(cachedSlots));
-      setLoading(false);
-      return;
-    }
-
     fetch(`/api/calendar/availability?date=${selectedDate}&duration=${duration}`)
       .then(res => res.json())
       .then(data => {
         console.log('📦 Calendar: API response', data);
         if (data.success) {
-          sessionStorage.setItem(cacheKey, JSON.stringify(data.availableSlots));
           setAvailableSlots(data.availableSlots);
           console.log('✅ Calendar: Set available slots', data.availableSlots.length);
         } else {

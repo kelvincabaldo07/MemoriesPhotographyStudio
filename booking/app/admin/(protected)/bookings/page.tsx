@@ -1028,7 +1028,9 @@ export default function BookingsPage() {
                             const isSelected = editedBooking?.backdrops?.includes(backdrop.key);
                             const maxBackdrops = editedBooking?.duration && editedBooking.duration >= 60 ? 4 : 2;
                             const currentCount = editedBooking?.backdrops?.length || 0;
-                            const isDisabled = !isSelected && currentCount >= maxBackdrops;
+                            // Disable if not selected AND adding one more would exceed max
+                            const wouldExceedMax = !isSelected && (currentCount + 1) > maxBackdrops;
+                            const isDisabled = wouldExceedMax;
                             
                             return (
                               <button
@@ -1038,6 +1040,7 @@ export default function BookingsPage() {
                                   const newBackdrops = isSelected
                                     ? editedBooking.backdrops.filter(b => b !== backdrop.key)
                                     : [...(editedBooking?.backdrops || []), backdrop.key];
+                                  console.log('Backdrop click:', { backdrop: backdrop.key, isSelected, currentCount, maxBackdrops, newCount: newBackdrops.length });
                                   setEditedBooking({ ...editedBooking!, backdrops: newBackdrops });
                                 }}
                                 disabled={isDisabled}
@@ -1069,7 +1072,7 @@ export default function BookingsPage() {
                       Session Price
                     </label>
                     <p className="mt-1 text-lg font-bold text-[#0b3d2e]">
-                      ₱{selectedBooking.sessionPrice.toLocaleString()}
+                      ₱{(isEditing ? editedBooking?.sessionPrice : selectedBooking.sessionPrice)?.toLocaleString()}
                     </p>
                   </div>
                   <div>
@@ -1077,7 +1080,14 @@ export default function BookingsPage() {
                       Add-ons
                     </label>
                     <p className="mt-1 text-lg font-bold text-blue-600">
-                      ₱{selectedBooking.addonsTotal.toLocaleString()}
+                      ₱{(() => {
+                        if (!isEditing) return selectedBooking.addonsTotal.toLocaleString();
+                        const addonsTotal = (editedBooking?.addons || []).reduce((sum, id) => {
+                          const prices: Record<string, number> = { '4r': 30, 'photostrip': 30, 'wallet': 30, 'premium4r': 50 };
+                          return sum + (prices[id] || 0);
+                        }, 0);
+                        return addonsTotal.toLocaleString();
+                      })()}
                     </p>
                   </div>
                   <div>
@@ -1085,7 +1095,14 @@ export default function BookingsPage() {
                       Grand Total
                     </label>
                     <p className="mt-1 text-lg font-bold text-green-600">
-                      ₱{selectedBooking.grandTotal.toLocaleString()}
+                      ₱{(() => {
+                        if (!isEditing) return selectedBooking.grandTotal.toLocaleString();
+                        const addonsTotal = (editedBooking?.addons || []).reduce((sum, id) => {
+                          const prices: Record<string, number> = { '4r': 30, 'photostrip': 30, 'wallet': 30, 'premium4r': 50 };
+                          return sum + (prices[id] || 0);
+                        }, 0);
+                        return ((editedBooking?.sessionPrice || 0) + addonsTotal).toLocaleString();
+                      })()}
                     </p>
                   </div>
                 </div>
