@@ -1036,19 +1036,17 @@ export default function BookingsPage() {
                             const isSelected = editedBooking?.backdrops?.includes(backdrop.key);
                             const maxBackdrops = editedBooking?.duration && editedBooking.duration >= 60 ? 4 : 2;
                             const currentCount = editedBooking?.backdrops?.length || 0;
-                            // Disable if not selected AND adding one more would exceed max
-                            const wouldExceedMax = !isSelected && (currentCount + 1) > maxBackdrops;
-                            const isDisabled = wouldExceedMax;
+                            // Disable if not selected AND we're already at max
+                            const isDisabled = !isSelected && currentCount >= maxBackdrops;
                             
-                            if (backdrop.key === 'gray') {
-                              console.log('🎨 Backdrop Gray state:', { 
+                            // Debug logging for all backdrops when count >= 3
+                            if (currentCount >= 3) {
+                              console.log(`🎨 ${backdrop.name}:`, { 
                                 isSelected, 
                                 currentCount, 
                                 maxBackdrops, 
-                                duration: editedBooking?.duration,
-                                wouldExceedMax, 
                                 isDisabled,
-                                calculation: `(${currentCount} + 1) > ${maxBackdrops} = ${(currentCount + 1) > maxBackdrops}`
+                                backdrops: editedBooking?.backdrops
                               });
                             }
                             
