@@ -5,14 +5,36 @@ import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from "lucide-reac
 import { cn } from "@/lib/utils";
 
 interface Booking {
-  id: string;
-  bookingId: string;
+  id: string; // Notion page ID
+  bookingId: string; // Booking ID (MMRS-xxx)
   name: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  serviceType: string;
+  serviceCategory: string;
+  serviceGroup: string;
+  service: string;
   date: string;
   time: string;
   duration: number;
-  service: string;
+  backdrops: string[];
+  backdropAllocations: string;
+  backdropOrder: string;
+  addons: string[];
+  socialConsent: string;
+  eventType: string;
+  celebrantName: string;
+  birthdayAge: string;
+  graduationLevel: string;
+  eventDate: string;
+  sessionPrice: number;
+  addonsTotal: number;
+  grandTotal: number;
   status: string;
+  createdAt: string;
 }
 
 interface BookingCalendarViewProps {
