@@ -37,8 +37,22 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user?.email !== process.env.ADMIN_EMAIL) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.log('[Booking Settings GET] Session:', session);
+    console.log('[Booking Settings GET] User email:', session?.user?.email);
+    
+    // Check if user is admin (check against allowed emails list)
+    const allowedEmails = [
+      "smile@memories-studio.com",
+      "kelvin.cabaldo@gmail.com",
+      process.env.ADMIN_EMAIL,
+    ].filter(Boolean);
+    
+    if (!session || !session.user?.email || !allowedEmails.includes(session.user.email)) {
+      console.log('[Booking Settings GET] Unauthorized - Email not in allowed list');
+      return NextResponse.json({ 
+        error: 'Unauthorized',
+        message: 'You must be logged in as an admin to view settings'
+      }, { status: 401 });
     }
 
     const notionApiKey = process.env.NOTION_API_KEY;
@@ -130,8 +144,22 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user?.email !== process.env.ADMIN_EMAIL) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.log('[Booking Settings POST] Session:', session);
+    console.log('[Booking Settings POST] User email:', session?.user?.email);
+    
+    // Check if user is admin (check against allowed emails list)
+    const allowedEmails = [
+      "smile@memories-studio.com",
+      "kelvin.cabaldo@gmail.com",
+      process.env.ADMIN_EMAIL,
+    ].filter(Boolean);
+    
+    if (!session || !session.user?.email || !allowedEmails.includes(session.user.email)) {
+      console.log('[Booking Settings POST] Unauthorized - Email not in allowed list');
+      return NextResponse.json({ 
+        error: 'Unauthorized', 
+        message: 'You must be logged in as an admin to save settings' 
+      }, { status: 401 });
     }
 
     const body: BookingSettings = await request.json();

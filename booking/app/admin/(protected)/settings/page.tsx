@@ -74,24 +74,30 @@ export default function SettingsPage() {
 
   const saveSettings = async () => {
     try {
+      console.log('[Settings] Saving booking settings...');
       const response = await fetch('/api/admin/booking-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Include cookies for NextAuth session
+        credentials: 'same-origin', // Changed from 'include' to 'same-origin' for same-domain requests
         body: JSON.stringify(bookingSettings),
       });
 
       const data = await response.json();
+      console.log('[Settings] Save response:', { status: response.status, data });
 
       if (response.ok && data.success) {
         setHasChanges(false);
-        alert("Settings saved successfully!");
+        alert("✅ Settings saved successfully!");
+      } else if (response.status === 401) {
+        alert("❌ Unauthorized: " + (data.message || data.error || 'Please log in again'));
+        console.error('Auth error:', data);
       } else {
-        alert("Failed to save settings: " + (data.error || 'Unknown error'));
+        alert("❌ Failed to save settings: " + (data.error || data.message || 'Unknown error'));
+        console.error('Save error:', data);
       }
     } catch (error) {
       console.error("Error saving settings:", error);
-      alert("Failed to save settings. Please try again.");
+      alert("❌ Network error: Failed to save settings. Please try again.");
     }
   };
 
@@ -116,12 +122,20 @@ export default function SettingsPage() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        console.log('[Settings] Loading booking settings...');
         const response = await fetch('/api/admin/booking-settings', {
-          credentials: 'include', // Include cookies for NextAuth session
+          credentials: 'same-origin', // Changed from 'include' to 'same-origin' for same-domain requests
         });
         const data = await response.json();
-        if (data.success && data.settings) {
+        console.log('[Settings] Load response:', { status: response.status, data });
+        
+        if (response.ok && data.success && data.settings) {
           setBookingSettings(data.settings);
+          console.log('[Settings] Settings loaded successfully');
+        } else if (response.status === 401) {
+          console.error('[Settings] Unauthorized - not logged in or session expired');
+        } else {
+          console.error('[Settings] Failed to load settings:', data);
         }
       } catch (error) {
         console.error("Error loading booking settings:", error);
@@ -585,16 +599,24 @@ export default function SettingsPage() {
             <p className="font-medium">15.5.6</p>
           </div>
           <div>
+            <p className="text-neutral-600">React Version</p>
+            <p className="font-medium">19.1.0</p>
+          </div>
+          <div>
             <p className="text-neutral-600">Environment</p>
-            <p className="font-medium">Production</p>
+            <p className="font-medium">{process.env.NODE_ENV === 'production' ? 'Production' : 'Development'}</p>
           </div>
           <div>
             <p className="text-neutral-600">Deployment</p>
-            <p className="font-medium">Vercel</p>
+            <p className="font-medium">{process.env.VERCEL ? 'Vercel' : 'Local'}</p>
           </div>
           <div>
-            <p className="text-neutral-600">Last Deploy</p>
-            <p className="font-medium">Nov 7, 2025</p>
+            <p className="text-neutral-600">Region</p>
+            <p className="font-medium">{process.env.VERCEL_REGION || 'Local'}</p>
+          </div>
+          <div>
+            <p className="text-neutral-600">Last Updated</p>
+            <p className="font-medium">Nov 11, 2025</p>
           </div>
         </div>
       </Card>
