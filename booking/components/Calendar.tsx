@@ -146,6 +146,7 @@ export function BookingCalendar({
     }
 
     console.log('🔍 Calendar: Fetching slots for', { selectedDate, duration });
+    console.log('🔍 Calendar: Full props:', { selectedDate, selectedTime, duration, serviceType });
     setLoading(true);
 
     fetch(`/api/calendar/availability?date=${selectedDate}&duration=${duration}`)

@@ -939,8 +939,14 @@ export default function BookingsPage() {
                       <BookingCalendar
                         selectedDate={editedBooking?.date || ""}
                         selectedTime={editedBooking?.time || ""}
-                        onDateChange={(date) => setEditedBooking({ ...editedBooking!, date })}
-                        onTimeChange={(time) => setEditedBooking({ ...editedBooking!, time })}
+                        onDateChange={(date) => {
+                          console.log('📆 Admin onDateChange called:', { date, currentDate: editedBooking?.date });
+                          setEditedBooking({ ...editedBooking!, date });
+                        }}
+                        onTimeChange={(time) => {
+                          console.log('⏰ Admin onTimeChange called:', { time });
+                          setEditedBooking({ ...editedBooking!, time });
+                        }}
                         duration={editedBooking?.duration || 30}
                         serviceType={editedBooking?.serviceType || ""}
                         bookingPolicies={{ schedulingWindow: 90, schedulingWindowUnit: 'days' }}
