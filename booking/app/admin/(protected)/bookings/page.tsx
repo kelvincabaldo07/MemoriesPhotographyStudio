@@ -953,6 +953,107 @@ export default function BookingsPage() {
                   <div className="grid grid-cols-2 gap-4 mt-6">
                   </div>
                 </div>
+                
+                {/* Add-ons & Backdrops Section */}
+                {isEditing && (
+                  <div className="border-t pt-4">
+                    <h3 className="text-lg font-bold text-[#0b3d2e] mb-3">Add-ons & Extras</h3>
+                    
+                    {/* Add-ons */}
+                    <div className="mb-4">
+                      <label className="text-sm font-semibold text-neutral-700 mb-2 block">Add-ons</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {[
+                          { id: "4r", label: "Printed 1 4R photo", price: 30 },
+                          { id: "photostrip", label: "Printed 2 photo strips", price: 30 },
+                          { id: "wallet", label: "Printed 4 wallet size photos", price: 30 },
+                          { id: "premium4r", label: "Printed 1 4R photo (Canon Selphy CP1500)", price: 50 },
+                        ].map((addon) => {
+                          const currentQty = editedBooking?.addons?.filter(a => a === addon.id).length || 0;
+                          return (
+                            <div key={addon.id} className="flex items-center justify-between p-3 border rounded-lg">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium">{addon.label}</p>
+                                <p className="text-xs text-neutral-500">₱{addon.price} each</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newAddons = [...(editedBooking?.addons || [])];
+                                    const index = newAddons.lastIndexOf(addon.id);
+                                    if (index > -1) {
+                                      newAddons.splice(index, 1);
+                                      setEditedBooking({ ...editedBooking!, addons: newAddons });
+                                    }
+                                  }}
+                                  disabled={currentQty === 0}
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30"
+                                >
+                                  -
+                                </button>
+                                <span className="w-8 text-center font-medium">{currentQty}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newAddons = [...(editedBooking?.addons || []), addon.id];
+                                    setEditedBooking({ ...editedBooking!, addons: newAddons });
+                                  }}
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Backdrops (for Self-Shoot only) */}
+                    {editedBooking?.serviceType === "Self-Shoot" && (
+                      <div>
+                        <label className="text-sm font-semibold text-neutral-700 mb-2 block">Backdrops</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[
+                            { key: "gray", name: "Gray" },
+                            { key: "mugwort", name: "Mugwort" },
+                            { key: "beige", name: "Beige" },
+                            { key: "ivory", name: "Ivory" },
+                            { key: "lightblue", name: "Light Blue" },
+                            { key: "flamered", name: "Flame Red" },
+                            { key: "carnationpink", name: "Carnation Pink" },
+                          ].map((backdrop) => {
+                            const isSelected = editedBooking?.backdrops?.includes(backdrop.key);
+                            return (
+                              <button
+                                key={backdrop.key}
+                                type="button"
+                                onClick={() => {
+                                  const newBackdrops = isSelected
+                                    ? editedBooking.backdrops.filter(b => b !== backdrop.key)
+                                    : [...(editedBooking?.backdrops || []), backdrop.key];
+                                  setEditedBooking({ ...editedBooking!, backdrops: newBackdrops });
+                                }}
+                                className={`p-3 text-sm rounded-lg border-2 transition ${
+                                  isSelected
+                                    ? 'border-[#0b3d2e] bg-[#0b3d2e]/10 font-medium'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                              >
+                                {backdrop.name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-neutral-500 mt-2">
+                          Select up to {editedBooking?.duration && editedBooking.duration >= 60 ? '4' : '2'} backdrops
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 {/* Pricing */}
                 <div className="grid grid-cols-3 gap-4 border-t pt-4">
                   <div>

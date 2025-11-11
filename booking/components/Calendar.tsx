@@ -140,13 +140,18 @@ export function BookingCalendar({
 
   // Fetch slots for selected date
   useEffect(() => {
-    if (!selectedDate || !duration) return;
+    if (!selectedDate || !duration) {
+      console.log('⚠️ Calendar: Missing date or duration', { selectedDate, duration });
+      return;
+    }
 
+    console.log('🔍 Calendar: Fetching slots for', { selectedDate, duration });
     setLoading(true);
 
     const cacheKey = `${selectedDate}-${duration}`;
     const cachedSlots = sessionStorage.getItem(cacheKey);
     if (cachedSlots) {
+      console.log('✅ Calendar: Using cached slots', JSON.parse(cachedSlots).length);
       setAvailableSlots(JSON.parse(cachedSlots));
       setLoading(false);
       return;
@@ -155,15 +160,18 @@ export function BookingCalendar({
     fetch(`/api/calendar/availability?date=${selectedDate}&duration=${duration}`)
       .then(res => res.json())
       .then(data => {
+        console.log('📦 Calendar: API response', data);
         if (data.success) {
           sessionStorage.setItem(cacheKey, JSON.stringify(data.availableSlots));
           setAvailableSlots(data.availableSlots);
+          console.log('✅ Calendar: Set available slots', data.availableSlots.length);
         } else {
+          console.warn('⚠️ Calendar: API returned success=false');
           setAvailableSlots([]);
         }
       })
       .catch(err => {
-        console.error('Error fetching availability:', err);
+        console.error('❌ Calendar: Error fetching availability:', err);
         setAvailableSlots([]);
       })
       .finally(() => setLoading(false));
@@ -300,8 +308,11 @@ export function BookingCalendar({
                   <p className="text-sm font-medium">No available times</p>
                   <p className="text-xs mt-1">
                     {selectedDate === today
-                      ? "Try selecting a future date"
-                      : "Please choose another day"}
+                      ? "All times have passed for today. Try selecting a future date."
+                      : "All time slots are booked or unavailable. Please choose another day."}
+                  </p>
+                  <p className="text-xs mt-2 text-neutral-400">
+                    Looking for {duration} minute sessions
                   </p>
                 </div>
               )}
