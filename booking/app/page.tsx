@@ -1288,12 +1288,12 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
     setServiceGroup(g===serviceGroup?"":g); setOpenGroup(g===openGroup?"":g); setService("");
   }
 
-  // ✅ ADD THIS HELPER FUNCTION HERE
+  // ✅ Group size descriptions
   function getGroupDescription(groupName: string): string {
     switch(groupName) {
-      case "Solo/Duo": return "1–2 persons";
-      case "Small Group": return "3–5 persons";
-      case "Big Group": return "6–15 persons";
+      case "Solo/Duo": return "👤 Session size is based on the number of people photographed, not how many appear in each shot — so bring your group and make every frame count!";
+      case "Small Group": return "👤 Session size is based on the number of people photographed, not how many appear in each shot — so bring your group and make every frame count!";
+      case "Big Group": return "👤 Session size is based on the number of people photographed, not how many appear in each shot — so bring your group and make every frame count!";
       default: return "Pick a theme / type";
     }
   }
@@ -1328,8 +1328,16 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
           >
             <div className="flex items-center justify-between p-3 bg-neutral-50">
               <button className="text-left flex-1" onClick={()=>toggleType(String(t))}>
-                <div className="font-medium">{t as string}</div>
-                <div className="text-xs text-neutral-500">{t === "Self-Shoot" ? "Use our studio & triggers" : t === "With Photographer" ? "Guided session with our photographer" : "Limited-time sets like Christmas"}</div>
+                <div className="font-medium">
+                  {t === "Self-Shoot" ? "📸 Self-Shoot" : t === "With Photographer" ? "👩‍🎨 Self-Shoot with Photographer" : "🎄 Seasonal Sessions"}
+                </div>
+                <div className="text-xs text-neutral-500">
+                  {t === "Self-Shoot" 
+                    ? "Be your own photographer in our well-lit studio — set your poses, control the shutter, and create photos your way." 
+                    : t === "With Photographer" 
+                    ? "A guided self-shoot experience where our photographer helps with poses, lighting, and framing to capture your best angles." 
+                    : "Limited-time themed sets that change with the season — perfect for holidays, back-to-school, and special occasions."}
+                </div>
               </button>
               <div className="flex items-center gap-2">
                 {serviceType && <Button size="sm" variant="outline" onClick={()=>{ setServiceType(""); setOpenType(""); setServiceCategory(""); setOpenCategory(""); setServiceGroup(""); setOpenGroup(""); setService(""); }}>Change</Button>}
@@ -1356,8 +1364,12 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                         }}
                       >
                         <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
-                          <div className="font-medium">{String(c)}</div>
-                          <div className="text-xs text-neutral-500">{c === "Classic" ? "Session + printed copies" : "Session + digital-only"}</div>
+                          <div className="font-medium">{c === "Classic" ? "🖼 Classic Package" : "💻 Digital Package"}</div>
+                          <div className="text-xs text-neutral-500">
+                            {c === "Classic" 
+                              ? "Includes all digital copies plus printed photos — perfect for those who want both online access and timeless physical keepsakes." 
+                              : "Includes all edited digital copies only, delivered via Adobe Lightroom for easy viewing and sharing."}
+                          </div>
                         </button>
                         {serviceCategory && String(c)===serviceCategory && (
                           <Button size="sm" variant="outline" onClick={()=>{ setServiceCategory(""); setOpenCategory(""); setServiceGroup(""); setOpenGroup(""); setService(""); }}>Change</Button>
