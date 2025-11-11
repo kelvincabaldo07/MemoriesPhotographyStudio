@@ -8,9 +8,11 @@ import { NextResponse } from 'next/server';
 // Default settings
 const DEFAULT_SETTINGS = {
   leadTime: 2, // hours
-  leadTimeUnit: 'hours' as 'hours' | 'minutes',
+  leadTimeUnit: 'hours' as 'minutes' | 'hours' | 'days',
   bookingSlotSize: 15, // minutes
+  bookingSlotUnit: 'minutes' as 'minutes' | 'hours',
   schedulingWindow: 90, // days
+  schedulingWindowUnit: 'days' as 'days' | 'months',
   cancellationPolicy: 2, // hours
   cancellationPolicyUnit: 'hours' as 'hours' | 'days',
 };
@@ -70,9 +72,11 @@ export async function GET() {
 
     const settings = {
       leadTime: props['Lead Time']?.number || DEFAULT_SETTINGS.leadTime,
-      leadTimeUnit: (props['Lead Time Unit']?.select?.name || DEFAULT_SETTINGS.leadTimeUnit) as 'hours' | 'minutes',
+      leadTimeUnit: (props['Lead Time Unit']?.select?.name || DEFAULT_SETTINGS.leadTimeUnit) as 'minutes' | 'hours' | 'days',
       bookingSlotSize: props['Booking Slot Size']?.number || DEFAULT_SETTINGS.bookingSlotSize,
+      bookingSlotUnit: (props['Booking Slot Unit']?.select?.name || DEFAULT_SETTINGS.bookingSlotUnit) as 'minutes' | 'hours',
       schedulingWindow: props['Scheduling Window']?.number || DEFAULT_SETTINGS.schedulingWindow,
+      schedulingWindowUnit: (props['Scheduling Window Unit']?.select?.name || DEFAULT_SETTINGS.schedulingWindowUnit) as 'days' | 'months',
       cancellationPolicy: props['Cancellation Policy']?.number || DEFAULT_SETTINGS.cancellationPolicy,
       cancellationPolicyUnit: (props['Cancellation Policy Unit']?.select?.name || DEFAULT_SETTINGS.cancellationPolicyUnit) as 'hours' | 'days',
     };

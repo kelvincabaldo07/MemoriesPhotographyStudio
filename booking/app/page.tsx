@@ -462,8 +462,9 @@ export default function App(){
     fetch('/api/booking-settings')
       .then(res => res.json())
       .then(data => {
-        if (data) {
-          setBookingPolicies(data);
+        if (data && data.settings) {
+          console.log('📅 Loaded booking policies:', data.settings);
+          setBookingPolicies(data.settings);
         }
       })
       .catch(err => console.error('Failed to load booking policies:', err));
