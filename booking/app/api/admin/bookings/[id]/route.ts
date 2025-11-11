@@ -136,7 +136,7 @@ export async function PATCH(
 
     if (body.time) {
       // Calculate end time including buffer
-      const totalDuration = duration + bufferMinutes;
+      const totalDuration = (body.duration || duration) + bufferMinutes;
       const endTime = calculateEndTime(body.time, totalDuration);
       
       // Use the provided date or get from old properties
@@ -152,6 +152,36 @@ export async function PATCH(
           end: endDateTime,
           time_zone: "Asia/Manila"
         }
+      };
+    }
+
+    if (body.service) {
+      notionProperties.Service = {
+        rich_text: [{ text: { content: body.service } }]
+      };
+    }
+
+    if (body.serviceType) {
+      notionProperties["Service Type"] = {
+        select: { name: body.serviceType }
+      };
+    }
+
+    if (body.serviceCategory) {
+      notionProperties["Service Category"] = {
+        select: { name: body.serviceCategory }
+      };
+    }
+
+    if (body.serviceGroup) {
+      notionProperties["Service Group"] = {
+        rich_text: [{ text: { content: body.serviceGroup } }]
+      };
+    }
+
+    if (body.duration) {
+      notionProperties.Duration = {
+        number: body.duration
       };
     }
 

@@ -27,7 +27,8 @@ import {
 } from "lucide-react";
 
 interface Booking {
-  id: string;
+  id: string; // Notion page ID
+  bookingId: string; // Booking ID (MMRS-xxx)
   name: string;
   firstName: string;
   lastName: string;
@@ -72,10 +73,19 @@ export default function BookingsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedBooking, setEditedBooking] = useState<Booking | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [availability, setAvailability] = useState<{date: string, slots: string[]}>({date: "", slots: []});
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  // Check availability when edit mode is enabled
+  useEffect(() => {
+    if (isEditing && editedBooking?.date && editedBooking?.duration) {
+      checkAvailability(editedBooking.date, editedBooking.duration);
+    }
+  }, [isEditing]);
 
   const fetchBookings = async () => {
     try {
@@ -116,6 +126,27 @@ export default function BookingsPage() {
     }
   };
 
+  const checkAvailability = async (date: string, duration: number) => {
+    if (!date || !duration) return;
+    
+    setCheckingAvailability(true);
+    try {
+      const response = await fetch(`/api/calendar/availability?date=${date}&duration=${duration}`);
+      const data = await response.json();
+      
+      if (response.ok && data.available) {
+        setAvailability({ date, slots: data.slots || [] });
+      } else {
+        setAvailability({ date, slots: [] });
+      }
+    } catch (error) {
+      console.error("Error checking availability:", error);
+      setAvailability({ date, slots: [] });
+    } finally {
+      setCheckingAvailability(false);
+    }
+  };
+
   const cancelBooking = async (bookingId: string) => {
     if (!confirm('Are you sure you want to cancel this booking? This will:\n\n• Update the status to "Cancelled" in Notion\n• Delete the Google Calendar event\n\nThis action cannot be undone.')) {
       return;
@@ -149,7 +180,7 @@ export default function BookingsPage() {
     setUpdating(true);
     try {
       // Admin update - send booking ID in URL and updates in body
-      const response = await fetch(`/api/admin/bookings/${editedBooking.id}`, {
+      const response = await fetch(`/api/admin/bookings/${editedBooking.bookingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -162,6 +193,11 @@ export default function BookingsPage() {
           date: editedBooking.date,
           time: editedBooking.time,
           status: editedBooking.status,
+          service: editedBooking.service,
+          serviceType: editedBooking.serviceType,
+          serviceCategory: editedBooking.serviceCategory,
+          serviceGroup: editedBooking.serviceGroup,
+          duration: editedBooking.duration,
         }),
       });
 
@@ -707,27 +743,108 @@ export default function BookingsPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Service Type</label>
-                      <p className="mt-1">{selectedBooking.serviceType}</p>
+                      {isEditing ? (
+                        <select
+                          value={editedBooking?.serviceType || ""}
+                          onChange={(e) =>
+                            setEditedBooking({ ...editedBooking!, serviceType: e.target.value })
+                          }
+                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                        >
+                          <option value="Self-Shoot">Self-Shoot</option>
+                          <option value="With Photographer">With Photographer</option>
+                          <option value="Occasional">Occasional</option>
+                        </select>
+                      ) : (
+                        <p className="mt-1">{selectedBooking.serviceType}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Category</label>
-                      <p className="mt-1">{selectedBooking.serviceCategory}</p>
+                      {isEditing ? (
+                        <Input
+                          value={editedBooking?.serviceCategory || ""}
+                          onChange={(e) =>
+                            setEditedBooking({ ...editedBooking!, serviceCategory: e.target.value })
+                          }
+                          className="mt-1"
+                          placeholder="e.g., Solo, Couple, Family"
+                        />
+                      ) : (
+                        <p className="mt-1">{selectedBooking.serviceCategory}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold text-neutral-700">Service Group</label>
+                      {isEditing ? (
+                        <Input
+                          value={editedBooking?.serviceGroup || ""}
+                          onChange={(e) =>
+                            setEditedBooking({ ...editedBooking!, serviceGroup: e.target.value })
+                          }
+                          className="mt-1"
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <p className="mt-1">{selectedBooking.serviceGroup || "N/A"}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold text-neutral-700">Duration (minutes)</label>
+                      {isEditing ? (
+                        <Input
+                          type="number"
+                          value={editedBooking?.duration || ""}
+                          onChange={(e) => {
+                            const newDuration = parseInt(e.target.value) || 0;
+                            setEditedBooking({ ...editedBooking!, duration: newDuration });
+                            if (editedBooking?.date && newDuration) {
+                              checkAvailability(editedBooking.date, newDuration);
+                            }
+                          }}
+                          className="mt-1"
+                          min="15"
+                          step="15"
+                        />
+                      ) : (
+                        <p className="mt-1">{selectedBooking.duration} minutes</p>
+                      )}
                     </div>
                     <div className="col-span-2">
                       <label className="text-sm font-semibold text-neutral-700">Service Package</label>
-                      <p className="mt-1">{selectedBooking.service}</p>
+                      {isEditing ? (
+                        <Input
+                          value={editedBooking?.service || ""}
+                          onChange={(e) =>
+                            setEditedBooking({ ...editedBooking!, service: e.target.value })
+                          }
+                          className="mt-1"
+                          placeholder="Service name"
+                        />
+                      ) : (
+                        <p className="mt-1">{selectedBooking.service}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Date</label>
                       {isEditing ? (
-                        <Input
-                          type="date"
-                          value={editedBooking?.date || ""}
-                          onChange={(e) =>
-                            setEditedBooking({ ...editedBooking!, date: e.target.value })
-                          }
-                          className="mt-1"
-                        />
+                        <>
+                          <Input
+                            type="date"
+                            value={editedBooking?.date || ""}
+                            onChange={(e) => {
+                              setEditedBooking({ ...editedBooking!, date: e.target.value });
+                              if (e.target.value && editedBooking?.duration) {
+                                checkAvailability(e.target.value, editedBooking.duration);
+                              }
+                            }}
+                            className="mt-1"
+                            min={new Date().toISOString().split('T')[0]}
+                          />
+                          {checkingAvailability && (
+                            <p className="text-xs text-blue-600 mt-1">Checking availability...</p>
+                          )}
+                        </>
                       ) : (
                         <p className="mt-1">{formatDate(selectedBooking.date)}</p>
                       )}
@@ -735,14 +852,40 @@ export default function BookingsPage() {
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Time (Manila Time)</label>
                       {isEditing ? (
-                        <Input
-                          type="time"
-                          value={editedBooking?.time || ""}
-                          onChange={(e) =>
-                            setEditedBooking({ ...editedBooking!, time: e.target.value })
-                          }
-                          className="mt-1"
-                        />
+                        <>
+                          <Input
+                            type="time"
+                            value={editedBooking?.time || ""}
+                            onChange={(e) =>
+                              setEditedBooking({ ...editedBooking!, time: e.target.value })
+                            }
+                            className="mt-1"
+                          />
+                          {availability.slots.length > 0 && editedBooking?.date === availability.date && (
+                            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
+                              <p className="font-semibold text-green-800 mb-1">✓ Available Slots:</p>
+                              <div className="flex flex-wrap gap-1">
+                                {availability.slots.map((slot) => (
+                                  <button
+                                    key={slot}
+                                    type="button"
+                                    onClick={() => setEditedBooking({ ...editedBooking!, time: slot })}
+                                    className={`px-2 py-1 rounded ${
+                                      editedBooking?.time === slot 
+                                        ? 'bg-green-600 text-white' 
+                                        : 'bg-white text-green-700 hover:bg-green-100'
+                                    } border border-green-300`}
+                                  >
+                                    {slot}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {!checkingAvailability && availability.date === editedBooking?.date && availability.slots.length === 0 && editedBooking?.date && (
+                            <p className="text-xs text-red-600 mt-1">⚠️ No available slots for this date</p>
+                          )}
+                        </>
                       ) : (
                         <p className="mt-1">{formatTimeTo12Hour(selectedBooking.time)}</p>
                       )}

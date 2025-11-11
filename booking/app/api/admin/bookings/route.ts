@@ -77,7 +77,8 @@ export async function GET(request: Request) {
       const fullName = `${firstName} ${lastName}`.trim() || props.Name?.title?.[0]?.plain_text || "";
       
       return {
-        id: page.id,
+        id: page.id, // Notion page ID
+        bookingId: props["Booking ID"]?.rich_text?.[0]?.plain_text || "", // Booking ID (MMRS-xxx)
         name: fullName,
         firstName,
         lastName,
