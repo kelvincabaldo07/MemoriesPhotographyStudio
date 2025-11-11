@@ -117,6 +117,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log('Batch API received dates:', dates.slice(0, 5), '... total:', dates.length);
+
     // If no refresh token, return mock data for all dates
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.warn('Google Calendar not configured. Using mock data for batch request.');

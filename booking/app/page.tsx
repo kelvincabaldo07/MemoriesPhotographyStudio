@@ -1562,9 +1562,13 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
   useEffect(() => {
     if (!duration) return;
     
+    // Wait for booking policies to load before fetching availability
+    if (!bookingPolicies.schedulingWindow) return;
+    
     // Skip if we already have data cached
     if (Object.keys(availabilityCache).length > 0) return;
     
+    console.log('Fetching batch availability for', next90Days.length, 'days');
     setLoadingDates(true);
     
     fetch('/api/calendar/availability-batch', {
@@ -1587,7 +1591,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
         console.error('Failed to load availability:', err);
       })
       .finally(() => setLoadingDates(false));
-  }, [duration]);
+  }, [duration, bookingPolicies.schedulingWindow, bookingPolicies.schedulingWindowUnit, next90Days]);
 
   // Fetch slots for selected date - WITH CACHING
   useEffect(() => {
