@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatTimeTo12Hour, formatManilaDate } from "@/lib/time-utils";
+import { BookingCalendar } from "@/components/Calendar";
 import { 
   Search, 
   Filter, 
@@ -75,10 +76,36 @@ export default function BookingsPage() {
   const [updating, setUpdating] = useState(false);
   const [availability, setAvailability] = useState<{date: string, slots: string[]}>({date: "", slots: []});
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  
+  // Service options from Notion
+  const [serviceOptions, setServiceOptions] = useState<{
+    types: string[];
+    categories: string[];
+    groupsByType: Record<string, string[]>;
+    servicesByGroup: Record<string, Array<{ name: string; duration: number; price: number }>>;
+  }>({
+    types: [],
+    categories: [],
+    groupsByType: {},
+    servicesByGroup: {},
+  });
 
   useEffect(() => {
     fetchBookings();
+    fetchServiceOptions();
   }, []);
+
+  const fetchServiceOptions = async () => {
+    try {
+      const response = await fetch("/api/admin/services/options");
+      const data = await response.json();
+      if (data.types) {
+        setServiceOptions(data);
+      }
+    } catch (error) {
+      console.error("Error fetching service options:", error);
+    }
+  };
 
   // Check availability when edit mode is enabled
   useEffect(() => {
@@ -746,14 +773,22 @@ export default function BookingsPage() {
                       {isEditing ? (
                         <select
                           value={editedBooking?.serviceType || ""}
-                          onChange={(e) =>
-                            setEditedBooking({ ...editedBooking!, serviceType: e.target.value })
-                          }
+                          onChange={(e) => {
+                            const newType = e.target.value;
+                            setEditedBooking({ 
+                              ...editedBooking!, 
+                              serviceType: newType,
+                              serviceGroup: "", // Reset group when type changes
+                              service: "", // Reset service when type changes
+                              duration: 30 // Reset duration
+                            });
+                          }}
                           className="mt-1 w-full px-3 py-2 border rounded-lg"
                         >
-                          <option value="Self-Shoot">Self-Shoot</option>
-                          <option value="With Photographer">With Photographer</option>
-                          <option value="Occasional">Occasional</option>
+                          <option value="">Select Type</option>
+                          {serviceOptions.types.map((type) => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
                         </select>
                       ) : (
                         <p className="mt-1">{selectedBooking.serviceType}</p>
@@ -762,14 +797,18 @@ export default function BookingsPage() {
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Category</label>
                       {isEditing ? (
-                        <Input
+                        <select
                           value={editedBooking?.serviceCategory || ""}
                           onChange={(e) =>
                             setEditedBooking({ ...editedBooking!, serviceCategory: e.target.value })
                           }
-                          className="mt-1"
-                          placeholder="e.g., Solo, Couple, Family"
-                        />
+                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                        >
+                          <option value="">Select Category</option>
+                          {serviceOptions.categories.map((category) => (
+                            <option key={category} value={category}>{category}</option>
+                          ))}
+                        </select>
                       ) : (
                         <p className="mt-1">{selectedBooking.serviceCategory}</p>
                       )}
@@ -777,16 +816,64 @@ export default function BookingsPage() {
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Service Group</label>
                       {isEditing ? (
-                        <Input
+                        <select
                           value={editedBooking?.serviceGroup || ""}
-                          onChange={(e) =>
-                            setEditedBooking({ ...editedBooking!, serviceGroup: e.target.value })
-                          }
-                          className="mt-1"
-                          placeholder="Optional"
-                        />
+                          onChange={(e) => {
+                            const newGroup = e.target.value;
+                            setEditedBooking({ 
+                              ...editedBooking!, 
+                              serviceGroup: newGroup,
+                              service: "", // Reset service when group changes
+                              duration: 30 // Reset duration
+                            });
+                          }}
+                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                          disabled={!editedBooking?.serviceType}
+                        >
+                          <option value="">Select Group</option>
+                          {editedBooking?.serviceType && serviceOptions.groupsByType[editedBooking.serviceType]?.map((group) => (
+                            <option key={group} value={group}>{group}</option>
+                          ))}
+                        </select>
                       ) : (
                         <p className="mt-1">{selectedBooking.serviceGroup || "N/A"}</p>
+                      )}
+                    </div>
+                    <div className="col-span-2">
+                      <label className="text-sm font-semibold text-neutral-700">Service Package</label>
+                      {isEditing ? (
+                        <select
+                          value={editedBooking?.service || ""}
+                          onChange={(e) => {
+                            const serviceName = e.target.value;
+                            const serviceData = editedBooking?.serviceGroup 
+                              ? serviceOptions.servicesByGroup[editedBooking.serviceGroup]?.find(s => s.name === serviceName)
+                              : null;
+                            
+                            setEditedBooking({ 
+                              ...editedBooking!, 
+                              service: serviceName,
+                              duration: serviceData?.duration || editedBooking?.duration || 30,
+                              sessionPrice: serviceData?.price || editedBooking?.sessionPrice || 0
+                            });
+                            
+                            // Trigger availability check if date is set
+                            if (editedBooking?.date && serviceData?.duration) {
+                              checkAvailability(editedBooking.date, serviceData.duration);
+                            }
+                          }}
+                          className="mt-1 w-full px-3 py-2 border rounded-lg"
+                          disabled={!editedBooking?.serviceGroup}
+                        >
+                          <option value="">Select Service</option>
+                          {editedBooking?.serviceGroup && serviceOptions.servicesByGroup[editedBooking.serviceGroup]?.map((service) => (
+                            <option key={service.name} value={service.name}>
+                              {service.name} ({service.duration} min - ₱{service.price})
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <p className="mt-1">{selectedBooking.service}</p>
                       )}
                     </div>
                     <div>
@@ -805,91 +892,43 @@ export default function BookingsPage() {
                           className="mt-1"
                           min="15"
                           step="15"
+                          readOnly
+                          title="Duration is set automatically based on selected service"
                         />
                       ) : (
                         <p className="mt-1">{selectedBooking.duration} minutes</p>
                       )}
                     </div>
-                    <div className="col-span-2">
-                      <label className="text-sm font-semibold text-neutral-700">Service Package</label>
-                      {isEditing ? (
-                        <Input
-                          value={editedBooking?.service || ""}
-                          onChange={(e) =>
-                            setEditedBooking({ ...editedBooking!, service: e.target.value })
-                          }
-                          className="mt-1"
-                          placeholder="Service name"
-                        />
-                      ) : (
-                        <p className="mt-1">{selectedBooking.service}</p>
-                      )}
+                  </div>
+
+                  {/* Date & Time Picker - Full Width Calendar */}
+                  {isEditing ? (
+                    <div className="mt-6">
+                      <h4 className="text-sm font-semibold text-neutral-700 mb-4">Select Date & Time</h4>
+                      <BookingCalendar
+                        selectedDate={editedBooking?.date || ""}
+                        selectedTime={editedBooking?.time || ""}
+                        onDateChange={(date) => setEditedBooking({ ...editedBooking!, date })}
+                        onTimeChange={(time) => setEditedBooking({ ...editedBooking!, time })}
+                        duration={editedBooking?.duration || 30}
+                        serviceType={editedBooking?.serviceType || ""}
+                        bookingPolicies={{ schedulingWindow: 90, schedulingWindowUnit: 'days' }}
+                      />
                     </div>
-                    <div>
-                      <label className="text-sm font-semibold text-neutral-700">Date</label>
-                      {isEditing ? (
-                        <>
-                          <Input
-                            type="date"
-                            value={editedBooking?.date || ""}
-                            onChange={(e) => {
-                              setEditedBooking({ ...editedBooking!, date: e.target.value });
-                              if (e.target.value && editedBooking?.duration) {
-                                checkAvailability(e.target.value, editedBooking.duration);
-                              }
-                            }}
-                            className="mt-1"
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                          {checkingAvailability && (
-                            <p className="text-xs text-blue-600 mt-1">Checking availability...</p>
-                          )}
-                        </>
-                      ) : (
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                      <div>
+                        <label className="text-sm font-semibold text-neutral-700">Date</label>
                         <p className="mt-1">{formatDate(selectedBooking.date)}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold text-neutral-700">Time (Manila Time)</label>
-                      {isEditing ? (
-                        <>
-                          <Input
-                            type="time"
-                            value={editedBooking?.time || ""}
-                            onChange={(e) =>
-                              setEditedBooking({ ...editedBooking!, time: e.target.value })
-                            }
-                            className="mt-1"
-                          />
-                          {availability.slots.length > 0 && editedBooking?.date === availability.date && (
-                            <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-xs">
-                              <p className="font-semibold text-green-800 mb-1">✓ Available Slots:</p>
-                              <div className="flex flex-wrap gap-1">
-                                {availability.slots.map((slot) => (
-                                  <button
-                                    key={slot}
-                                    type="button"
-                                    onClick={() => setEditedBooking({ ...editedBooking!, time: slot })}
-                                    className={`px-2 py-1 rounded ${
-                                      editedBooking?.time === slot 
-                                        ? 'bg-green-600 text-white' 
-                                        : 'bg-white text-green-700 hover:bg-green-100'
-                                    } border border-green-300`}
-                                  >
-                                    {slot}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                          {!checkingAvailability && availability.date === editedBooking?.date && availability.slots.length === 0 && editedBooking?.date && (
-                            <p className="text-xs text-red-600 mt-1">⚠️ No available slots for this date</p>
-                          )}
-                        </>
-                      ) : (
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-neutral-700">Time (Manila Time)</label>
                         <p className="mt-1">{formatTimeTo12Hour(selectedBooking.time)}</p>
-                      )}
+                      </div>
                     </div>
+                  )}
+                  
+                  <div className="grid grid-cols-2 gap-4 mt-6">
                   </div>
                 </div>
                 {/* Pricing */}
