@@ -876,8 +876,7 @@ export default function BookingsPage() {
                             // Filter services by category
                             const filteredServices = editedBooking?.serviceGroup 
                               ? serviceOptions.servicesByGroup[editedBooking.serviceGroup]?.filter(s => 
-                                  s.category === editedBooking.serviceCategory || 
-                                  (!s.category && editedBooking.serviceCategory === "Digital")
+                                  s.category === editedBooking.serviceCategory
                                 )
                               : [];
                             
@@ -901,10 +900,7 @@ export default function BookingsPage() {
                           <option value="">Select Service</option>
                           {editedBooking?.serviceGroup && editedBooking?.serviceCategory && 
                             serviceOptions.servicesByGroup[editedBooking.serviceGroup]
-                              ?.filter(service => 
-                                service.category === editedBooking.serviceCategory || 
-                                (!service.category && editedBooking.serviceCategory === "Digital")
-                              )
+                              ?.filter(service => service.category === editedBooking.serviceCategory)
                               .map((service) => (
                                 <option key={service.name} value={service.name}>
                                   {service.name} ({service.duration} min - ₱{service.price})
@@ -1030,6 +1026,10 @@ export default function BookingsPage() {
                             { key: "carnationpink", name: "Carnation Pink" },
                           ].map((backdrop) => {
                             const isSelected = editedBooking?.backdrops?.includes(backdrop.key);
+                            const maxBackdrops = editedBooking?.duration && editedBooking.duration >= 60 ? 4 : 2;
+                            const currentCount = editedBooking?.backdrops?.length || 0;
+                            const isDisabled = !isSelected && currentCount >= maxBackdrops;
+                            
                             return (
                               <button
                                 key={backdrop.key}
@@ -1040,9 +1040,12 @@ export default function BookingsPage() {
                                     : [...(editedBooking?.backdrops || []), backdrop.key];
                                   setEditedBooking({ ...editedBooking!, backdrops: newBackdrops });
                                 }}
+                                disabled={isDisabled}
                                 className={`p-3 text-sm rounded-lg border-2 transition ${
                                   isSelected
                                     ? 'border-[#0b3d2e] bg-[#0b3d2e]/10 font-medium'
+                                    : isDisabled
+                                    ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
                                     : 'border-gray-200 hover:border-gray-300'
                                 }`}
                               >
@@ -1052,7 +1055,7 @@ export default function BookingsPage() {
                           })}
                         </div>
                         <p className="text-xs text-neutral-500 mt-2">
-                          Select up to {editedBooking?.duration && editedBooking.duration >= 60 ? '4' : '2'} backdrops
+                          {editedBooking?.backdrops?.length || 0} of {editedBooking?.duration && editedBooking.duration >= 60 ? '4' : '2'} backdrops selected
                         </p>
                       </div>
                     )}

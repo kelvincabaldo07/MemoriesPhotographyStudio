@@ -64,7 +64,7 @@ export async function GET() {
     const types = new Set<string>();
     const categories = new Set<string>();
     const groupsByType: Record<string, Set<string>> = {};
-    const servicesByGroup: Record<string, Array<{ name: string; duration: number; price: number }>> = {};
+    const servicesByGroup: Record<string, Array<{ name: string; duration: number; price: number; category: string }>> = {};
 
     data.results.forEach((page: any) => {
       const props = page.properties;
@@ -94,7 +94,7 @@ export async function GET() {
         if (!servicesByGroup[group]) {
           servicesByGroup[group] = [];
         }
-        servicesByGroup[group].push({ name, duration, price: basePrice });
+        servicesByGroup[group].push({ name, duration, price: basePrice, category });
       }
     });
 

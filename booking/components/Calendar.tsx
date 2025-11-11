@@ -44,6 +44,20 @@ export function BookingCalendar({
   const [availabilityCache, setAvailabilityCache] = useState<Record<string, number>>({});
   const [loadingDates, setLoadingDates] = useState(false);
 
+  // Clear cache when duration changes or component mounts for editing
+  useEffect(() => {
+    if (duration) {
+      console.log('🗑️ Calendar: Clearing sessionStorage cache for duration change');
+      // Clear all calendar cache entries
+      const keys = Object.keys(sessionStorage);
+      keys.forEach(key => {
+        if (key.includes('-') && !isNaN(parseInt(key.split('-').pop() || ''))) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    }
+  }, [duration]);
+
   // Get today's date in YYYY-MM-DD format (Manila timezone)
   const today = useMemo(() => {
     const now = new Date();
