@@ -1391,11 +1391,20 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                   <div className="mt-4">
                     <div className="text-sm font-medium mb-2">Session Sizes</div>
                     <div className="grid md:grid-cols-3 gap-3">
-                      {groups.map((g)=> (
+                      {groups.map((g)=> {
+                        // Check if this group has a sample photo
+                        const hasPhoto = g === "Kids Pre-birthday (Girls)" || g === "Kids Pre-birthday (Boys)";
+                        const photoPath = g === "Kids Pre-birthday (Girls)" 
+                          ? "/placeholders/prebirthday-girls.jpg"
+                          : g === "Kids Pre-birthday (Boys)"
+                          ? "/placeholders/prebirthday-boys.jpg"
+                          : null;
+                        
+                        return (
                         <button 
                           key={g} 
                           className={cn(
-                            "text-left border rounded-xl p-3 hover:shadow-sm transition flex items-center gap-3",
+                            "text-left border rounded-xl overflow-hidden hover:shadow-sm transition",
                             serviceGroup === g && "shadow-md"
                           )}
                           style={{ 
@@ -1404,13 +1413,34 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           }}
                           onClick={()=>toggleGroup(g)}
                         >
-                          <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
-                          <div>
-                            <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
-                            <div className="text-xs" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
+                          {hasPhoto && photoPath && (
+                            <div className="relative h-32 bg-neutral-100 overflow-hidden">
+                              <img 
+                                src={photoPath} 
+                                alt={g}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Hide image if not found
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                              {/* Fallback emoji overlay if image doesn't load */}
+                              <div className="absolute inset-0 flex items-center justify-center text-4xl bg-neutral-50/80">
+                                {GROUP_THUMBS[g] || "📷"}
+                              </div>
+                            </div>
+                          )}
+                          <div className="p-3 flex items-center gap-3">
+                            {!hasPhoto && (
+                              <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
+                            )}
+                            <div className="flex-1">
+                              <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
+                              <div className="text-xs" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
+                            </div>
                           </div>
                         </button>
-                      ))}
+                      )})}
                     </div>
                     <div className="mt-2 text-xs text-neutral-500 italic">
                       👤 Session size is based on the number of people photographed, not how many appear per shot.
@@ -2300,6 +2330,7 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
           const isSelected = selected.includes(bd.key);
           const canAdd = selected.length < limit;
           const isDisabled = !isSelected && !canAdd;
+          const photoPath = `/placeholders/backdrops/${bd.key}.jpg`;
           
           return (
             <button 
@@ -2307,30 +2338,42 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
               onClick={()=>onToggle(bd.key)} 
               disabled={isDisabled}
               className={cn(
-                "border rounded-2xl p-3 text-left shadow-sm transition relative",
+                "border rounded-2xl overflow-hidden text-left shadow-sm transition relative",
                 isSelected ? "border-green-600 bg-green-50" : "border-neutral-200 hover:shadow-md",
                 isDisabled && "opacity-50 cursor-not-allowed"
               )}
             >
               {/* Selected checkmark badge */}
               {isSelected && (
-                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
+                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-green-600 flex items-center justify-center z-10">
                   <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
               )}
               
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl" style={{background: bd.swatch}}/>
-                <div>
-                  <div className="font-medium">{bd.name}</div>
-                  <div className="text-xs text-neutral-500">
-                    {isSelected 
-                      ? "✓ Selected • Tap to remove" 
-                      : isDisabled 
-                        ? `Max ${limit} backdrops` 
-                        : "Tap to add"
-                    }
-                  </div>
+              {/* Backdrop sample photo */}
+              <div className="relative h-24 bg-neutral-100 overflow-hidden">
+                <img 
+                  src={photoPath} 
+                  alt={bd.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to color swatch if image not found
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                {/* Color swatch overlay/fallback */}
+                <div className="absolute inset-0" style={{background: `linear-gradient(135deg, ${bd.swatch} 0%, ${bd.swatch}dd 100%)`}} />
+              </div>
+              
+              <div className="p-3">
+                <div className="font-medium">{bd.name}</div>
+                <div className="text-xs text-neutral-500">
+                  {isSelected 
+                    ? "✓ Selected • Tap to remove" 
+                    : isDisabled 
+                      ? `Max ${limit} backdrops` 
+                      : "Tap to add"
+                  }
                 </div>
               </div>
             </button>
