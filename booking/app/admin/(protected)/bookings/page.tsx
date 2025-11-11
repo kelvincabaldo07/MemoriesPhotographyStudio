@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatTimeTo12Hour, formatManilaDate } from "@/lib/time-utils";
 import { BookingCalendar } from "@/components/Calendar";
+import { BookingCalendarView } from "@/components/BookingCalendarView";
 import { 
   Search, 
   Filter, 
@@ -24,7 +25,9 @@ import {
   Users,
   Package,
   Layers,
-  Tag
+  Tag,
+  List,
+  CalendarDays
 } from "lucide-react";
 
 interface Booking {
@@ -63,6 +66,7 @@ interface Booking {
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [timeRangeFilter, setTimeRangeFilter] = useState<string>("all");
@@ -371,10 +375,34 @@ export default function BookingsPage() {
             Manage all studio bookings and reservations
           </p>
         </div>
-        <Button className="bg-[#0b3d2e] hover:bg-[#0a3426] text-xs md:text-sm">
-          <Download className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline">Export CSV</span>
-        </Button>
+        <div className="flex gap-2">
+          <div className="flex border rounded-lg overflow-hidden">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-2 text-sm font-medium transition ${
+                viewMode === 'list' 
+                  ? 'bg-[#0b3d2e] text-white' 
+                  : 'bg-white text-neutral-600 hover:bg-neutral-50'
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`px-3 py-2 text-sm font-medium transition ${
+                viewMode === 'calendar' 
+                  ? 'bg-[#0b3d2e] text-white' 
+                  : 'bg-white text-neutral-600 hover:bg-neutral-50'
+              }`}
+            >
+              <CalendarDays className="w-4 h-4" />
+            </button>
+          </div>
+          <Button className="bg-[#0b3d2e] hover:bg-[#0a3426] text-xs md:text-sm">
+            <Download className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Export CSV</span>
+          </Button>
+        </div>
       </div>
 
       {/* Time Range Filter */}
@@ -562,6 +590,15 @@ export default function BookingsPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0b3d2e] mx-auto"></div>
             <p className="mt-4">Loading bookings...</p>
           </Card>
+        ) : viewMode === 'calendar' ? (
+          <BookingCalendarView 
+            bookings={filteredBookings}
+            onBookingClick={(booking) => {
+              setSelectedBooking(booking);
+              setEditedBooking(booking);
+              setIsEditing(false);
+            }}
+          />
         ) : filteredBookings.length === 0 ? (
           <Card className="p-8 text-center text-neutral-600">
             <Calendar className="w-12 h-12 mx-auto text-neutral-400 mb-4" />
