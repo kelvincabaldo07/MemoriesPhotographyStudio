@@ -50,6 +50,18 @@ function getOAuth2Client() {
  * Returns the event ID if successful, null if failed
  */
 export async function createCalendarEvent(eventData: CalendarEventData): Promise<string | null> {
+  // DIAGNOSTIC LOGGING - Track all calendar event creation attempts
+  const callStack = new Error().stack;
+  const caller = callStack?.split('\n')[2]?.trim() || 'unknown';
+  
+  console.log('='.repeat(80));
+  console.log(`[Calendar Event] CREATE ATTEMPT at ${new Date().toISOString()}`);
+  console.log(`[Calendar Event] Booking ID: ${eventData.bookingId}`);
+  console.log(`[Calendar Event] Customer: ${eventData.customer.firstName} ${eventData.customer.lastName}`);
+  console.log(`[Calendar Event] Date/Time: ${eventData.date} ${eventData.time}`);
+  console.log(`[Calendar Event] Called from: ${caller}`);
+  console.log('='.repeat(80));
+  
   try {
     const oauth2Client = getOAuth2Client();
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
@@ -67,6 +79,31 @@ export async function createCalendarEvent(eventData: CalendarEventData): Promise
     // Create ISO datetime strings with Manila timezone
     const startDateTime = `${date}T${time}:00+08:00`;
     const endDateTime = `${date}T${endTime}:00+08:00`;
+
+    // Check if event already exists for this booking ID to prevent duplicates
+    try {
+      const existingEvents = await calendar.events.list({
+        calendarId: CALENDAR_ID,
+        timeMin: new Date(`${date}T00:00:00+08:00`).toISOString(),
+        timeMax: new Date(`${date}T23:59:59+08:00`).toISOString(),
+        q: bookingId, // Search for booking ID in event
+      });
+
+      if (existingEvents.data.items && existingEvents.data.items.length > 0) {
+        const existing = existingEvents.data.items.find(e => 
+          e.description?.includes(`Booking ID: ${bookingId}`)
+        );
+        
+        if (existing) {
+          console.log(`⚠️  Calendar event already exists for booking ${bookingId}: ${existing.id}`);
+          console.log(`⚠️  Skipping duplicate creation`);
+          return existing.id || null;
+        }
+      }
+    } catch (searchError) {
+      console.warn('Warning: Could not search for existing events:', searchError);
+      // Continue with creation anyway
+    }
 
     // Build event description
     let eventDescription = `Booking ID: ${bookingId}\n\n`;
