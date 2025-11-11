@@ -2461,11 +2461,11 @@ function StepVideoAndTerms({
         </label>
       </div>
 
-      {/* Term 2: Studio Location & Arrival Time */}
+      {/* Term 2: Studio Location */}
       <div className="border rounded-2xl p-4 bg-white">
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck className="w-5 h-5 text-green-600"/>
-          <span className="font-semibold text-base">Studio Location & Arrival Guidelines</span>
+          <span className="font-semibold text-base">Studio Location</span>
         </div>
         <div className="space-y-2 text-sm text-neutral-700 mb-4">
           <p className="font-medium">English:</p>
@@ -2481,15 +2481,6 @@ function StepVideoAndTerms({
             <li>Please be courteous to the residents in front of the property</li>
             <li>Avoid being noisy, nosy, or disruptive while waiting or shooting</li>
           </ul>
-          <p className="mt-2"><strong>Arrival Time:</strong></p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Arrive <strong>at least 5 minutes before</strong> your scheduled time</li>
-            <li>Late arrivals will have the lost time deducted from their session</li>
-            <li>We provide 5 minutes of extra time for outfit or backdrop changes</li>
-            <li>Our timer starts at your session time plus 5 minutes (for setup and backdrop transitions)</li>
-            <li>Timers are set per backdrop</li>
-            <li>Timer stoppage or pauses are solely under the studio's discretion</li>
-          </ul>
           <p className="font-medium mt-3">Filipino:</p>
           <p><strong>Address ng Studio:</strong> Matatagpuan sa loob ng <strong>Green Valley Field Subdivision</strong>, sa pagitan ng Lintiw Road at Indang Central Elementary School. Direksyon:</p>
           <ul className="list-disc pl-5 space-y-1">
@@ -2503,15 +2494,6 @@ function StepVideoAndTerms({
             <li>Pakiusap na maging magalang sa mga nakatira sa harap ng property</li>
             <li>Iwasan ang pagmamaingay, pagkausisa, o pag-abala habang naghihintay o nag-shoot</li>
           </ul>
-          <p className="mt-2"><strong>Oras ng Pagdating:</strong></p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Dumating nang <strong>hindi bababa sa 5 minuto bago</strong> ang inyong schedule</li>
-            <li>Ang mga late arrival ay babawasan ng oras na nawala sa kanilang session</li>
-            <li>Nagbibigay kami ng 5 minuto extra para sa outfit o backdrop changes</li>
-            <li>Ang aming timer ay nagsisimula sa inyong session time plus 5 minuto (para sa setup at backdrop transitions)</li>
-            <li>Ang timers ay naka-set bawat backdrop</li>
-            <li>Ang pagtigil o pag-pause ng timer ay nasa discretion lamang ng studio</li>
-          </ul>
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox 
@@ -2520,10 +2502,10 @@ function StepVideoAndTerms({
             className="mt-1"
           />
           <span className="flex-1">
-            <strong>I agree</strong> and confirm that I know the studio location, will be respectful to neighbors, and will arrive on time.
+            <strong>I agree</strong> and confirm that I know the studio location and will be respectful to neighbors.
             <br/>
             <span className="text-neutral-600">
-              <strong>Sumasang-ayon ako</strong> at kinukumpirma na alam ko ang lokasyon ng studio, igagalang ko ang kapitbahayan, at darating ako sa tamang oras.
+              <strong>Sumasang-ayon ako</strong> at kinukumpirma na alam ko ang lokasyon ng studio at igagalang ko ang kapitbahayan.
             </span>
           </span>
         </label>
@@ -2571,12 +2553,21 @@ function StepVideoAndTerms({
       <div className="border rounded-2xl p-4 bg-white">
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck className="w-5 h-5 text-red-600"/>
-          <span className="font-semibold text-base">Booking Policy & Tardy Penalties</span>
+          <span className="font-semibold text-base">Booking Policy</span>
         </div>
         <div className="space-y-3 text-sm text-neutral-700 mb-4">
           <div>
             <p className="font-medium">English:</p>
-            <p><strong>Tardy Penalties:</strong></p>
+            <p><strong>Arrival Guidelines:</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Arrive <strong>at least 5 minutes before</strong> your scheduled time</li>
+              <li>Late arrivals will have the lost time deducted from their session</li>
+              <li>We provide 5 minutes of extra time for outfit or backdrop changes</li>
+              <li>Our timer starts at your session time plus 5 minutes (for setup and backdrop transitions)</li>
+              <li>Timers are set per backdrop</li>
+              <li>Timer stoppage or pauses are solely under the studio's discretion</li>
+            </ul>
+            <p className="mt-2"><strong>Tardy Penalties:</strong></p>
           </div>
           
           <div className="pl-4 space-y-2">
@@ -2612,7 +2603,16 @@ function StepVideoAndTerms({
           
           <div className="mt-3">
             <p className="font-medium">Filipino:</p>
-            <p><strong>Mga Parusa sa Pagka-late:</strong></p>
+            <p><strong>Mga Alituntunin sa Pagdating:</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Dumating nang <strong>hindi bababa sa 5 minuto bago</strong> ang inyong schedule</li>
+              <li>Ang mga late arrival ay babawasan ng oras na nawala sa kanilang session</li>
+              <li>Nagbibigay kami ng 5 minuto extra para sa outfit o backdrop changes</li>
+              <li>Ang aming timer ay nagsisimula sa inyong session time plus 5 minuto (para sa setup at backdrop transitions)</li>
+              <li>Ang timers ay naka-set bawat backdrop</li>
+              <li>Ang pagtigil o pag-pause ng timer ay nasa discretion lamang ng studio</li>
+            </ul>
+            <p className="mt-2"><strong>Mga Parusa sa Pagka-late:</strong></p>
           </div>
           
           <div className="pl-4 space-y-2">
@@ -2653,10 +2653,10 @@ function StepVideoAndTerms({
             className="mt-1"
           />
           <span className="flex-1">
-            <strong>I agree</strong> to the booking policy, tardy penalties, and understand the reschedule/cancellation terms.
+            <strong>I agree</strong> to arrive on time, accept the tardy penalties, and understand the reschedule/cancellation terms.
             <br/>
             <span className="text-neutral-600">
-              <strong>Sumasang-ayon ako</strong> sa booking policy, mga parusa sa pagka-late, at nauunawaan ko ang mga patakaran sa pag-reschedule/cancellation.
+              <strong>Sumasang-ayon ako</strong> na darating sa tamang oras, tatanggapin ang mga parusa sa pagka-late, at nauunawaan ko ang mga patakaran sa pag-reschedule/cancellation.
             </span>
           </span>
         </label>

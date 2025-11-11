@@ -206,7 +206,7 @@ IMPORTANT REMINDERS
 • Please ensure you have an Adobe Lightroom account (free)
 • Download the Lightroom Mobile App if accessing via mobile/tablet
 
-📍 LOCATION & PARKING:
+📍 STUDIO LOCATION:
 Studio Address:
 • Located inside Green Valley Field Subdivision, between Lintiw Road and Indang Central Elementary School
 • Enter the subdivision, go straight to the dead end, then turn right
@@ -218,11 +218,11 @@ Respect the Neighborhood:
 • Please be courteous to the residents in front of the property
 • Avoid being noisy, nosy, or disruptive while waiting or shooting
 
-Parking:
+🚗 PARKING GUIDELINES:
 • Park under the rambutan tree (designated parking area), OR on the vacant corner lot to the left
 • DO NOT block the gate or driveway at any time
 
-📅 ARRIVAL & BOOKING POLICY:
+📅 BOOKING POLICY:
 Arrival Guidelines:
 • Arrive at least 5 minutes before your scheduled time
 • Late arrivals will have the lost time deducted from their session
@@ -406,7 +406,7 @@ Phone: 0906 469 4122
                         </div>
                         
                         <div style="margin-bottom: 15px;">
-                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📍 Location & Parking:</p>
+                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📍 Studio Location:</p>
                           <p style="margin: 0 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Studio Address:</strong></p>
                           <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
                             <li>Located inside <strong>Green Valley Field Subdivision</strong>, between Lintiw Road and Indang Central Elementary School</li>
@@ -420,7 +420,10 @@ Phone: 0906 469 4122
                             <li>Be courteous to the residents in front of the property</li>
                             <li>Avoid being noisy, nosy, or disruptive</li>
                           </ul>
-                          <p style="margin: 8px 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Parking:</strong></p>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">🚗 Parking Guidelines:</p>
                           <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
                             <li>Park <strong>under the rambutan tree</strong> OR <strong>on the vacant corner lot to the left</strong></li>
                             <li><strong>DO NOT block the gate or driveway at any time</strong></li>
@@ -428,13 +431,15 @@ Phone: 0906 469 4122
                         </div>
                         
                         <div>
-                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">� Arrival & Booking Policy:</p>
+                          <p style="margin: 0 0 8px 0; color: #856404; font-size: 14px; font-weight: bold;">📅 Booking Policy:</p>
                           <p style="margin: 0 0 4px 0; padding-left: 20px; color: #856404; font-size: 13px;"><strong>Arrival Guidelines:</strong></p>
                           <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 12px; line-height: 1.5;">
                             <li>Arrive <strong>at least 5 minutes before</strong> your scheduled time</li>
                             <li>Late arrivals will have the lost time deducted from their session</li>
                             <li>We provide 5 minutes extra time for outfit/backdrop changes</li>
                             <li>Timer starts at your session time + 5 minutes</li>
+                            <li>Timers are set per backdrop</li>
+                            <li>Timer stoppage/pauses are at studio's discretion</li>
                           </ul>
                           <p style="margin: 8px 0 4px 0; padding-left: 20px; color: #dc3545; font-size: 13px;"><strong>Tardy Penalties:</strong></p>
                           <ul style="margin: 0; padding-left: 40px; color: #856404; font-size: 11px; line-height: 1.4;">
