@@ -275,8 +275,21 @@ export async function deleteCalendarEvent(eventId: string): Promise<boolean> {
 
     console.log('✅ Calendar event deleted:', eventId);
     return true;
-  } catch (error) {
+  } catch (error: any) {
+    // Handle case where event is already deleted (410 Gone)
+    if (error.code === 410 || error.status === 410) {
+      console.log('ℹ️  Calendar event already deleted:', eventId);
+      return true; // Consider it a success since the end result is the same
+    }
+    
+    // Handle case where event doesn't exist (404 Not Found)
+    if (error.code === 404 || error.status === 404) {
+      console.log('ℹ️  Calendar event not found (may have been deleted):', eventId);
+      return true; // Consider it a success since the event is gone
+    }
+    
     console.error('❌ Google Calendar event deletion error:', error);
+    console.error('Error code:', error.code, 'Status:', error.status);
     return false;
   }
 }
