@@ -145,6 +145,57 @@ export async function sendOTPEmail(email: string, otpCode: string): Promise<bool
 }
 
 /**
+ * Get BCC email addresses from settings
+ */
+async function getBccEmails(): Promise<string[]> {
+  try {
+    // Try to fetch from Notion settings
+    const notionApiKey = process.env.NOTION_API_KEY;
+    const settingsDbId = process.env.NOTION_SETTINGS_DATABASE_ID;
+    
+    if (!notionApiKey || !settingsDbId) {
+      // Default to studio email
+      return ['smile@memories-studio.com'];
+    }
+
+    const response = await fetch(`https://api.notion.com/v1/databases/${settingsDbId}/query`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${notionApiKey}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28',
+      },
+      body: JSON.stringify({
+        filter: {
+          property: 'Setting Name',
+          rich_text: {
+            equals: 'BCC Email Addresses'
+          }
+        }
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        const setting = data.results[0];
+        const emailsText = setting.properties?.['Value']?.rich_text?.[0]?.plain_text || '';
+        if (emailsText) {
+          // Split by comma and clean up
+          return emailsText.split(',').map((email: string) => email.trim()).filter(Boolean);
+        }
+      }
+    }
+    
+    // Default to studio email
+    return ['smile@memories-studio.com'];
+  } catch (error) {
+    console.warn('⚠️ Could not fetch BCC settings, using default:', error);
+    return ['smile@memories-studio.com'];
+  }
+}
+
+/**
  * Send booking confirmation email
  */
 export async function sendBookingConfirmationEmail(bookingData: BookingData): Promise<boolean> {
@@ -163,8 +214,13 @@ export async function sendBookingConfirmationEmail(bookingData: BookingData): Pr
           .join(', ')
       : 'None';
 
+    // Get BCC addresses
+    const bccEmails = await getBccEmails();
+    console.log('📧 Sending confirmation to:', customer.email, '| BCC:', bccEmails.join(', '));
+
     const msg = {
       to: customer.email,
+      bcc: bccEmails,
       from: {
         email: FROM_EMAIL,
         name: FROM_NAME,

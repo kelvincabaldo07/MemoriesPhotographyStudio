@@ -42,9 +42,8 @@ export default function SettingsPage() {
 
   const [settingsDbConfigured, setSettingsDbConfigured] = useState(true);
 
-  const [authorizedEmails, setAuthorizedEmails] = useState([
+  const [bccEmails, setBccEmails] = useState([
     "smile@memories-studio.com",
-    "kelvin.cabaldo@gmail.com",
   ]);
   const [newEmail, setNewEmail] = useState("");
 
@@ -62,16 +61,48 @@ export default function SettingsPage() {
   });
 
   const addEmail = () => {
-    if (newEmail && !authorizedEmails.includes(newEmail)) {
-      setAuthorizedEmails([...authorizedEmails, newEmail]);
+    if (newEmail && !bccEmails.includes(newEmail)) {
+      const updatedEmails = [...bccEmails, newEmail];
+      setBccEmails(updatedEmails);
       setNewEmail("");
       setHasChanges(true);
+      saveBccEmails(updatedEmails);
     }
   };
 
   const removeEmail = (email: string) => {
-    setAuthorizedEmails(authorizedEmails.filter((e) => e !== email));
+    // Don't allow removing the default email
+    if (email === "smile@memories-studio.com") {
+      alert("❌ Cannot remove the default studio email address");
+      return;
+    }
+    const updatedEmails = bccEmails.filter((e) => e !== email);
+    setBccEmails(updatedEmails);
     setHasChanges(true);
+    saveBccEmails(updatedEmails);
+  };
+
+  const saveBccEmails = async (emails: string[]) => {
+    try {
+      const response = await fetch('/api/admin/settings/bcc-emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ emails }),
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        console.log('✅ BCC emails saved successfully');
+      } else if (data.needsSetup) {
+        console.warn('⚠️ BCC emails saved (memory only) - Settings DB not configured');
+      } else {
+        console.error('Failed to save BCC emails:', data.error);
+      }
+    } catch (error) {
+      console.error("Error saving BCC emails:", error);
+    }
   };
 
   const saveSettings = async () => {
@@ -124,13 +155,13 @@ export default function SettingsPage() {
     }
   };
 
-  // Load booking settings on mount
+  // Load booking settings and BCC emails on mount
   useEffect(() => {
     const loadSettings = async () => {
       try {
         console.log('[Settings] Loading booking settings...');
         const response = await fetch('/api/admin/booking-settings', {
-          credentials: 'same-origin', // Changed from 'include' to 'same-origin' for same-domain requests
+          credentials: 'same-origin',
         });
         const data = await response.json();
         console.log('[Settings] Load response:', { status: response.status, data });
@@ -149,7 +180,27 @@ export default function SettingsPage() {
       }
     };
 
+    const loadBccEmails = async () => {
+      try {
+        console.log('[Settings] Loading BCC email addresses...');
+        const response = await fetch('/api/admin/settings/bcc-emails', {
+          credentials: 'same-origin',
+        });
+        const data = await response.json();
+        
+        if (response.ok && data.success && data.emails) {
+          setBccEmails(data.emails);
+          console.log('[Settings] BCC emails loaded:', data.emails);
+        } else {
+          console.error('[Settings] Failed to load BCC emails:', data);
+        }
+      } catch (error) {
+        console.error("Error loading BCC emails:", error);
+      }
+    };
+
     loadSettings();
+    loadBccEmails();
   }, []);
 
   return (
@@ -317,6 +368,73 @@ export default function SettingsPage() {
             </Button>
           </div>
         </div>
+      </Card>
+
+      {/* BCC Email Addresses */}
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Mail className="w-5 h-5 text-[#0b3d2e]" />
+          <h2 className="text-xl font-bold text-[#0b3d2e]">BCC Email Addresses</h2>
+          <Badge variant="outline" className="bg-blue-100 text-blue-700 border-blue-200">
+            Booking Confirmations
+          </Badge>
+        </div>
+
+        <p className="text-sm text-neutral-600 mb-4">
+          Add email addresses to receive a BCC copy of all booking confirmation emails sent to customers.
+          Perfect for tracking bookings and keeping your team informed.
+        </p>
+
+        <div className="flex gap-2 mb-4">
+          <Input
+            type="email"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            placeholder="email@example.com"
+            className="flex-1"
+          />
+          <Button
+            onClick={addEmail}
+            className="bg-[#0b3d2e] hover:bg-[#0a3426]"
+            disabled={!newEmail}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Add Email
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          {bccEmails.map((email) => (
+            <div
+              key={email}
+              className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
+            >
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-neutral-500" />
+                <span className="font-medium text-neutral-900">{email}</span>
+                {email === "smile@memories-studio.com" && (
+                  <Badge variant="outline" className="bg-green-100 text-green-700 border-green-200 text-xs">
+                    Default
+                  </Badge>
+                )}
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeEmail(email)}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                disabled={email === "smile@memories-studio.com"}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-neutral-600 mt-4">
+          💡 <strong>Note:</strong> These emails will receive blind carbon copies (BCC) of booking confirmations.
+          Customers won't see these addresses in their email.
+        </p>
       </Card>
 
       {/* Email Notifications */}
@@ -563,57 +681,6 @@ export default function SettingsPage() {
             Existing bookings will not be affected.
           </p>
         </div>
-      </Card>
-
-      {/* Authorized Users */}
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Users className="w-5 h-5 text-[#0b3d2e]" />
-          <h2 className="text-xl font-bold text-[#0b3d2e]">Authorized Admin Users</h2>
-        </div>
-
-        <div className="flex gap-2 mb-4">
-          <Input
-            type="email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            placeholder="email@example.com"
-            className="flex-1"
-          />
-          <Button
-            onClick={addEmail}
-            className="bg-[#0b3d2e] hover:bg-[#0a3426]"
-            disabled={!newEmail}
-          >
-            Add Email
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          {authorizedEmails.map((email) => (
-            <div
-              key={email}
-              className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg"
-            >
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-neutral-500" />
-                <span className="font-medium text-neutral-900">{email}</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => removeEmail(email)}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-xs text-neutral-600 mt-4">
-          Only these email addresses can access the admin dashboard
-        </p>
       </Card>
 
       {/* System Info */}

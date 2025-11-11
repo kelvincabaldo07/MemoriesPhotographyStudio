@@ -2,6 +2,19 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+// Helper function to check if status counts as confirmed (for revenue)
+function isConfirmedStatus(status: string): boolean {
+  const confirmedStatuses = [
+    "Booking Confirmed",
+    "Attendance Confirmed", 
+    "Session Completed",
+    "RAW Photos Sent",
+    "Final Deliverables Sent",
+    "Access Granted - Completed"
+  ];
+  return confirmedStatuses.includes(status);
+}
+
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   
@@ -87,13 +100,13 @@ export async function GET(request: Request) {
       // Current period stats
       if (bookingDate >= startDate) {
         currentPeriodBookings++;
-        if (status === "Confirmed" || status === "Completed") {
+        if (isConfirmedStatus(status)) {
           currentPeriodRevenue += grandTotal;
         }
         if (email) uniqueCustomers.add(email);
 
         // Track service popularity
-        if (serviceName && (status === "Confirmed" || status === "Completed")) {
+        if (serviceName && isConfirmedStatus(status)) {
           if (!serviceMap.has(serviceName)) {
             serviceMap.set(serviceName, { name: serviceName, bookings: 0, revenue: 0 });
           }
@@ -132,7 +145,7 @@ export async function GET(request: Request) {
       // Previous period stats
       if (bookingDate >= previousStartDate && bookingDate < startDate) {
         previousPeriodBookings++;
-        if (status === "Confirmed" || status === "Completed") {
+        if (isConfirmedStatus(status)) {
           previousPeriodRevenue += grandTotal;
         }
         if (email) previousCustomers.add(email);
@@ -141,7 +154,7 @@ export async function GET(request: Request) {
       // Monthly revenue (last 12 months for chart)
       if (bookingDate >= new Date(now.getFullYear(), now.getMonth() - 11, 1)) {
         const monthKey = bookingDate.toLocaleDateString("en-US", { month: "short", year: "numeric" });
-        if ((status === "Confirmed" || status === "Completed")) {
+        if (isConfirmedStatus(status)) {
           monthlyRevenue.set(monthKey, (monthlyRevenue.get(monthKey) || 0) + grandTotal);
         }
       }

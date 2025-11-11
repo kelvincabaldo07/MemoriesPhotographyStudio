@@ -267,12 +267,25 @@ export default function BookingsPage() {
 
   const timeRangeFilteredBookings = getFilteredByTimeRange();
 
+  // Helper to check if status counts for revenue
+  const isConfirmedStatus = (status: string) => {
+    const confirmedStatuses = [
+      "Booking Confirmed",
+      "Attendance Confirmed", 
+      "Session Completed",
+      "RAW Photos Sent",
+      "Final Deliverables Sent",
+      "Access Granted - Completed"
+    ];
+    return confirmedStatuses.includes(status);
+  };
+
   const stats = {
     total: timeRangeFilteredBookings.length,
-    confirmed: timeRangeFilteredBookings.filter((b) => b.status === "Confirmed").length,
+    confirmed: timeRangeFilteredBookings.filter((b) => b.status === "Booking Confirmed").length,
     pending: timeRangeFilteredBookings.filter((b) => b.status === "Pending").length,
     revenue: timeRangeFilteredBookings
-      .filter((b) => b.status === "Confirmed" || b.status === "Completed")
+      .filter((b) => isConfirmedStatus(b.status))
       .reduce((sum, b) => sum + b.grandTotal, 0),
   };
 
@@ -393,7 +406,7 @@ export default function BookingsPage() {
           <div>
             <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status</label>
             <div className="flex gap-2 overflow-x-auto pb-2">
-              {["All", "Pending", "Confirmed", "Completed", "Cancelled"].map((status) => (
+              {["All", "Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
                 <Button
                   key={status}
                   variant={statusFilter === status ? "default" : "outline"}
@@ -602,7 +615,7 @@ export default function BookingsPage() {
                   Booking Details
                 </h2>
                 <div className="flex items-center gap-2">
-                  {!isEditing && selectedBooking.status !== "Completed" && selectedBooking.status !== "Cancelled" && (
+                  {!isEditing && selectedBooking.status !== "Access Granted - Completed" && selectedBooking.status !== "Cancelled" && selectedBooking.status !== "No Show" && (
                     <Button
                       size="sm"
                       variant="outline"

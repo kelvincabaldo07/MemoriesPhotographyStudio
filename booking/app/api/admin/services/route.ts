@@ -65,7 +65,8 @@ export async function GET(request: Request) {
 
         const service = serviceMap.get(key);
         service.count += 1;
-        if (status === "Confirmed" || status === "Completed") {
+        const confirmedStatuses = ["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed"];
+        if (confirmedStatuses.includes(status)) {
           service.totalRevenue += grandTotal;
         }
         service.prices.push(grandTotal);

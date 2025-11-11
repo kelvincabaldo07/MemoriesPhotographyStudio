@@ -72,7 +72,8 @@ export async function GET(request: Request) {
           price: grandTotal,
         });
         customer.totalBookings += 1;
-        if (status === "Confirmed" || status === "Completed") {
+        const confirmedStatuses = ["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed"];
+        if (confirmedStatuses.includes(status)) {
           customer.totalRevenue += grandTotal;
         }
         if (new Date(date) > new Date(customer.lastBooking)) {

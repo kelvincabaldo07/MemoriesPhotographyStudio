@@ -216,7 +216,7 @@ async function handleBookingCreated(pageId: string, props: any) {
   }
 
   // Only create calendar event if booking is confirmed and has required data
-  if (status === 'Confirmed' && email && date && time) {
+  if (status === 'Booking Confirmed' && email && date && time) {
     console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
     console.log(`[Notion Webhook] Details: ${firstName} ${lastName}, ${email}, ${date} ${time}, ${service} (${duration}min)`);
     
@@ -263,8 +263,8 @@ async function handleBookingUpdated(pageId: string, props: any) {
   }
 
   // If status changed to confirmed and no calendar event exists, create one
-  if (status === 'Confirmed' && !calendarEventId) {
-    console.log(`[Notion Webhook] Status changed to Confirmed - creating calendar event`);
+  if (status === 'Booking Confirmed' && !calendarEventId) {
+    console.log(`[Notion Webhook] Status changed to Booking Confirmed - creating calendar event`);
     await handleBookingCreated(pageId, props);
     return;
   }
