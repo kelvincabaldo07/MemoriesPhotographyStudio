@@ -185,6 +185,64 @@ export async function PATCH(
       };
     }
 
+    // Handle add-ons array
+    if (body.addons !== undefined) {
+      // Add-ons is an array of addon IDs, can have duplicates for quantity
+      notionProperties["Add-ons"] = {
+        multi_select: body.addons.map((id: string) => ({ name: id }))
+      };
+      
+      // Calculate add-ons total
+      const addonPrices: Record<string, number> = {
+        "4r": 30,
+        "photostrip": 30,
+        "wallet": 30,
+        "premium4r": 50,
+      };
+      const addonsTotal = body.addons.reduce((sum: number, id: string) => sum + (addonPrices[id] || 0), 0);
+      notionProperties["Add-ons Total"] = {
+        number: addonsTotal
+      };
+      
+      // Update grand total if session price is known
+      const sessionPrice = body.sessionPrice || oldProps["Session Price"]?.number || 0;
+      notionProperties["Grand Total"] = {
+        number: sessionPrice + addonsTotal
+      };
+    }
+
+    // Handle backdrops array
+    if (body.backdrops !== undefined) {
+      notionProperties.Backdrops = {
+        multi_select: body.backdrops.map((backdrop: string) => ({ name: backdrop }))
+      };
+      
+      // Also update backdrop order/allocations if provided
+      if (body.backdropOrder) {
+        notionProperties["Backdrop Order"] = {
+          rich_text: [{ text: { content: body.backdropOrder } }]
+        };
+      }
+      if (body.backdropAllocations) {
+        notionProperties["Backdrop Allocations"] = {
+          rich_text: [{ text: { content: body.backdropAllocations } }]
+        };
+      }
+    }
+
+    // Handle session price updates (for recalculating totals)
+    if (body.sessionPrice !== undefined) {
+      notionProperties["Session Price"] = {
+        number: body.sessionPrice
+      };
+      
+      // Recalculate grand total
+      const addonsTotal = body.addonsTotal || oldProps["Add-ons Total"]?.number || 0;
+      notionProperties["Grand Total"] = {
+        number: body.sessionPrice + addonsTotal
+      };
+    }
+
     // Update Notion page
     const updateResponse = await fetch(
       `https://api.notion.com/v1/pages/${notionPageId}`,

@@ -225,6 +225,11 @@ export default function BookingsPage() {
           serviceCategory: editedBooking.serviceCategory,
           serviceGroup: editedBooking.serviceGroup,
           duration: editedBooking.duration,
+          addons: editedBooking.addons || [],
+          backdrops: editedBooking.backdrops || [],
+          backdropOrder: editedBooking.backdropOrder,
+          backdropAllocations: editedBooking.backdropAllocations,
+          sessionPrice: editedBooking.sessionPrice,
         }),
       });
 
