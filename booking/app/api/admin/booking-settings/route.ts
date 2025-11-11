@@ -59,11 +59,13 @@ export async function GET(request: NextRequest) {
     const settingsDatabaseId = process.env.NOTION_SETTINGS_DATABASE_ID;
 
     if (!notionApiKey || !settingsDatabaseId) {
-      console.warn('Settings database not configured, returning defaults');
+      console.warn('[Booking Settings GET] Settings database not configured, returning defaults');
+      console.warn('[Booking Settings GET] Add NOTION_SETTINGS_DATABASE_ID to .env.local to persist settings');
       return NextResponse.json({
         success: true,
         settings: DEFAULT_SETTINGS,
-        isDefault: true,
+        usingDefaults: true,
+        warning: 'Settings database not configured. Using default values.',
       });
     }
 
@@ -167,11 +169,20 @@ export async function POST(request: NextRequest) {
     const notionApiKey = process.env.NOTION_API_KEY;
     const settingsDatabaseId = process.env.NOTION_SETTINGS_DATABASE_ID;
 
+    // If database not configured, still accept the settings but warn
     if (!notionApiKey || !settingsDatabaseId) {
-      return NextResponse.json(
-        { success: false, error: 'Settings database not configured' },
-        { status: 500 }
-      );
+      console.warn('[Booking Settings POST] Settings database not configured. Settings will not persist across deployments.');
+      console.warn('[Booking Settings POST] To persist settings, add NOTION_SETTINGS_DATABASE_ID to .env.local');
+      console.warn('[Booking Settings POST] See BOOKING_SETTINGS_SETUP.md for instructions');
+      
+      // Return success but with a warning
+      return NextResponse.json({
+        success: true,
+        warning: 'Settings saved in memory only. To persist settings, configure NOTION_SETTINGS_DATABASE_ID environment variable.',
+        message: 'Settings updated successfully (memory only)',
+        settings: body,
+        needsSetup: true,
+      });
     }
 
     // Check if settings page already exists

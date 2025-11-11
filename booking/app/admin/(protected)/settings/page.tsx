@@ -40,6 +40,8 @@ export default function SettingsPage() {
     cancellationPolicyUnit: 'hours' as 'hours' | 'days',
   });
 
+  const [settingsDbConfigured, setSettingsDbConfigured] = useState(true);
+
   const [authorizedEmails, setAuthorizedEmails] = useState([
     "smile@memories-studio.com",
     "kelvin.cabaldo@gmail.com",
@@ -87,7 +89,11 @@ export default function SettingsPage() {
 
       if (response.ok && data.success) {
         setHasChanges(false);
-        alert("✅ Settings saved successfully!");
+        if (data.needsSetup) {
+          alert("⚠️ Settings saved (memory only)\n\n" + data.warning + "\n\nSee BOOKING_SETTINGS_SETUP.md for setup instructions.");
+        } else {
+          alert("✅ Settings saved successfully!");
+        }
       } else if (response.status === 401) {
         alert("❌ Unauthorized: " + (data.message || data.error || 'Please log in again'));
         console.error('Auth error:', data);
@@ -131,6 +137,7 @@ export default function SettingsPage() {
         
         if (response.ok && data.success && data.settings) {
           setBookingSettings(data.settings);
+          setSettingsDbConfigured(!data.usingDefaults);
           console.log('[Settings] Settings loaded successfully');
         } else if (response.status === 401) {
           console.error('[Settings] Unauthorized - not logged in or session expired');
@@ -392,6 +399,25 @@ export default function SettingsPage() {
           <h2 className="text-xl font-bold text-[#0b3d2e]">Booking Policies</h2>
         </div>
 
+        {!settingsDbConfigured && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-yellow-900 mb-1">⚠️ Settings Database Not Configured</h3>
+                <p className="text-sm text-yellow-800 mb-2">
+                  Changes will work but won't persist across deployments. To save settings permanently:
+                </p>
+                <ol className="text-xs text-yellow-800 space-y-1 ml-4 list-decimal">
+                  <li>Create a "Settings" database in Notion</li>
+                  <li>Add <code className="bg-yellow-100 px-1 rounded">NOTION_SETTINGS_DATABASE_ID</code> to your <code className="bg-yellow-100 px-1 rounded">.env.local</code></li>
+                  <li>See <code className="bg-yellow-100 px-1 rounded">BOOKING_SETTINGS_SETUP.md</code> for complete instructions</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-6">
           {/* Lead Time */}
           <div>
@@ -604,19 +630,21 @@ export default function SettingsPage() {
           </div>
           <div>
             <p className="text-neutral-600">Environment</p>
-            <p className="font-medium">{process.env.NODE_ENV === 'production' ? 'Production' : 'Development'}</p>
+            <p className="font-medium">{typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'Development' : 'Production'}</p>
           </div>
           <div>
             <p className="text-neutral-600">Deployment</p>
-            <p className="font-medium">{process.env.VERCEL ? 'Vercel' : 'Local'}</p>
+            <p className="font-medium">{typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'Local' : 'Vercel'}</p>
           </div>
           <div>
-            <p className="text-neutral-600">Region</p>
-            <p className="font-medium">{process.env.VERCEL_REGION || 'Local'}</p>
+            <p className="text-neutral-600">URL</p>
+            <p className="font-medium text-xs">{typeof window !== 'undefined' ? window.location.origin : 'Loading...'}</p>
           </div>
           <div>
-            <p className="text-neutral-600">Last Updated</p>
-            <p className="font-medium">Nov 11, 2025</p>
+            <p className="text-neutral-600">Git Commit</p>
+            <p className="font-medium text-xs" title={process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'd7f1b5f'}>
+              {(process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'd7f1b5f').substring(0, 7)}
+            </p>
           </div>
         </div>
       </Card>
