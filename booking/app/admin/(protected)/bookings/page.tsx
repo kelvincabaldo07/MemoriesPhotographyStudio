@@ -594,8 +594,10 @@ export default function BookingsPage() {
           <BookingCalendarView 
             bookings={filteredBookings}
             onBookingClick={(booking) => {
-              setSelectedBooking(booking);
-              setEditedBooking(booking);
+              // Create a deep copy to avoid reference issues
+              const bookingCopy = JSON.parse(JSON.stringify(booking));
+              setSelectedBooking(bookingCopy);
+              setEditedBooking(bookingCopy);
               setIsEditing(false);
             }}
           />
