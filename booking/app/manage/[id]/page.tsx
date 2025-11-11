@@ -33,6 +33,8 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
   const [recaptchaReady, setRecaptchaReady] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [availability, setAvailability] = useState<{date: string, slots: string[]}>({date: "", slots: []});
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
   // Load reCAPTCHA on mount
   useEffect(() => {
@@ -62,6 +64,13 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
 
     return () => clearInterval(interval);
   }, [otpExpiry]);
+
+  // Check availability when editing starts
+  useEffect(() => {
+    if (editing && newDate && booking?.selections?.duration) {
+      checkAvailability(newDate, booking.selections.duration);
+    }
+  }, [editing]);
 
   async function sendOTP() {
     if (!verifyEmail) {
@@ -160,6 +169,27 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
       alert('Failed to verify code. Please try again.');
     } finally {
       setVerifyingOtp(false);
+    }
+  }
+
+  async function checkAvailability(date: string, duration: number) {
+    if (!date || !duration) return;
+    
+    setCheckingAvailability(true);
+    try {
+      const response = await fetch(`/api/calendar/availability?date=${date}&duration=${duration}`);
+      const data = await response.json();
+      
+      if (response.ok && data.available) {
+        setAvailability({ date, slots: data.slots || [] });
+      } else {
+        setAvailability({ date, slots: [] });
+      }
+    } catch (error) {
+      console.error("Error checking availability:", error);
+      setAvailability({ date, slots: [] });
+    } finally {
+      setCheckingAvailability(false);
     }
   }
 
@@ -483,8 +513,17 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
                   <Input 
                     type="date" 
                     value={newDate} 
-                    onChange={(e) => setNewDate(e.target.value)}
+                    onChange={(e) => {
+                      setNewDate(e.target.value);
+                      if (e.target.value && booking?.selections?.duration) {
+                        checkAvailability(e.target.value, booking.selections.duration);
+                      }
+                    }}
+                    min={new Date().toISOString().split('T')[0]}
                   />
+                  {checkingAvailability && (
+                    <p className="text-xs text-blue-600 mt-1">Checking availability...</p>
+                  )}
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">New Time</label>
@@ -496,10 +535,41 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
                 </div>
               </div>
 
+              {/* Available Time Slots */}
+              {availability.slots.length > 0 && newDate === availability.date && (
+                <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="font-semibold text-green-800 mb-2 text-sm">✓ Available Time Slots:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {availability.slots.map((slot) => (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => setNewTime(slot)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          newTime === slot 
+                            ? 'bg-green-600 text-white' 
+                            : 'bg-white text-green-700 hover:bg-green-100 border border-green-300'
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-green-700 mt-2">Click a time slot to select it</p>
+                </div>
+              )}
+
+              {!checkingAvailability && availability.date === newDate && availability.slots.length === 0 && newDate && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-800">⚠️ No available slots for this date. Please choose another date.</p>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <Button 
                   onClick={handleReschedule}
                   style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+                  disabled={!newDate || !newTime}
                 >
                   Confirm Reschedule
                 </Button>
