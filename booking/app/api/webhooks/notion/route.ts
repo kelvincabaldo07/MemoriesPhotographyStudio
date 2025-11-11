@@ -108,6 +108,19 @@ export async function POST(request: NextRequest) {
         break;
       
       case 'page.properties_updated':
+        // Check if only Calendar Event ID was updated - skip to prevent loop
+        const updatedProperties = payload.data?.updated_properties || [];
+        const onlyCalendarEventIdUpdated = updatedProperties.length === 1 && 
+                                            updatedProperties[0] === 'Calendar Event ID';
+        
+        if (onlyCalendarEventIdUpdated) {
+          console.log('[Notion Webhook] Skipping - only Calendar Event ID was updated (preventing loop)');
+          return NextResponse.json({ 
+            success: true, 
+            message: 'Skipped - Calendar Event ID update only' 
+          });
+        }
+        
         await handleBookingUpdated(pageId, props);
         break;
       
@@ -195,8 +208,14 @@ async function handleBookingCreated(pageId: string, props: any) {
   const calendarEventId = extractText(props['Calendar Event ID']);
   const status = extractSelect(props['Status']);
 
-  // Only create calendar event if booking is confirmed and doesn't have event yet
-  if (status === 'Confirmed' && !calendarEventId && email && date && time) {
+  // IMPORTANT: Skip if calendar event already exists (prevent duplicates)
+  if (calendarEventId) {
+    console.log(`[Notion Webhook] Skipping - booking already has calendar event ID: ${calendarEventId}`);
+    return;
+  }
+
+  // Only create calendar event if booking is confirmed and has required data
+  if (status === 'Confirmed' && email && date && time) {
     console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
     console.log(`[Notion Webhook] Details: ${firstName} ${lastName}, ${email}, ${date} ${time}, ${service} (${duration}min)`);
     
@@ -226,7 +245,7 @@ async function handleBookingCreated(pageId: string, props: any) {
       throw error;
     }
   } else {
-    console.log(`[Notion Webhook] Skipping calendar creation: status=${status}, hasEventId=${!!calendarEventId}, hasEmail=${!!email}, hasDate=${!!date}, hasTime=${!!time}`);
+    console.log(`[Notion Webhook] Skipping calendar creation: status=${status}, hasEmail=${!!email}, hasDate=${!!date}, hasTime=${!!time}`);
   }
 }
 
