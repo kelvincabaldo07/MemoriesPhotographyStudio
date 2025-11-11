@@ -45,7 +45,7 @@ function getShopHoursForDate(dateStr: string): ShopHours {
   return SHOP_HOURS_BY_DAY[dayOfWeek];
 }
 
-function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES) {
+function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES, slotSize: number = SLOT_MINUTES) {
   const hours: ShopHours = dateStr ? getShopHoursForDate(dateStr) : { ...SHOP_HOURS, lunchBreak: null };
   const start = hours.open * 60;
   const end = hours.close * 60;
@@ -55,7 +55,7 @@ function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DUR
   
   const slots: string[] = [];
   
-  for (let mins = start; mins <= latestStartTime; mins += SLOT_MINUTES) {
+  for (let mins = start; mins <= latestStartTime; mins += slotSize) {
     slots.push(toHHMM(mins));
   }
   
@@ -115,7 +115,7 @@ function calculateRealSlots(availableSlots: string[], duration: number): number 
 }
 
 // Filter out past time slots if date is today
-function filterPastSlots(slots: string[], dateStr: string): string[] {
+function filterPastSlots(slots: string[], dateStr: string, leadTimeMinutes: number = 120): string[] {
   const today = new Date().toLocaleDateString('en-US', { timeZone: STUDIO_TZ }).split('/');
   const todayStr = `${today[2]}-${today[0].padStart(2, '0')}-${today[1].padStart(2, '0')}`;
   
@@ -124,9 +124,8 @@ function filterPastSlots(slots: string[], dateStr: string): string[] {
   const now = new Date(new Date().toLocaleString('en-US', { timeZone: STUDIO_TZ }));
   const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
   
-  // Add minimum advance booking time (e.g., 2 hours)
-  const minAdvanceHours = 2;
-  const minBookingTime = currentTimeInMinutes + (minAdvanceHours * 60);
+  // Add minimum advance booking time from settings
+  const minBookingTime = currentTimeInMinutes + leadTimeMinutes;
   
   return slots.filter(slot => {
     const slotTimeInMinutes = toMinutes(slot);
@@ -135,6 +134,24 @@ function filterPastSlots(slots: string[], dateStr: string): string[] {
 }
 
 export async function GET(request: NextRequest) {
+  // Fetch booking policies from settings (declare outside try for catch access)
+  let bookingPolicies = {
+    leadTime: 2,
+    leadTimeUnit: 'hours' as 'hours' | 'minutes',
+    bookingSlotSize: 15,
+  };
+  
+  try {
+    const settingsUrl = new URL('/api/booking-settings', request.url);
+    const settingsRes = await fetch(settingsUrl.toString());
+    if (settingsRes.ok) {
+      const settings = await settingsRes.json();
+      bookingPolicies = settings;
+    }
+  } catch (err) {
+    console.warn('Failed to load booking settings, using defaults');
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
@@ -147,11 +164,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Convert lead time to minutes
+    const leadTimeMinutes = bookingPolicies.leadTimeUnit === 'hours' 
+      ? bookingPolicies.leadTime * 60 
+      : bookingPolicies.leadTime;
+
     // Check if refresh token exists
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.warn('Google Calendar not configured. Using mock data.');
-      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES);
-      const filteredSlots = filterPastSlots(allSlots, date);
+      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, bookingPolicies.bookingSlotSize);
+      const filteredSlots = filterPastSlots(allSlots, date, leadTimeMinutes);
       const realSlots = calculateRealSlots(filteredSlots, duration);
       
       return NextResponse.json({
@@ -235,11 +257,11 @@ export async function GET(request: NextRequest) {
       blockedRanges.push([clampedStart, clampedEnd]);
     });
 
-    const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES);
+    const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, bookingPolicies.bookingSlotSize);
     const availableSlots = allSlots.filter((slot) =>
       isSlotAvailable(slot, duration, blockedRanges)
     );
-    const filteredSlots = filterPastSlots(availableSlots, date);
+    const filteredSlots = filterPastSlots(availableSlots, date, leadTimeMinutes);
     
     const realSlots = calculateRealSlots(filteredSlots, duration);
 
@@ -259,8 +281,14 @@ export async function GET(request: NextRequest) {
     
     const dateParam = request.nextUrl.searchParams.get('date') || '';
     const durationParam = parseInt(request.nextUrl.searchParams.get('duration') || '45');
-    const allSlots = generateDailySlots(dateParam, durationParam, BUFFER_MINUTES);
-    const filteredSlots = filterPastSlots(allSlots, dateParam);
+    
+    // Use settings that were loaded earlier (or defaults if load failed)
+    const leadTimeMinutes = bookingPolicies.leadTimeUnit === 'hours' 
+      ? bookingPolicies.leadTime * 60 
+      : bookingPolicies.leadTime;
+    
+    const allSlots = generateDailySlots(dateParam, durationParam, BUFFER_MINUTES, bookingPolicies.bookingSlotSize);
+    const filteredSlots = filterPastSlots(allSlots, dateParam, leadTimeMinutes);
     const realSlots = calculateRealSlots(filteredSlots, durationParam);
     
     return NextResponse.json({

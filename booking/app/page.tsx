@@ -301,7 +301,7 @@ function getShopHoursForDate(dateStr: string): ShopHours {
 function toMinutes(hhmm: string) { const [h,m] = hhmm.split(":").map(Number); return h*60+m; }
 function toHHMM(mins: number) { const h = Math.floor(mins/60), m = mins%60; return `${pad(h)}:${pad(m)}`; }
 function range(start: number, end: number, step: number){ const out:number[]=[]; for(let x=start;x<=end;x+=step) out.push(x); return out; }
-function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES){ 
+function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DURATION, buffer: number = BUFFER_MINUTES, slotSize: number = SLOT_MINUTES){ 
   const hours: ShopHours = dateStr ? getShopHoursForDate(dateStr) : { ...SHOP_HOURS, lunchBreak: null };
   const start = hours.open * 60;
   const end = hours.close * 60;
@@ -310,7 +310,7 @@ function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DUR
   const latestStartTime = end - duration - buffer;
   
   // Generate all slots up to the latest valid start time
-  const allSlots = range(start, latestStartTime, SLOT_MINUTES).map(toHHMM);
+  const allSlots = range(start, latestStartTime, slotSize).map(toHHMM);
   
   // Filter out lunch break if applicable
   if (hours.lunchBreak) {
@@ -402,6 +402,16 @@ export default function App(){
   // Dynamic service info from API (descriptions, prices)
   const [serviceInfo, setServiceInfo] = useState<Record<string, { details: string; price: number; classicDetails?: string }>>(SERVICE_INFO);
 
+  // Booking policies from admin settings
+  const [bookingPolicies, setBookingPolicies] = useState({
+    leadTime: 2,
+    leadTimeUnit: 'hours' as 'hours' | 'minutes',
+    bookingSlotSize: 15,
+    schedulingWindow: 90,
+    cancellationPolicy: 2,
+    cancellationPolicyUnit: 'hours' as 'hours' | 'days',
+  });
+
   // Schedule
   const [date, setDate] = useState(offsetDate(0));
   const [time, setTime] = useState("");
@@ -444,6 +454,18 @@ export default function App(){
   const [acceptedLocation, setAcceptedLocation] = useState(false);
   const [acceptedParking, setAcceptedParking] = useState(false);
   const [acceptedBookingPolicy, setAcceptedBookingPolicy] = useState(false);
+
+  // Load booking policies from API on mount
+  useEffect(() => {
+    fetch('/api/booking-settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data) {
+          setBookingPolicies(data);
+        }
+      })
+      .catch(err => console.error('Failed to load booking policies:', err));
+  }, []);
 
   // Load service data from API on mount
   useEffect(() => {
@@ -543,7 +565,7 @@ export default function App(){
     }
   }, [duration]);
 
-  const slots = useMemo(()=>generateDailySlots(), []);
+  const slots = useMemo(()=>generateDailySlots(undefined, MIN_SESSION_DURATION, BUFFER_MINUTES, bookingPolicies.bookingSlotSize), [bookingPolicies.bookingSlotSize]);
   const blocked = useMemo(()=>buildBlockedMap(date, EXISTING_BOOKINGS), [date]);
   const availableSlots = useMemo(()=> slots.filter((s)=>isSlotAvailable(s, duration, blocked)), [slots, duration, blocked]);
 
@@ -805,6 +827,7 @@ async function submitBooking(){
                 availableSlots={availableSlots} 
                 serviceType={serviceType}
                 serviceRestrictions={serviceRestrictions}
+                bookingPolicies={bookingPolicies}
               />
             )}
 
@@ -1446,8 +1469,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
 }
 
 
-function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, serviceType, serviceRestrictions }:{
-  date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[]; serviceType:string; serviceRestrictions: Record<string, ServiceRestriction>;
+function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, serviceType, serviceRestrictions, bookingPolicies }:{
+  date:string; setDate:(v:string)=>void; time:string; setTime:(v:string)=>void; duration:number; availableSlots:string[]; serviceType:string; serviceRestrictions: Record<string, ServiceRestriction>; bookingPolicies: { schedulingWindow: number };
 }){
   const [loading, setLoading] = useState(false);
   const [realAvailableSlots, setRealAvailableSlots] = useState<string[]>(availableSlots);
@@ -1478,17 +1501,18 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     }
   }, [date, today, setDate]);
 
-  // Generate next 90 days (3 months) for calendar
+  // Generate calendar days based on scheduling window from settings
   const next90Days = useMemo(() => {
     const days: string[] = [];
     const start = new Date(today);
-    for (let i = 0; i < 90; i++) {
+    const daysToGenerate = bookingPolicies.schedulingWindow;
+    for (let i = 0; i < daysToGenerate; i++) {
       const dateObj = new Date(start);
       dateObj.setDate(start.getDate() + i);
       days.push(dateObj.toISOString().split('T')[0]);
     }
     return days;
-  }, [today]);
+  }, [today, bookingPolicies.schedulingWindow]);
 
   // Current month view state
   const [currentMonth, setCurrentMonth] = useState(new Date(today));
