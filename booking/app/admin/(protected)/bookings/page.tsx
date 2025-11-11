@@ -855,12 +855,20 @@ export default function BookingsPage() {
                             });
                           }}
                           className="mt-1 w-full px-3 py-2 border rounded-lg"
-                          disabled={!editedBooking?.serviceType}
+                          disabled={!editedBooking?.serviceType || !editedBooking?.serviceCategory}
                         >
                           <option value="">Select Group</option>
-                          {editedBooking?.serviceType && serviceOptions.groupsByType[editedBooking.serviceType]?.map((group) => (
-                            <option key={group} value={group}>{group}</option>
-                          ))}
+                          {editedBooking?.serviceType && editedBooking?.serviceCategory && 
+                            serviceOptions.groupsByType[editedBooking.serviceType]
+                              ?.filter(group => {
+                                // Only show groups that have services in the selected category
+                                const servicesInGroup = serviceOptions.servicesByGroup[group] || [];
+                                return servicesInGroup.some(s => s.category === editedBooking.serviceCategory);
+                              })
+                              .map((group) => (
+                                <option key={group} value={group}>{group}</option>
+                              ))
+                          }
                         </select>
                       ) : (
                         <p className="mt-1">{selectedBooking.serviceGroup || "N/A"}</p>
