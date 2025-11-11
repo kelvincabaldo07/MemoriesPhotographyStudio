@@ -775,9 +775,15 @@ export default function BookingsPage() {
                           value={editedBooking?.serviceType || ""}
                           onChange={(e) => {
                             const newType = e.target.value;
+                            // Auto-set category based on type
+                            const autoCategory = (newType === "With Photographer" || newType === "Seasonal Sessions") 
+                              ? "Digital" 
+                              : editedBooking?.serviceCategory || "";
+                            
                             setEditedBooking({ 
                               ...editedBooking!, 
                               serviceType: newType,
+                              serviceCategory: autoCategory,
                               serviceGroup: "", // Reset group when type changes
                               service: "", // Reset service when type changes
                               duration: 30 // Reset duration
@@ -797,18 +803,34 @@ export default function BookingsPage() {
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Category</label>
                       {isEditing ? (
-                        <select
-                          value={editedBooking?.serviceCategory || ""}
-                          onChange={(e) =>
-                            setEditedBooking({ ...editedBooking!, serviceCategory: e.target.value })
-                          }
-                          className="mt-1 w-full px-3 py-2 border rounded-lg"
-                        >
-                          <option value="">Select Category</option>
-                          {serviceOptions.categories.map((category) => (
-                            <option key={category} value={category}>{category}</option>
-                          ))}
-                        </select>
+                        <>
+                          {(editedBooking?.serviceType === "With Photographer" || editedBooking?.serviceType === "Seasonal Sessions") ? (
+                            <div className="mt-1 px-3 py-2 bg-gray-50 border rounded-lg text-gray-600">
+                              Digital (Auto-selected)
+                            </div>
+                          ) : (
+                            <select
+                              value={editedBooking?.serviceCategory || ""}
+                              onChange={(e) => {
+                                const newCategory = e.target.value;
+                                setEditedBooking({ 
+                                  ...editedBooking!, 
+                                  serviceCategory: newCategory,
+                                  serviceGroup: "",
+                                  service: "",
+                                  duration: 30
+                                });
+                              }}
+                              className="mt-1 w-full px-3 py-2 border rounded-lg"
+                              disabled={!editedBooking?.serviceType}
+                            >
+                              <option value="">Select Category</option>
+                              {serviceOptions.categories.map((category) => (
+                                <option key={category} value={category}>{category}</option>
+                              ))}
+                            </select>
+                          )}
+                        </>
                       ) : (
                         <p className="mt-1">{selectedBooking.serviceCategory}</p>
                       )}
@@ -846,9 +868,15 @@ export default function BookingsPage() {
                           value={editedBooking?.service || ""}
                           onChange={(e) => {
                             const serviceName = e.target.value;
-                            const serviceData = editedBooking?.serviceGroup 
-                              ? serviceOptions.servicesByGroup[editedBooking.serviceGroup]?.find(s => s.name === serviceName)
-                              : null;
+                            // Filter services by category
+                            const filteredServices = editedBooking?.serviceGroup 
+                              ? serviceOptions.servicesByGroup[editedBooking.serviceGroup]?.filter(s => 
+                                  s.category === editedBooking.serviceCategory || 
+                                  (!s.category && editedBooking.serviceCategory === "Digital")
+                                )
+                              : [];
+                            
+                            const serviceData = filteredServices?.find(s => s.name === serviceName);
                             
                             setEditedBooking({ 
                               ...editedBooking!, 
@@ -863,14 +891,21 @@ export default function BookingsPage() {
                             }
                           }}
                           className="mt-1 w-full px-3 py-2 border rounded-lg"
-                          disabled={!editedBooking?.serviceGroup}
+                          disabled={!editedBooking?.serviceGroup || !editedBooking?.serviceCategory}
                         >
                           <option value="">Select Service</option>
-                          {editedBooking?.serviceGroup && serviceOptions.servicesByGroup[editedBooking.serviceGroup]?.map((service) => (
-                            <option key={service.name} value={service.name}>
-                              {service.name} ({service.duration} min - ₱{service.price})
-                            </option>
-                          ))}
+                          {editedBooking?.serviceGroup && editedBooking?.serviceCategory && 
+                            serviceOptions.servicesByGroup[editedBooking.serviceGroup]
+                              ?.filter(service => 
+                                service.category === editedBooking.serviceCategory || 
+                                (!service.category && editedBooking.serviceCategory === "Digital")
+                              )
+                              .map((service) => (
+                                <option key={service.name} value={service.name}>
+                                  {service.name} ({service.duration} min - ₱{service.price})
+                                </option>
+                              ))
+                          }
                         </select>
                       ) : (
                         <p className="mt-1">{selectedBooking.service}</p>
@@ -879,22 +914,9 @@ export default function BookingsPage() {
                     <div>
                       <label className="text-sm font-semibold text-neutral-700">Duration (minutes)</label>
                       {isEditing ? (
-                        <Input
-                          type="number"
-                          value={editedBooking?.duration || ""}
-                          onChange={(e) => {
-                            const newDuration = parseInt(e.target.value) || 0;
-                            setEditedBooking({ ...editedBooking!, duration: newDuration });
-                            if (editedBooking?.date && newDuration) {
-                              checkAvailability(editedBooking.date, newDuration);
-                            }
-                          }}
-                          className="mt-1"
-                          min="15"
-                          step="15"
-                          readOnly
-                          title="Duration is set automatically based on selected service"
-                        />
+                        <div className="mt-1 px-3 py-2 bg-gray-50 border rounded-lg text-gray-600">
+                          {editedBooking?.duration || 30} minutes (Auto-set by service)
+                        </div>
                       ) : (
                         <p className="mt-1">{selectedBooking.duration} minutes</p>
                       )}
