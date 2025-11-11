@@ -1083,6 +1083,7 @@ export default function BookingsPage() {
                         </div>
                         <p className="text-xs text-neutral-500 mt-2">
                           {editedBooking?.backdrops?.length || 0} of {editedBooking?.duration && editedBooking.duration >= 60 ? '4' : '2'} backdrops selected
+                          <span className="ml-2 text-xs">({editedBooking?.backdrops?.join(', ') || 'none'})</span>
                         </p>
                       </div>
                     )}

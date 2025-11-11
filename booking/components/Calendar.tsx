@@ -237,6 +237,8 @@ export function BookingCalendar({
                   onClick={() => {
                     console.log('📅 Date clicked:', { date: d, isFullyBooked, availableCount, isPastDate });
                     if (!isFullyBooked) {
+                      console.log('🎯 Calling onDateChange with:', d);
+                      console.log('🎯 onDateChange function exists?', typeof onDateChange === 'function');
                       onDateChange(d);
                       onTimeChange('');
                     }
