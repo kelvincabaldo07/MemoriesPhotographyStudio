@@ -409,7 +409,6 @@ export async function POST(request: NextRequest) {
         "Grand Total": { number: bookingData.totals?.grandTotal || 0 },
         "Status": { select: { name: "Confirmed" } },
         "Address": { rich_text: [{ text: { content: bookingData.customer.address || "" } }] },
-        "Created By": { rich_text: [{ text: { content: "Booking System" } }] }, // Track source to prevent webhook duplicates
       }
     };
 

@@ -207,15 +207,9 @@ async function handleBookingCreated(pageId: string, props: any) {
   const time = extractTime(props['Time']);
   const calendarEventId = extractText(props['Calendar Event ID']);
   const status = extractSelect(props['Status']);
-  const createdBy = extractText(props['Created By']);
-
-  // IMPORTANT: Skip if created by booking system (API already created calendar event)
-  if (createdBy === 'Booking System') {
-    console.log(`[Notion Webhook] Skipping - created by Booking System (calendar event already created by API)`);
-    return;
-  }
 
   // IMPORTANT: Skip if calendar event already exists (prevent duplicates)
+  // The google-calendar.ts will also check for existing events by booking ID
   if (calendarEventId) {
     console.log(`[Notion Webhook] Skipping - booking already has calendar event ID: ${calendarEventId}`);
     return;
