@@ -177,24 +177,6 @@ export async function PATCH(
         { status: 500 }
       );
     }
-
-    // Optionally send to n8n webhook for notifications
-    const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL;
-    if (n8nWebhookUrl) {
-      try {
-        await fetch(n8nWebhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event: 'booking_updated',
-            bookingId,
-            updates: body,
-          }),
-        });
-      } catch (err) {
-        console.log('n8n webhook warning:', err);
-      }
-    }
     
     return NextResponse.json({
       success: true,

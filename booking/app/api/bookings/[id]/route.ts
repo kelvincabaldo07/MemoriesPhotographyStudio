@@ -299,20 +299,6 @@ export async function PUT(
     // Audit: Successful update
     await logAudit(createUpdateAudit(request, bookingId, verifyEmail, oldData, updates, 'success'));
     
-    // Optionally notify via n8n
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
-    if (n8nWebhookUrl) {
-      await fetch(n8nWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event: 'booking_updated',
-          bookingId,
-          updates,
-        }),
-      }).catch(() => {}); // Fail silently
-    }
-    
     return NextResponse.json({
       success: true,
       message: 'Booking updated successfully',
@@ -422,19 +408,6 @@ export async function PATCH(
       console.error('Notion update error:', errorData);
       throw new Error("Failed to update Notion");
     }
-
-    // Also send to n8n webhook for any additional processing
-    const n8nWebhookUrl = 'https://n8n-production-f7c3.up.railway.app/webhook/booking-updated';
-    
-    await fetch(n8nWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        event: 'booking_updated',
-        bookingId,
-        updates,
-      }),
-    }).catch(err => console.log('n8n webhook warning:', err.message));
     
     return NextResponse.json({
       success: true,
@@ -539,19 +512,6 @@ export async function DELETE(
     
     // Audit: Successful cancellation
     await logAudit(createCancelAudit(request, bookingId, verifyEmail, 'success'));
-    
-    // Optionally notify via n8n
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
-    if (n8nWebhookUrl) {
-      await fetch(n8nWebhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event: 'booking_cancelled',
-          bookingId,
-        }),
-      }).catch(() => {}); // Fail silently
-    }
     
     return NextResponse.json({
       success: true,
