@@ -116,6 +116,33 @@ export default function BookingsPage() {
     }
   };
 
+  const cancelBooking = async (bookingId: string) => {
+    if (!confirm('Are you sure you want to cancel this booking? This will:\n\n• Update the status to "Cancelled" in Notion\n• Delete the Google Calendar event\n\nThis action cannot be undone.')) {
+      return;
+    }
+
+    setUpdating(true);
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        await fetchBookings();
+        setSelectedBooking(null);
+        alert('Booking cancelled successfully! Calendar event has been deleted.');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to cancel booking: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      alert("Error cancelling booking");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   const saveBookingChanges = async () => {
     if (!editedBooking) return;
 
@@ -783,11 +810,11 @@ export default function BookingsPage() {
                     </Button>
                     <Button
                       className="flex-1 bg-red-600 hover:bg-red-700"
-                      onClick={() => updateBookingStatus(selectedBooking.id, "Cancelled")}
+                      onClick={() => cancelBooking(selectedBooking.id)}
                       disabled={updating}
                     >
                       <XCircle className="w-4 h-4 mr-2" />
-                      {updating ? "Cancelling..." : "Cancel Booking"}
+                      {updating ? "Cancelling..." : "Cancel Booking & Delete Event"}
                     </Button>
                   </>
                 ) : null}
