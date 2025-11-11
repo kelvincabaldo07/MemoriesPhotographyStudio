@@ -1040,6 +1040,18 @@ export default function BookingsPage() {
                             const wouldExceedMax = !isSelected && (currentCount + 1) > maxBackdrops;
                             const isDisabled = wouldExceedMax;
                             
+                            if (backdrop.key === 'gray') {
+                              console.log('🎨 Backdrop Gray state:', { 
+                                isSelected, 
+                                currentCount, 
+                                maxBackdrops, 
+                                duration: editedBooking?.duration,
+                                wouldExceedMax, 
+                                isDisabled,
+                                calculation: `(${currentCount} + 1) > ${maxBackdrops} = ${(currentCount + 1) > maxBackdrops}`
+                              });
+                            }
+                            
                             return (
                               <button
                                 key={backdrop.key}

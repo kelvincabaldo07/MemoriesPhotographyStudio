@@ -140,8 +140,8 @@ export function BookingCalendar({
 
   // Fetch slots for selected date
   useEffect(() => {
-    if (!selectedDate || !duration) {
-      console.log('⚠️ Calendar: Missing date or duration', { selectedDate, duration });
+    if (!selectedDate || !duration || typeof duration !== 'number') {
+      console.log('⚠️ Calendar: Missing or invalid date/duration', { selectedDate, duration, type: typeof duration });
       return;
     }
 
