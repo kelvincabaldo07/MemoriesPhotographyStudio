@@ -90,6 +90,22 @@ const BRAND = {
   clay: "#8B5E3C",           // Secondary accent (kept for variety)
 };
 
+// Helper function to properly capitalize names
+// Converts any case (JOHN, john, jOhN) to proper case (John)
+// Handles multiple words with spaces or hyphens (e.g., "mary jane" -> "Mary Jane", "anne-marie" -> "Anne-Marie")
+function toProperCase(name: string): string {
+  if (!name) return "";
+  
+  return name
+    .toLowerCase()
+    .split(/(\s+|-)/g) // Split on spaces and hyphens but keep delimiters
+    .map(word => {
+      if (word.trim() === "" || word === "-" || word === " ") return word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join("");
+}
+
 // const BACKDROPS = [
 //   { key: "tan", name: "Tan", swatch: "#D2B48C" },
 //   { key: "lemon", name: "Lemon Yellow", swatch: "#FFE45E" },
@@ -1945,8 +1961,16 @@ function StepCustomer(props: {
       <p className="text-neutral-600 mb-4">We&apos;ll send your confirmation and reminders here.</p>
       
       <div className="grid md:grid-cols-2 gap-3">
-        <Input placeholder="First name *" value={firstName} onChange={(e) => setFirst(e.target.value)} />
-        <Input placeholder="Last name *" value={lastName} onChange={(e) => setLast(e.target.value)} />
+        <Input 
+          placeholder="First name *" 
+          value={firstName} 
+          onChange={(e) => setFirst(toProperCase(e.target.value))} 
+        />
+        <Input 
+          placeholder="Last name *" 
+          value={lastName} 
+          onChange={(e) => setLast(toProperCase(e.target.value))} 
+        />
         
         <div className="md:col-span-2">
           <div className="flex gap-2">
@@ -2072,7 +2096,7 @@ function StepConsent(props:{
           <Input 
             placeholder="Celebrant's name *" 
             value={celebrantName} 
-            onChange={(e) => setCelebName(e.target.value)} 
+            onChange={(e) => setCelebName(toProperCase(e.target.value))} 
           />
           <Input 
             placeholder="Age *" 
@@ -2101,7 +2125,7 @@ function StepConsent(props:{
           <Input 
             placeholder="Name for greetings *" 
             value={celebrantName} 
-            onChange={(e) => setCelebName(e.target.value)} 
+            onChange={(e) => setCelebName(toProperCase(e.target.value))} 
           />
         </div>
       )}
@@ -2125,7 +2149,7 @@ function StepConsent(props:{
           <Input 
             placeholder="Celebrant's name *" 
             value={celebrantName} 
-            onChange={(e) => setCelebName(e.target.value)} 
+            onChange={(e) => setCelebName(toProperCase(e.target.value))} 
           />
           
           {/* Birthday-specific fields */}
