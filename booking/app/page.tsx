@@ -1291,9 +1291,9 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
   // ✅ Group size descriptions
   function getGroupDescription(groupName: string): string {
     switch(groupName) {
-      case "Solo/Duo": return "👤 Session size is based on the number of people photographed, not how many appear in each shot — so bring your group and make every frame count!";
-      case "Small Group": return "👤 Session size is based on the number of people photographed, not how many appear in each shot — so bring your group and make every frame count!";
-      case "Big Group": return "👤 Session size is based on the number of people photographed, not how many appear in each shot — so bring your group and make every frame count!";
+      case "Solo/Duo": return "1–2 persons";
+      case "Small Group": return "3–5 persons";
+      case "Big Group": return "6–16 persons";
       default: return "Pick a theme / type";
     }
   }
@@ -1329,14 +1329,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
             <div className="flex items-center justify-between p-3 bg-neutral-50">
               <button className="text-left flex-1" onClick={()=>toggleType(String(t))}>
                 <div className="font-medium">
-                  {t === "Self-Shoot" ? "📸 Self-Shoot" : t === "With Photographer" ? "👩‍🎨 Self-Shoot with Photographer" : "🎄 Seasonal Sessions"}
+                  {t === "Self-Shoot" ? "📸 Self-Shoot" : t === "With Photographer" ? "👩‍🎨 With Photographer" : "🎄 Seasonal Sessions"}
                 </div>
                 <div className="text-xs text-neutral-500">
                   {t === "Self-Shoot" 
-                    ? "Be your own photographer in our well-lit studio — set your poses, control the shutter, and create photos your way." 
+                    ? "Be your own photographer — strike a pose, click the remote, and have fun your way!" 
                     : t === "With Photographer" 
-                    ? "A guided self-shoot experience where our photographer helps with poses, lighting, and framing to capture your best angles." 
-                    : "Limited-time themed sets that change with the season — perfect for holidays, back-to-school, and special occasions."}
+                    ? "Enjoy your shoot while we guide the angles, lighting, and poses — easy and effortless!" 
+                    : "Special themed sets made for holidays and milestones — limited-time magic only!"}
                 </div>
               </button>
               <div className="flex items-center gap-2">
@@ -1359,16 +1359,18 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           serviceCategory === c && "shadow-md"
                         )}
                         style={{
-                          borderColor: serviceCategory === c ? BRAND.cream : "#e5e5e5",
-                          backgroundColor: serviceCategory === c ? BRAND.cream : BRAND.white
+                          borderColor: serviceCategory === c ? BRAND.forest : "#e5e5e5",
+                          backgroundColor: serviceCategory === c ? BRAND.forest : BRAND.white
                         }}
                       >
                         <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
-                          <div className="font-medium">{c === "Classic" ? "🖼 Classic Package" : "💻 Digital Package"}</div>
-                          <div className="text-xs text-neutral-500">
+                          <div className="font-medium" style={{ color: serviceCategory === c ? BRAND.white : BRAND.charcoal }}>
+                            {c === "Classic" ? "🖼 Classic Package" : "💻 Digital Package"}
+                          </div>
+                          <div className="text-xs" style={{ color: serviceCategory === c ? BRAND.white : "#737373" }}>
                             {c === "Classic" 
-                              ? "Includes all digital copies plus printed photos — perfect for those who want both online access and timeless physical keepsakes." 
-                              : "Includes all edited digital copies only, delivered via Adobe Lightroom for easy viewing and sharing."}
+                              ? "All enhanced digital copies + printed photos — the best of both worlds to keep and display!" 
+                              : "All enhanced digital copies only, delivered through Lightroom for instant access."}
                           </div>
                         </button>
                         {serviceCategory && String(c)===serviceCategory && (
@@ -1387,7 +1389,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {/* Groups */}
                 {serviceCategory && (
                   <div className="mt-4">
-                    <div className="text-sm font-medium mb-2">Groups</div>
+                    <div className="text-sm font-medium mb-2">Session Sizes</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {groups.map((g)=> (
                         <button 
@@ -1405,11 +1407,13 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                           <div>
                             <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
-                            {/* ✅ CHANGE THIS LINE */}
                             <div className="text-xs" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
                           </div>
                         </button>
                       ))}
+                    </div>
+                    <div className="mt-2 text-xs text-neutral-500 italic">
+                      👤 Session size is based on the number of people photographed, not how many appear per shot.
                     </div>
                   </div>
                 )}
