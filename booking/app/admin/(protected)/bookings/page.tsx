@@ -1043,7 +1043,11 @@ export default function BookingsPage() {
                             { key: "flamered", name: "Flame Red" },
                             { key: "carnationpink", name: "Carnation Pink" },
                           ].map((backdrop) => {
-                            const isSelected = editedBooking?.backdrops?.includes(backdrop.key);
+                            // Check both lowercase key and proper case name for backwards compatibility
+                            const isSelected = editedBooking?.backdrops?.some(b => 
+                              b.toLowerCase() === backdrop.key.toLowerCase() || 
+                              b.toLowerCase() === backdrop.name.toLowerCase()
+                            );
                             const maxBackdrops = editedBooking?.duration && editedBooking.duration >= 60 ? 4 : 2;
                             const currentCount = editedBooking?.backdrops?.length || 0;
                             // Disable if not selected AND we're already at max
@@ -1066,7 +1070,7 @@ export default function BookingsPage() {
                                 type="button"
                                 onClick={() => {
                                   console.log('Backdrop click START:', { 
-                                    backdrop: backdrop.key, 
+                                    backdrop: backdrop.name, 
                                     isSelected, 
                                     currentBackdrops: editedBooking?.backdrops,
                                     currentCount, 
@@ -1074,8 +1078,13 @@ export default function BookingsPage() {
                                   });
                                   setEditedBooking(prev => {
                                     const newBackdrops = isSelected
-                                      ? prev!.backdrops.filter(b => b !== backdrop.key)
-                                      : [...(prev?.backdrops || []), backdrop.key];
+                                      // Remove by matching both key and name (case insensitive)
+                                      ? prev!.backdrops.filter(b => 
+                                          b.toLowerCase() !== backdrop.key.toLowerCase() && 
+                                          b.toLowerCase() !== backdrop.name.toLowerCase()
+                                        )
+                                      // Add using proper case name to match Notion format
+                                      : [...(prev?.backdrops || []), backdrop.name];
                                     console.log('Backdrop click END:', { newBackdrops, newCount: newBackdrops.length });
                                     return { ...prev!, backdrops: newBackdrops };
                                   });
