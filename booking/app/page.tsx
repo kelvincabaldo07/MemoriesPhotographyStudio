@@ -1419,17 +1419,9 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {/* Groups */}
                 {serviceCategory && (
                   <div className="mt-4">
-                    <div className="text-sm font-medium mb-2">Session Sizes</div>
+                    <div className="text-sm font-medium mb-2">Service Group</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {groups.map((g)=> {
-                        // Check if this group has a sample photo
-                        const hasPhoto = g === "Kids Pre-birthday (Girls)" || g === "Kids Pre-birthday (Boys)";
-                        const photoPath = g === "Kids Pre-birthday (Girls)" 
-                          ? "/placeholders/prebirthday-girls.jpg"
-                          : g === "Kids Pre-birthday (Boys)"
-                          ? "/placeholders/prebirthday-boys.jpg"
-                          : null;
-                        
                         return (
                         <button 
                           key={g} 
@@ -1443,27 +1435,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           }}
                           onClick={()=>toggleGroup(g)}
                         >
-                          {hasPhoto && photoPath && (
-                            <div className="relative h-32 bg-neutral-100 overflow-hidden">
-                              <img 
-                                src={photoPath} 
-                                alt={g}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // Hide image if not found
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                              {/* Fallback emoji overlay if image doesn't load */}
-                              <div className="absolute inset-0 flex items-center justify-center text-4xl bg-neutral-50/80">
-                                {GROUP_THUMBS[g] || "📷"}
-                              </div>
-                            </div>
-                          )}
                           <div className="p-3 flex items-center gap-3">
-                            {!hasPhoto && (
-                              <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
-                            )}
+                            <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                             <div className="flex-1">
                               <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
                               <div className="text-xs" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
@@ -3011,7 +2984,7 @@ function Confirmation(){
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = "https://book.memories-studio.com";
+          window.location.href = "https://www.memories-studio.com";
           return 0;
         }
         return prev - 1;
