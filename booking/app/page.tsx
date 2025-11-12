@@ -3011,7 +3011,7 @@ function Confirmation(){
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = "https://www.memories-studio.com";
+          window.location.href = "https://book.memories-studio.com";
           return 0;
         }
         return prev - 1;
