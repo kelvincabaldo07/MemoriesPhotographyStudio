@@ -1467,7 +1467,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     <div className="text-sm font-medium mb-2">Services</div>
                     <div className={cn("grid gap-3", service ? "grid-cols-1" : "md:grid-cols-3")}>
                       {(service ? [service] : services).map((s: string)=> {
-                        const info = serviceInfo[s] || { details: "", price: 0 };
+                        const info = serviceInfo[s] || { details: "", price: 0, thumbnail: undefined };
                         // Use classic details if Classic category is selected, otherwise use digital details
                         const displayDetails = serviceCategory === "Classic" && info.classicDetails ? info.classicDetails : info.details;
                         const displayPrice = serviceCategory === "Classic" ? info.price + 50 : info.price;
