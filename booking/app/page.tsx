@@ -1467,7 +1467,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                         
                         // Check if this is a pre-birthday service that should have a photo
                         const isPreBirthdayService = (serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)");
-                        const serviceName = s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        // Convert service name to match filename format (e.g., "Butterfly Theme" -> "butterfly-theme")
+                        const serviceName = s.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '&');
                         const photoPath = isPreBirthdayService ? `/placeholders/services/${serviceName}.jpg` : null;
                         
                         return (
