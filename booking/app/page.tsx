@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User, Phone, Mail, X as CloseIcon, Globe } from 'lucide-react';
 // import React, { useMemo, useState } from "react";
@@ -935,16 +935,22 @@ async function submitBooking(){
             {step === 8 && (<Confirmation />)}
 
             <div className="mt-6 flex items-center justify-between">
-              <Button variant="ghost" onClick={()=>setStep(Math.max(step-1,0))} disabled={step===0}>
-                <ChevronLeft className="w-4 h-4 mr-2"/> Back
-              </Button>
+              {/* Hide Back button on confirmation screen */}
+              {step !== 8 && (
+                <Button variant="ghost" onClick={()=>setStep(Math.max(step-1,0))} disabled={step===0}>
+                  <ChevronLeft className="w-4 h-4 mr-2"/> Back
+                </Button>
+              )}
+              
+              {/* Spacer when Back is hidden */}
+              {step === 8 && <div></div>}
 
               <Button 
                 variant="outline" 
-                onClick={() => setShowResetModal(true)}
+                onClick={() => step === 8 ? window.location.reload() : setShowResetModal(true)}
                 className=""
               >
-                Start Over
+                {step === 8 ? "Book Again" : "Start Over"}
               </Button>
 
               {step < 7 && (
@@ -2388,7 +2394,7 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
               onClick={()=>onToggle(bd.key)} 
               disabled={isDisabled}
               className={cn(
-                "border rounded-2xl overflow-hidden text-left shadow-sm transition relative",
+                "border rounded-2xl overflow-hidden text-left shadow-sm transition relative flex h-32",
                 isSelected ? "border-green-600 bg-green-50" : "border-neutral-200 hover:shadow-md",
                 isDisabled && "opacity-50 cursor-not-allowed"
               )}
@@ -2400,8 +2406,8 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
                 </div>
               )}
               
-              {/* Backdrop sample photo */}
-              <div className="relative h-24 bg-neutral-100 overflow-hidden">
+              {/* Backdrop sample photo - 2/3 width */}
+              <div className="relative w-2/3 bg-neutral-100 overflow-hidden">
                 <img 
                   src={bd.image} 
                   alt={bd.name}
@@ -2412,18 +2418,25 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
                   }}
                 />
                 {/* Color swatch overlay/fallback */}
-                <div className="absolute inset-0" style={{background: `linear-gradient(135deg, ${bd.swatch} 0%, ${bd.swatch}dd 100%)`}} />
+                <div className="absolute inset-0 -z-10" style={{background: `linear-gradient(135deg, ${bd.swatch} 0%, ${bd.swatch}dd 100%)`}} />
               </div>
               
-              <div className="p-3">
-                <div className="font-medium">{bd.name}</div>
-                <div className="text-xs text-neutral-500">
-                  {isSelected 
-                    ? "✓ Selected • Tap to remove" 
-                    : isDisabled 
-                      ? `Max ${limit} backdrops` 
-                      : "Tap to add"
-                  }
+              {/* Color swatch and text - 1/3 width */}
+              <div className="w-1/3 flex flex-col">
+                {/* Color block */}
+                <div className="h-1/2 w-full" style={{backgroundColor: bd.swatch}} />
+                
+                {/* Text content */}
+                <div className="h-1/2 p-2 flex flex-col justify-center bg-white">
+                  <div className="font-medium text-sm leading-tight">{bd.name}</div>
+                  <div className="text-xs text-neutral-500 mt-1">
+                    {isSelected 
+                      ? "✓ Selected" 
+                      : isDisabled 
+                        ? `Max ${limit}` 
+                        : "Tap to add"
+                    }
+                  </div>
                 </div>
               </div>
             </button>
@@ -2910,19 +2923,38 @@ function Line({ label, value }:{ label:string; value:string }){
   );
 }
 
+
 function Confirmation(){
+  const [countdown, setCountdown] = useState(10);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          window.location.href = "https://memoriesphotographystudio.com";
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="text-center py-12">
-      <CheckCircle2 className="w-12 h-12 mx-auto"/>
-      <h2 className="text-2xl font-semibold mt-3">You’re booked!</h2>
-      <p className="text-neutral-600 mt-1">A confirmation email will be sent shortly. We’re excited to see you in the studio!</p>
+      <CheckCircle2 className="w-12 h-12 mx-auto text-green-600"/>
+      <h2 className="text-2xl font-semibold mt-3">You're booked!</h2>
+      <p className="text-neutral-600 mt-1">A confirmation email will be sent shortly. We're excited to see you in the studio!</p>
+      <p className="text-sm text-neutral-500 mt-4">Redirecting to our website in {countdown} second{countdown !== 1 ? 's' : ''}...</p>
     </div>
   );
 }
-
 // Tiny CSS animation helper (scoped-in)
 if (typeof document !== "undefined") {
   const styles = document.createElement("style");
   styles.innerHTML = `.animate-accordion{animation:acc 160ms ease-out both}@keyframes acc{from{opacity:.0;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}`;
   document.head.appendChild(styles);
 }
+
