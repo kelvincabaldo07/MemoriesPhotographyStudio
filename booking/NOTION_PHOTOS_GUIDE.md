@@ -22,22 +22,36 @@ Your booking system is already set up to load service photos from Notion! You ca
 
 You have two options:
 
-#### Option A: Embed Photo in Notion Page (Recommended)
-1. Open a service row (e.g., "Pink Cloud Wonderland Theme")
-2. Click into the page
-3. Upload or drag the theme photo into the page
-4. Click on the image and select "Copy link"
-5. Go back to table view
-6. Paste the link into the **Thumbnail** field
+#### Option A: Use External Image URL (Recommended ⭐)
+**IMPORTANT:** Images embedded in Notion pages require authentication and won't work on your public booking site!
 
-#### Option B: Use External Image URL
-1. Upload photo to:
-   - Google Drive (get shareable link)
-   - Imgur
-   - Your own website
-   - Cloud storage (Cloudinary, AWS S3)
-2. Copy the direct image URL
-3. Paste into the **Thumbnail** field
+Upload photos to a public hosting service:
+1. **Imgur** (Free & Easy):
+   - Go to https://imgur.com
+   - Upload image (no account needed)
+   - Right-click image → "Copy Image Link"
+   - Paste into **Thumbnail** field
+   
+2. **Google Drive** (Requires public link):
+   - Upload to Google Drive
+   - Right-click → Get Link → "Anyone with the link"
+   - Change share URL format from:
+     - `drive.google.com/file/d/FILE_ID/view`
+     - To: `drive.google.com/uc?export=view&id=FILE_ID`
+   - Paste into **Thumbnail** field
+
+3. **Cloudinary** (Best for production):
+   - Sign up at https://cloudinary.com (free tier)
+   - Upload images
+   - Copy the direct image URL
+   - Paste into **Thumbnail** field
+
+#### Option B: GitHub Repository (Also works)
+Since your site is on GitHub:
+1. Add images to `/booking/public/placeholders/services/`
+2. Commit and push
+3. Use path: `/placeholders/services/your-image.jpg`
+4. This still requires code deployment though
 
 ### 3. Add the New Theme
 
