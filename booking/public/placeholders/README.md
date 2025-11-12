@@ -24,14 +24,14 @@ Place individual service photos in the `services/` folder:
 - `dinosaur-world.jpg` - Dinosaur World service
 
 ### Backdrop Color Samples
-Place backdrop sample photos in the `backdrops/` folder:
-- `tan.jpg` - Tan backdrop sample
-- `lemon.jpg` - Lemon Yellow backdrop sample
-- `mardi.jpg` - Mardi Gras backdrop sample
-- `ivory.jpg` - Ivory backdrop sample
-- `gray.jpg` - Gray backdrop sample
-- `bluegreen.jpg` - Blue Green backdrop sample
-- `lotus.jpg` - Lotus Root Pink backdrop sample
+✅ Backdrop photos added in the `backdrops/` folder:
+- `beige.jpg` - Beige backdrop
+- `carnationpink.jpg` - Carnation Pink backdrop
+- `flamered.jpg` - Flame Red backdrop
+- `gray.jpg` - Gray backdrop
+- `ivory.jpg` - Ivory backdrop
+- `lightblue.jpg` - Light Blue backdrop
+- `mugwort.jpg` - Mugwort backdrop
 
 ## Image Guidelines
 - Recommended size: 800x600px or similar aspect ratio

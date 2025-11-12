@@ -116,13 +116,13 @@ function toProperCase(name: string): string {
 //   { key: "lotus", name: "Lotus Root Pink", swatch: "#F4C2C2" },
 // ];
 const BACKDROPS = [
-  { key: "gray", name: "Gray", swatch: "#838383", image: "/backdrops/gray.jpg" },
-  { key: "mugwort", name: "Mugwort", swatch: "#99FFBB", image: "/backdrops/mugwort.jpg" },
-  { key: "beige", name: "Beige", swatch: "#F7D69D", image: "/backdrops/beige.jpg" },
-  { key: "ivory", name: "Ivory", swatch: "#FFFFF0", image: "/backdrops/ivory.jpg" },
-  { key: "lightblue", name: "Light Blue", swatch: "#ADD8E6", image: "/backdrops/lightblue.jpg" },
-  { key: "flamered", name: "Flame Red", swatch: "#800000", image: "/backdrops/flamered.jpg" },
-  { key: "carnationpink", name: "Carnation Pink", swatch: "#FFA6C9", image: "/backdrops/carnationpink.jpg" },
+  { key: "gray", name: "Gray", swatch: "#838383", image: "/placeholders/backdrops/gray.jpg" },
+  { key: "mugwort", name: "Mugwort", swatch: "#99FFBB", image: "/placeholders/backdrops/mugwort.jpg" },
+  { key: "beige", name: "Beige", swatch: "#F7D69D", image: "/placeholders/backdrops/beige.jpg" },
+  { key: "ivory", name: "Ivory", swatch: "#FFFFF0", image: "/placeholders/backdrops/ivory.jpg" },
+  { key: "lightblue", name: "Light Blue", swatch: "#ADD8E6", image: "/placeholders/backdrops/lightblue.jpg" },
+  { key: "flamered", name: "Flame Red", swatch: "#800000", image: "/placeholders/backdrops/flamered.jpg" },
+  { key: "carnationpink", name: "Carnation Pink", swatch: "#FFA6C9", image: "/placeholders/backdrops/carnationpink.jpg" },
 ];
 
 const CHRISTMAS_2025 = {
@@ -2381,7 +2381,6 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
           const isSelected = selected.includes(bd.key);
           const canAdd = selected.length < limit;
           const isDisabled = !isSelected && !canAdd;
-          const photoPath = `/placeholders/backdrops/${bd.key}.jpg`;
           
           return (
             <button 
@@ -2404,7 +2403,7 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
               {/* Backdrop sample photo */}
               <div className="relative h-24 bg-neutral-100 overflow-hidden">
                 <img 
-                  src={photoPath} 
+                  src={bd.image} 
                   alt={bd.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
