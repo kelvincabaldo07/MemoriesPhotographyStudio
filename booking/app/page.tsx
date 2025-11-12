@@ -1485,8 +1485,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                       <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} — {CHRISTMAS_2025.desc}</div>
                     )}
                     <div className="text-sm font-medium mb-2">Services</div>
-                    <div className="grid md:grid-cols-3 gap-3">
-                      {services.map((s: string)=> {
+                    <div className={cn("grid gap-3", service ? "grid-cols-1" : "md:grid-cols-3")}>
+                      {(service ? [service] : services).map((s: string)=> {
                         const info = serviceInfo[s] || { details: "", price: 0 };
                         // Use classic details if Classic category is selected, otherwise use digital details
                         const displayDetails = serviceCategory === "Classic" && info.classicDetails ? info.classicDetails : info.details;
@@ -1498,11 +1498,10 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                         const photoPath = isPreBirthdayService ? `/placeholders/services/${serviceName}.jpg` : null;
                         
                         return (
-                          <button 
+                          <div 
                             key={s} 
-                            onClick={()=> setService(s)} 
                             className={cn(
-                              "text-left border rounded-xl overflow-hidden hover:shadow-md transition",
+                              "border rounded-xl overflow-hidden transition relative",
                               service === s && "shadow-lg"
                             )}
                             style={{ 
@@ -1510,6 +1509,26 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                               backgroundColor: service === s ? "#e8f5f0" : BRAND.white
                             }}
                           >
+                            {/* Change button for selected service */}
+                            {service === s && (
+                              <div className="absolute top-3 right-3 z-10">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  onClick={(e)=>{ 
+                                    e.stopPropagation(); 
+                                    setService(""); 
+                                  }}
+                                >
+                                  Change
+                                </Button>
+                              </div>
+                            )}
+                            <button 
+                              onClick={()=> service !== s && setService(s)} 
+                              className="w-full text-left"
+                              disabled={service === s}
+                            >
                             {/* Service Photo (for pre-birthday services) */}
                             {isPreBirthdayService && photoPath && (
                               <div className="relative h-40 bg-neutral-100 overflow-hidden">
@@ -1531,27 +1550,28 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                             
                             <div className="p-3">
                               <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-0">
                                   <div className="font-semibold" style={{ color: BRAND.forest }}>{s}</div>
                                   {displayDetails && (
                                   <ul className="text-sm text-neutral-600 mt-2 space-y-1">
                                     {displayDetails.split('\n').map((line, idx) => (
                                       <li key={idx} className="flex items-start gap-1">
-                                        <span className="text-green-600 mt-0.5">•</span>
-                                        <span>{line}</span>
+                                        <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
+                                        <span className="break-words">{line}</span>
                                       </li>
                                     ))}
                                   </ul>
                                 )}
                                 </div>
                                 {displayPrice > 0 && (
-                                <Badge style={{ backgroundColor: BRAND.forest, color: BRAND.white }}>
+                                <Badge className="flex-shrink-0" style={{ backgroundColor: BRAND.forest, color: BRAND.white }}>
                                   {currency(displayPrice)}
                                 </Badge>
                               )}
                               </div>
                             </div>
-                          </button>
+                            </button>
+                          </div>
                         );
                       })}
                     </div>
