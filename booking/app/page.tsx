@@ -116,13 +116,13 @@ function toProperCase(name: string): string {
 //   { key: "lotus", name: "Lotus Root Pink", swatch: "#F4C2C2" },
 // ];
 const BACKDROPS = [
-  { key: "gray", name: "Gray", swatch: "#838383", image: "/placeholders/backdrops/gray.jpg" },
-  { key: "mugwort", name: "Mugwort", swatch: "#99FFBB", image: "/placeholders/backdrops/mugwort.jpg" },
-  { key: "beige", name: "Beige", swatch: "#F7D69D", image: "/placeholders/backdrops/beige.jpg" },
-  { key: "ivory", name: "Ivory", swatch: "#FFFFF0", image: "/placeholders/backdrops/ivory.jpg" },
-  { key: "lightblue", name: "Light Blue", swatch: "#ADD8E6", image: "/placeholders/backdrops/lightblue.jpg" },
-  { key: "flamered", name: "Flame Red", swatch: "#800000", image: "/placeholders/backdrops/flamered.jpg" },
-  { key: "carnationpink", name: "Carnation Pink", swatch: "#FFA6C9", image: "/placeholders/backdrops/carnationpink.jpg" },
+  { key: "gray", name: "Gray", swatch: "#666b71", image: "/placeholders/backdrops/gray.jpg" },
+  { key: "mugwort", name: "Mugwort", swatch: "#c7f0e8", image: "/placeholders/backdrops/mugwort.jpg" },
+  { key: "beige", name: "Beige", swatch: "#e9c396", image: "/placeholders/backdrops/beige.jpg" },
+  { key: "ivory", name: "Ivory", swatch: "#faecdf", image: "/placeholders/backdrops/ivory.jpg" },
+  { key: "lightblue", name: "Light Blue", swatch: "#acdbf5", image: "/placeholders/backdrops/lightblue.jpg" },
+  { key: "flamered", name: "Flame Red", swatch: "#6d1e31", image: "/placeholders/backdrops/flamered.jpg" },
+  { key: "carnationpink", name: "Carnation Pink", swatch: "#eea8c4", image: "/placeholders/backdrops/carnationpink.jpg" },
 ];
 
 const CHRISTMAS_2025 = {
@@ -391,7 +391,15 @@ function isSlotAvailable(slotHHMM: string, duration: number, blocked:[number,num
   const s=toMinutes(slotHHMM), e=s+duration; 
   return blocked.every(([bs,be])=> e<=bs || s>=be); 
 }
-function inferDuration(serviceLabel?: string){ if(!serviceLabel) return 30; if(/(15)/i.test(serviceLabel)) return 15; if(/(60)/i.test(serviceLabel)) return 60; return 30; }
+function inferDuration(serviceLabel?: string, serviceType?: string){ 
+  if(!serviceLabel) return 30; 
+  // Check for explicit duration in service name
+  if(/(15)/i.test(serviceLabel)) return 15; 
+  if(/(60)/i.test(serviceLabel)) return 60; 
+  // With Photographer services are 45 minutes
+  if(serviceType === "With Photographer" || serviceType === "Seasonal Sessions") return 45;
+  return 30; 
+}
 function backdropLimitByDuration(mins: number){ return mins>=60?4:2; }
 function currency(n:number){ return new Intl.NumberFormat("en-PH", { style:"currency", currency:"PHP"}).format(n); }
 function to12Hour(hhmm: string) { 
@@ -459,7 +467,7 @@ export default function App(){
   const [eventDate, setEventDate] = useState(""); // ADD THIS LINE
   
   // Self-shoot backdrops
-  const duration = useMemo(()=>inferDuration(service), [service]);
+  const duration = useMemo(()=>inferDuration(service, serviceType), [service, serviceType]);
   const bdLimit = backdropLimitByDuration(duration);
   const [selectedBackdrops, setSelectedBackdrops] = useState<string[]>([]);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
