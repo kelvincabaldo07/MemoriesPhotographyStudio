@@ -505,7 +505,7 @@ export default function App(){
         console.log('📦 Received service data:', data);
         if (data.services) {
           const restrictions: Record<string, ServiceRestriction> = {};
-          const info: Record<string, { details: string; price: number; classicDetails?: string }> = {};
+          const info: Record<string, { details: string; price: number; classicDetails?: string; thumbnail?: string }> = {};
           
           // Build restrictions and info from services data
           data.services.forEach((svc: any) => {
