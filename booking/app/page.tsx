@@ -2566,11 +2566,43 @@ function StepVideoAndTerms({
   acceptedParking: boolean; setAcceptedParking: (v:boolean)=>void;
   acceptedBookingPolicy: boolean; setAcceptedBookingPolicy: (v:boolean)=>void;
 }){
+  const [language, setLanguage] = useState<'en' | 'fil'>('en');
+  
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-xl font-semibold">Terms & Conditions</h2>
-        <p className="text-neutral-600">Please read and agree to each term individually to proceed.</p>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-xl font-semibold">Terms & Conditions</h2>
+            <p className="text-neutral-600">Please read and agree to each term individually to proceed.</p>
+          </div>
+          
+          {/* Language Toggle */}
+          <div className="flex items-center gap-2 border rounded-lg p-1 bg-neutral-50">
+            <button
+              onClick={() => setLanguage('en')}
+              className={cn(
+                "px-3 py-1.5 rounded text-sm font-medium transition",
+                language === 'en' 
+                  ? "bg-white shadow-sm text-neutral-900" 
+                  : "text-neutral-500 hover:text-neutral-700"
+              )}
+            >
+              English
+            </button>
+            <button
+              onClick={() => setLanguage('fil')}
+              className={cn(
+                "px-3 py-1.5 rounded text-sm font-medium transition",
+                language === 'fil' 
+                  ? "bg-white shadow-sm text-neutral-900" 
+                  : "text-neutral-500 hover:text-neutral-700"
+              )}
+            >
+              Filipino
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Term 1: Photo Delivery via Adobe Lightroom */}
@@ -2580,20 +2612,25 @@ function StepVideoAndTerms({
           <span className="font-semibold text-base">Photo Delivery Method</span>
         </div>
         <div className="space-y-2 text-sm text-neutral-700 mb-4">
-          <p className="font-medium">English:</p>
-          <p>Your photos will be delivered <strong>only via Adobe Lightroom</strong>. By agreeing, you understand that:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li><strong>We do not send photos through any other platform</strong> such as Google Drive, Dropbox, or Messenger</li>
-            <li>You need to have an <strong>Adobe Lightroom account</strong> (free to create)</li>
-            <li>If accessing via mobile or tablet, you need to download the <strong>Lightroom Mobile App</strong></li>
-          </ul>
-          <p className="font-medium mt-3">Filipino:</p>
-          <p>Ang inyong mga larawan ay <strong>ihahatid lamang sa pamamagitan ng Adobe Lightroom</strong>. Sa pagsang-ayon, nauunawaan ninyo na:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li><strong>Hindi kami nagpapadala ng larawan sa ibang platform</strong> tulad ng Google Drive, Dropbox, o Messenger</li>
-            <li>Kailangan ninyong gumawa ng <strong>Adobe Lightroom account</strong> (libre lang po)</li>
-            <li>Kung gagamitin sa cellphone o tablet, kailangan i-download ang <strong>Lightroom Mobile App</strong></li>
-          </ul>
+          {language === 'en' ? (
+            <>
+              <p>Your photos will be delivered <strong>only via Adobe Lightroom</strong>. By agreeing, you understand that:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>We do not send photos through any other platform</strong> such as Google Drive, Dropbox, or Messenger</li>
+                <li>You need to have an <strong>Adobe Lightroom account</strong> (free to create)</li>
+                <li>If accessing via mobile or tablet, you need to download the <strong>Lightroom Mobile App</strong></li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <p>Ang inyong mga larawan ay <strong>ihahatid lamang sa pamamagitan ng Adobe Lightroom</strong>. Sa pagsang-ayon, nauunawaan ninyo na:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Hindi kami nagpapadala ng larawan sa ibang platform</strong> tulad ng Google Drive, Dropbox, o Messenger</li>
+                <li>Kailangan ninyong gumawa ng <strong>Adobe Lightroom account</strong> (libre lang po)</li>
+                <li>Kung gagamitin sa cellphone o tablet, kailangan i-download ang <strong>Lightroom Mobile App</strong></li>
+              </ul>
+            </>
+          )}
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox 
@@ -2602,11 +2639,11 @@ function StepVideoAndTerms({
             className="mt-1"
           />
           <span className="flex-1">
-            <strong>I agree</strong> to receive my photos only via Adobe Lightroom and will create an account/download the app as needed.
-            <br/>
-            <span className="text-neutral-600">
-              <strong>Sumasang-ayon ako</strong> na tatanggapin ang aking mga larawan lamang sa Adobe Lightroom at gagawa ng account/mag-download ng app kung kinakailangan.
-            </span>
+            {language === 'en' ? (
+              <><strong>I agree</strong> to receive my photos only via Adobe Lightroom and will create an account/download the app as needed.</>
+            ) : (
+              <><strong>Sumasang-ayon ako</strong> na tatanggapin ang aking mga larawan lamang sa Adobe Lightroom at gagawa ng account/mag-download ng app kung kinakailangan.</>
+            )}
           </span>
         </label>
       </div>
@@ -2618,32 +2655,37 @@ function StepVideoAndTerms({
           <span className="font-semibold text-base">Studio Location</span>
         </div>
         <div className="space-y-2 text-sm text-neutral-700 mb-4">
-          <p className="font-medium">English:</p>
-          <p><strong>Studio Address:</strong> Located inside <strong>Green Valley Field Subdivision</strong>, between Lintiw Road and Indang Central Elementary School. Directions:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Enter the subdivision, go straight to the dead end, then turn right</li>
-            <li>We're the <strong>fourth gate on the left</strong>, with a <strong>Memories Photography Studio tarpaulin</strong> near the gate</li>
-            <li>Our studio is at the back of the property — the <strong>dark gray and blue painted house</strong>, not the house at the front</li>
-            <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View on Google Maps</a></li>
-          </ul>
-          <p className="mt-2"><strong>Respect the Neighborhood:</strong></p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Please be courteous to the residents in front of the property</li>
-            <li>Avoid being noisy, nosy, or disruptive while waiting or shooting</li>
-          </ul>
-          <p className="font-medium mt-3">Filipino:</p>
-          <p><strong>Address ng Studio:</strong> Matatagpuan sa loob ng <strong>Green Valley Field Subdivision</strong>, sa pagitan ng Lintiw Road at Indang Central Elementary School. Direksyon:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Pumasok sa subdivision, diretso hanggang dulo, pagkatapos kumanan</li>
-            <li>Kami ang <strong>ikaapat na gate sa kaliwa</strong>, may <strong>Memories Photography Studio tarpaulin</strong> malapit sa gate</li>
-            <li>Ang aming studio ay nasa likod ng property — ang <strong>kulay dark gray at asul na pintadong bahay</strong>, hindi ang bahay sa harap</li>
-            <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tingnan sa Google Maps</a></li>
-          </ul>
-          <p className="mt-2"><strong>Igalang ang Kapitbahayan:</strong></p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Pakiusap na maging magalang sa mga nakatira sa harap ng property</li>
-            <li>Iwasan ang pagmamaingay, pagkausisa, o pag-abala habang naghihintay o nag-shoot</li>
-          </ul>
+          {language === 'en' ? (
+            <>
+              <p><strong>Studio Address:</strong> Located inside <strong>Green Valley Field Subdivision</strong>, between Lintiw Road and Indang Central Elementary School. Directions:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Enter the subdivision, go straight to the dead end, then turn right</li>
+                <li>We're the <strong>fourth gate on the left</strong>, with a <strong>Memories Photography Studio tarpaulin</strong> near the gate</li>
+                <li>Our studio is at the back of the property — the <strong>dark gray and blue painted house</strong>, not the house at the front</li>
+                <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View on Google Maps</a></li>
+              </ul>
+              <p className="mt-2"><strong>Respect the Neighborhood:</strong></p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Please be courteous to the residents in front of the property</li>
+                <li>Avoid being noisy, nosy, or disruptive while waiting or shooting</li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <p><strong>Address ng Studio:</strong> Matatagpuan sa loob ng <strong>Green Valley Field Subdivision</strong>, sa pagitan ng Lintiw Road at Indang Central Elementary School. Direksyon:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Pumasok sa subdivision, diretso hanggang dulo, pagkatapos kumanan</li>
+                <li>Kami ang <strong>ikaapat na gate sa kaliwa</strong>, may <strong>Memories Photography Studio tarpaulin</strong> malapit sa gate</li>
+                <li>Ang aming studio ay nasa likod ng property — ang <strong>kulay dark gray at asul na pintadong bahay</strong>, hindi ang bahay sa harap</li>
+                <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tingnan sa Google Maps</a></li>
+              </ul>
+              <p className="mt-2"><strong>Igalang ang Kapitbahayan:</strong></p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Pakiusap na maging magalang sa mga nakatira sa harap ng property</li>
+                <li>Iwasan ang pagmamaingay, pagkausisa, o pag-abala habang naghihintay o nag-shoot</li>
+              </ul>
+            </>
+          )}
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox 
@@ -2652,11 +2694,11 @@ function StepVideoAndTerms({
             className="mt-1"
           />
           <span className="flex-1">
-            <strong>I agree</strong> and confirm that I know the studio location and will be respectful to neighbors.
-            <br/>
-            <span className="text-neutral-600">
-              <strong>Sumasang-ayon ako</strong> at kinukumpirma na alam ko ang lokasyon ng studio at igagalang ko ang kapitbahayan.
-            </span>
+            {language === 'en' ? (
+              <><strong>I agree</strong> and confirm that I know the studio location and will be respectful to neighbors.</>
+            ) : (
+              <><strong>Sumasang-ayon ako</strong> at kinukumpirma na alam ko ang lokasyon ng studio at igagalang ko ang kapitbahayan.</>
+            )}
           </span>
         </label>
       </div>
@@ -2668,20 +2710,25 @@ function StepVideoAndTerms({
           <span className="font-semibold text-base">Parking Guidelines</span>
         </div>
         <div className="space-y-2 text-sm text-neutral-700 mb-4">
-          <p className="font-medium">English:</p>
-          <p>By agreeing, you understand and commit to our parking policy:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Park <strong>under the rambutan tree</strong> (designated parking area), <strong>OR</strong></li>
-            <li>On the <strong>vacant corner lot to the left</strong></li>
-            <li><strong>DO NOT block the gate or driveway at any time</strong></li>
-          </ul>
-          <p className="font-medium mt-3">Filipino:</p>
-          <p>Sa pagsang-ayon, nauunawaan at nangagako kayong sumunod sa aming parking policy:</p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Mag-park <strong>sa ilalim ng puno ng rambutan</strong> (itinalagang parking area), <strong>O KAYA</strong></li>
-            <li>Sa <strong>bakanteng corner lot sa kaliwa</strong></li>
-            <li><strong>HUWAG haharangan ang gate o driveway anumang oras</strong></li>
-          </ul>
+          {language === 'en' ? (
+            <>
+              <p>By agreeing, you understand and commit to our parking policy:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Park <strong>under the rambutan tree</strong> (designated parking area), <strong>OR</strong></li>
+                <li>On the <strong>vacant corner lot to the left</strong></li>
+                <li><strong>DO NOT block the gate or driveway at any time</strong></li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <p>Sa pagsang-ayon, nauunawaan at nangagako kayong sumunod sa aming parking policy:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Mag-park <strong>sa ilalim ng puno ng rambutan</strong> (itinalagang parking area), <strong>O KAYA</strong></li>
+                <li>Sa <strong>bakanteng corner lot sa kaliwa</strong></li>
+                <li><strong>HUWAG haharangan ang gate o driveway anumang oras</strong></li>
+              </ul>
+            </>
+          )}
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox 
@@ -2690,11 +2737,11 @@ function StepVideoAndTerms({
             className="mt-1"
           />
           <span className="flex-1">
-            <strong>I agree</strong> to follow the parking guidelines and will not block the gate or driveway.
-            <br/>
-            <span className="text-neutral-600">
-              <strong>Sumasang-ayon ako</strong> na susundin ang parking guidelines at hindi haharangan ang gate o driveway.
-            </span>
+            {language === 'en' ? (
+              <><strong>I agree</strong> to follow the parking guidelines and will not block the gate or driveway.</>
+            ) : (
+              <><strong>Sumasang-ayon ako</strong> na susundin ang parking guidelines at hindi haharangan ang gate o driveway.</>
+            )}
           </span>
         </label>
       </div>
@@ -2706,95 +2753,99 @@ function StepVideoAndTerms({
           <span className="font-semibold text-base">Booking Policy</span>
         </div>
         <div className="space-y-3 text-sm text-neutral-700 mb-4">
-          <div>
-            <p className="font-medium">English:</p>
-            <p><strong>Arrival Guidelines:</strong></p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Arrive <strong>at least 5 minutes before</strong> your scheduled time</li>
-              <li>Late arrivals will have the lost time deducted from their session</li>
-              <li>We provide 5 minutes of extra time for outfit or backdrop changes</li>
-              <li>Our timer starts at your session time plus 5 minutes (for setup and backdrop transitions)</li>
-              <li>Timers are set per backdrop</li>
-              <li>Timer stoppage or pauses are solely under the studio's discretion</li>
-            </ul>
-            <p className="mt-2"><strong>Tardy Penalties:</strong></p>
-          </div>
-          
-          <div className="pl-4 space-y-2">
-            <p className="font-semibold text-red-600">🕒 Sessions 30 Minutes and Below:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>5-minute grace period for lateness</li>
-              <li>More than 5 minutes late: Session time reduced by the number of minutes late + Limited to only 1 backdrop</li>
-              <li>10 minutes or more late: <strong>Booking will be cancelled</strong></li>
-            </ul>
-            
-            <p className="font-semibold text-red-600">🕓 1-Hour Sessions:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>5–20 minutes late: Time reduced by the number of minutes late + Limited to 2 backdrops of choice</li>
-              <li>30 minutes late or more: <strong>Booking will be cancelled</strong></li>
-            </ul>
-            
-            <p className="font-semibold text-red-600">📷 With Photographer / Occasional Sessions:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>10-minute grace period</li>
-              <li>10–25 minutes late: Time reduced by the number of minutes late</li>
-              <li>25 minutes or more late: <strong>Booking will be cancelled</strong></li>
-            </ul>
-          </div>
-          
-          <div>
-            <p><strong>Reschedule & Cancellation Policy:</strong></p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Reschedule or cancel at least <strong>2 hours before</strong> your session with a valid reason</li>
-              <li><strong>Maximum of 2 reschedules</strong> per booking</li>
-              <li>Late cancellations or no-shows may result in a ban from future bookings</li>
-            </ul>
-          </div>
-          
-          <div className="mt-3">
-            <p className="font-medium">Filipino:</p>
-            <p><strong>Mga Alituntunin sa Pagdating:</strong></p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Dumating nang <strong>hindi bababa sa 5 minuto bago</strong> ang inyong schedule</li>
-              <li>Ang mga late arrival ay babawasan ng oras na nawala sa kanilang session</li>
-              <li>Nagbibigay kami ng 5 minuto extra para sa outfit o backdrop changes</li>
-              <li>Ang aming timer ay nagsisimula sa inyong session time plus 5 minuto (para sa setup at backdrop transitions)</li>
-              <li>Ang timers ay naka-set bawat backdrop</li>
-              <li>Ang pagtigil o pag-pause ng timer ay nasa discretion lamang ng studio</li>
-            </ul>
-            <p className="mt-2"><strong>Mga Parusa sa Pagka-late:</strong></p>
-          </div>
-          
-          <div className="pl-4 space-y-2">
-            <p className="font-semibold text-red-600">🕒 Mga Session na 30 Minuto at Mas Mababa:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>5-minute grace period para sa pagka-late</li>
-              <li>Higit sa 5 minuto ang late: Babawasan ang session time ng bilang ng minutong late + Limitado lamang sa 1 backdrop</li>
-              <li>10 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
-            </ul>
-            
-            <p className="font-semibold text-red-600">🕓 1-Oras na mga Session:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>5–20 minuto ang late: Babawasan ng oras ang bilang ng minutong late + Limitado sa 2 backdrops na pipiliin</li>
-              <li>30 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
-            </ul>
-            
-            <p className="font-semibold text-red-600">📷 With Photographer / Occasional Sessions:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>10-minute grace period</li>
-              <li>10–25 minuto ang late: Babawasan ng oras ang bilang ng minutong late</li>
-              <li>25 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
-            </ul>
-          </div>
-          
-          <div>
-            <p><strong>Reschedule & Cancellation Policy:</strong></p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Mag-reschedule o mag-cancel nang <strong>hindi bababa sa 2 oras bago</strong> ang inyong session na may valid na dahilan</li>
-              <li><strong>Maximum na 2 reschedules</strong> bawat booking</li>
-              <li>Ang late cancellations o no-shows ay maaaring magresulta sa pag-ban mula sa mga susunod na booking</li>
-            </ul>
-          </div>
+          {language === 'en' ? (
+            <>
+              <div>
+                <p><strong>Arrival Guidelines:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Arrive <strong>at least 5 minutes before</strong> your scheduled time</li>
+                  <li>Late arrivals will have the lost time deducted from their session</li>
+                  <li>We provide 5 minutes of extra time for outfit or backdrop changes</li>
+                  <li>Our timer starts at your session time plus 5 minutes (for setup and backdrop transitions)</li>
+                  <li>Timers are set per backdrop</li>
+                  <li>Timer stoppage or pauses are solely under the studio's discretion</li>
+                </ul>
+                <p className="mt-2"><strong>Tardy Penalties:</strong></p>
+              </div>
+              
+              <div className="pl-4 space-y-2">
+                <p className="font-semibold text-red-600">🕒 Sessions 30 Minutes and Below:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>5-minute grace period for lateness</li>
+                  <li>More than 5 minutes late: Session time reduced by the number of minutes late + Limited to only 1 backdrop</li>
+                  <li>10 minutes or more late: <strong>Booking will be cancelled</strong></li>
+                </ul>
+                
+                <p className="font-semibold text-red-600">🕓 1-Hour Sessions:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>5–20 minutes late: Time reduced by the number of minutes late + Limited to 2 backdrops of choice</li>
+                  <li>30 minutes late or more: <strong>Booking will be cancelled</strong></li>
+                </ul>
+                
+                <p className="font-semibold text-red-600">📷 With Photographer / Occasional Sessions:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>10-minute grace period</li>
+                  <li>10–25 minutes late: Time reduced by the number of minutes late</li>
+                  <li>25 minutes or more late: <strong>Booking will be cancelled</strong></li>
+                </ul>
+              </div>
+              
+              <div>
+                <p><strong>Reschedule & Cancellation Policy:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Reschedule or cancel at least <strong>2 hours before</strong> your session with a valid reason</li>
+                  <li><strong>Maximum of 2 reschedules</strong> per booking</li>
+                  <li>Late cancellations or no-shows may result in a ban from future bookings</li>
+                </ul>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <p><strong>Mga Alituntunin sa Pagdating:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Dumating nang <strong>hindi bababa sa 5 minuto bago</strong> ang inyong schedule</li>
+                  <li>Ang mga late arrival ay babawasan ng oras na nawala sa kanilang session</li>
+                  <li>Nagbibigay kami ng 5 minuto extra para sa outfit o backdrop changes</li>
+                  <li>Ang aming timer ay nagsisimula sa inyong session time plus 5 minuto (para sa setup at backdrop transitions)</li>
+                  <li>Ang timers ay naka-set bawat backdrop</li>
+                  <li>Ang pagtigil o pag-pause ng timer ay nasa discretion lamang ng studio</li>
+                </ul>
+                <p className="mt-2"><strong>Mga Parusa sa Pagka-late:</strong></p>
+              </div>
+              
+              <div className="pl-4 space-y-2">
+                <p className="font-semibold text-red-600">🕒 Mga Session na 30 Minuto at Mas Mababa:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>5-minute grace period para sa pagka-late</li>
+                  <li>Higit sa 5 minuto ang late: Babawasan ang session time ng bilang ng minutong late + Limitado lamang sa 1 backdrop</li>
+                  <li>10 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
+                </ul>
+                
+                <p className="font-semibold text-red-600">🕓 1-Oras na mga Session:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>5–20 minuto ang late: Babawasan ng oras ang bilang ng minutong late + Limitado sa 2 backdrops na pipiliin</li>
+                  <li>30 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
+                </ul>
+                
+                <p className="font-semibold text-red-600">📷 With Photographer / Occasional Sessions:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>10-minute grace period</li>
+                  <li>10–25 minuto ang late: Babawasan ng oras ang bilang ng minutong late</li>
+                  <li>25 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
+                </ul>
+              </div>
+              
+              <div>
+                <p><strong>Reschedule & Cancellation Policy:</strong></p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Mag-reschedule o mag-cancel nang <strong>hindi bababa sa 2 oras bago</strong> ang inyong session na may valid na dahilan</li>
+                  <li><strong>Maximum na 2 reschedules</strong> bawat booking</li>
+                  <li>Ang late cancellations o no-shows ay maaaring magresulta sa pag-ban mula sa mga susunod na booking</li>
+                </ul>
+              </div>
+            </>
+          )}
         </div>
         <label className="flex items-start gap-3 text-sm cursor-pointer">
           <Checkbox 
@@ -2803,11 +2854,11 @@ function StepVideoAndTerms({
             className="mt-1"
           />
           <span className="flex-1">
-            <strong>I agree</strong> to arrive on time, accept the tardy penalties, and understand the reschedule/cancellation terms.
-            <br/>
-            <span className="text-neutral-600">
-              <strong>Sumasang-ayon ako</strong> na darating sa tamang oras, tatanggapin ang mga parusa sa pagka-late, at nauunawaan ko ang mga patakaran sa pag-reschedule/cancellation.
-            </span>
+            {language === 'en' ? (
+              <><strong>I agree</strong> to arrive on time, accept the tardy penalties, and understand the reschedule/cancellation terms.</>
+            ) : (
+              <><strong>Sumasang-ayon ako</strong> na darating sa tamang oras, tatanggapin ang mga parusa sa pagka-late, at nauunawaan ko ang mga patakaran sa pag-reschedule/cancellation.</>
+            )}
           </span>
         </label>
       </div>
