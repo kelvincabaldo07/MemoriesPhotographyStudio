@@ -546,6 +546,7 @@ export default function App(){
               
               // Store thumbnail if available (from Notion)
               if (svc.thumbnail) {
+                console.log(`📸 Thumbnail found for ${baseServiceName}:`, svc.thumbnail);
                 info[baseServiceName].thumbnail = svc.thumbnail;
               }
               
@@ -1519,6 +1520,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                                   src={photoPath} 
                                   alt={s}
                                   className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    console.error(`Failed to load image for ${s}:`, photoPath);
+                                    // Try to show a placeholder on error
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                  onLoad={() => {
+                                    console.log(`Successfully loaded image for ${s}:`, photoPath);
+                                  }}
                                 />
                               </div>
                             )}
