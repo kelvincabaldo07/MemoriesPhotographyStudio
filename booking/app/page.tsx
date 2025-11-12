@@ -426,7 +426,7 @@ export default function App(){
   const [serviceRestrictions, setServiceRestrictions] = useState<Record<string, ServiceRestriction>>(SERVICE_RESTRICTIONS);
   
   // Dynamic service info from API (descriptions, prices)
-  const [serviceInfo, setServiceInfo] = useState<Record<string, { details: string; price: number; classicDetails?: string }>>(SERVICE_INFO);
+  const [serviceInfo, setServiceInfo] = useState<Record<string, { details: string; price: number; classicDetails?: string; thumbnail?: string }>>(SERVICE_INFO);
 
   // Booking policies from admin settings
   const [bookingPolicies, setBookingPolicies] = useState({
@@ -542,6 +542,11 @@ export default function App(){
                   details: "",
                   price: 0,
                 };
+              }
+              
+              // Store thumbnail if available (from Notion)
+              if (svc.thumbnail) {
+                info[baseServiceName].thumbnail = svc.thumbnail;
               }
               
               // If it's a Classic service, store classic details and price
@@ -1469,9 +1474,11 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                         
                         // Check if this is a pre-birthday service that should have a photo
                         const isPreBirthdayService = (serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)");
-                        // Convert service name to match filename format (e.g., "Butterfly Theme" -> "butterfly-theme")
+                        // Use thumbnail from Notion if available, otherwise fall back to local file
                         const serviceName = s.toLowerCase().replace(/\s+/g, '-');
-                        const photoPath = isPreBirthdayService ? `/placeholders/services/${serviceName}.jpg` : null;
+                        const photoPath = isPreBirthdayService 
+                          ? (info.thumbnail || `/placeholders/services/${serviceName}.jpg`)
+                          : null;
                         
                         return (
                           <div 

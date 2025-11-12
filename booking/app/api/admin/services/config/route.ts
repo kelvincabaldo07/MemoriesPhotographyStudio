@@ -146,6 +146,17 @@ const DEFAULT_SERVICES = [
     availableUntil: 18,
     enabled: true,
   },
+  {
+    name: "Pink Cloud Wonderland Theme",
+    type: "With Photographer",
+    group: "Kids Pre-birthday (Girls)",
+    description: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)",
+    basePrice: 1000,
+    duration: 45,
+    availableFrom: 8,
+    availableUntil: 18,
+    enabled: true,
+  },
   // With Photographer - Kids Pre-birthday (Boys)
   {
     name: "Racing Theme",
