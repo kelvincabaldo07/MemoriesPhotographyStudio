@@ -161,6 +161,7 @@ const TAXONOMY = {
         "Cuddly Bear Theme",
         "Mermaid Theme",
         "Hot Air Balloon Theme",
+        "Pink Cloud Wonderland Theme",
       ],
       "Kids Pre-birthday (Boys)": [
         "Racing Theme",
@@ -249,6 +250,7 @@ const SERVICE_INFO: Record<string, { details: string; price: number; digitalPric
   "Pastel Daisies Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Butterfly Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   "Mermaid Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Pink Cloud Wonderland Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
 
   // Seasonal Christmas
   "2025 Christmas – White & Gold (Solo/Duo)": { details: "1–2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 1000 },
