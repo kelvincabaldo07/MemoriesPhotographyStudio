@@ -357,11 +357,8 @@ export async function POST(request: NextRequest) {
     }
 
     const notionResult = await notionResponse.json();
-    console.log('✅ Saved to Notion successfully!');
-
     // Send booking confirmation email via SendGrid
     try {
-      console.log('📧 Sending booking confirmation email via SendGrid...');
       await sendBookingConfirmationEmail({
         bookingId,
         customer: bookingData.customer,
@@ -371,9 +368,10 @@ export async function POST(request: NextRequest) {
         addons: bookingData.addons,
         selfShoot: bookingData.selfShoot,
       });
-      console.log('✅ Booking confirmation email sent');
     } catch (emailError) {
-      console.warn('⚠️ SendGrid email failed (non-critical):', emailError);
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('SendGrid email failed (non-critical):', emailError);
+      }
       // Continue - don't fail the booking if email fails
     }
 

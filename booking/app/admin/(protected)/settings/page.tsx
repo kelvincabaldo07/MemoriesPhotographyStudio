@@ -93,15 +93,15 @@ export default function SettingsPage() {
 
       const data = await response.json();
       
-      if (response.ok && data.success) {
-        console.log('✅ BCC emails saved successfully');
-      } else if (data.needsSetup) {
-        console.warn('⚠️ BCC emails saved (memory only) - Settings DB not configured');
-      } else {
-        console.error('Failed to save BCC emails:', data.error);
+      if (!response.ok || !data.success) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to save BCC emails:', data.error);
+        }
       }
     } catch (error) {
-      console.error("Error saving BCC emails:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error saving BCC emails:", error);
+      }
     }
   };
 
@@ -182,7 +182,6 @@ export default function SettingsPage() {
 
     const loadBccEmails = async () => {
       try {
-        console.log('[Settings] Loading BCC email addresses...');
         const response = await fetch('/api/admin/settings/bcc-emails', {
           credentials: 'same-origin',
         });
@@ -190,8 +189,7 @@ export default function SettingsPage() {
         
         if (response.ok && data.success && data.emails) {
           setBccEmails(data.emails);
-          console.log('[Settings] BCC emails loaded:', data.emails);
-        } else {
+        } else if (process.env.NODE_ENV === 'development') {
           console.error('[Settings] Failed to load BCC emails:', data);
         }
       } catch (error) {

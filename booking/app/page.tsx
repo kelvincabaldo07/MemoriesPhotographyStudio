@@ -489,20 +489,21 @@ export default function App(){
       .then(res => res.json())
       .then(data => {
         if (data && data.settings) {
-          console.log('📅 Loaded booking policies:', data.settings);
           setBookingPolicies(data.settings);
         }
       })
-      .catch(err => console.error('Failed to load booking policies:', err));
+      .catch(err => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to load booking policies:', err);
+        }
+      });
   }, []);
 
   // Load service data from API on mount
   useEffect(() => {
-    console.log('🔄 Loading service data from API...');
     fetch('/api/admin/services/config')
       .then(res => res.json())
       .then(data => {
-        console.log('📦 Received service data:', data);
         if (data.services) {
           const restrictions: Record<string, ServiceRestriction> = {};
           const info: Record<string, { details: string; price: number; classicDetails?: string; thumbnail?: string }> = {};
@@ -534,8 +535,6 @@ export default function App(){
               // But booking page uses base names like "Solo/Duo 15"
               const baseServiceName = svc.name.replace(/^(Classic |Digital )/, '');
               
-              console.log(`Processing service: ${svc.name} -> ${baseServiceName} (Category: ${svc.category})`);
-              
               // Initialize entry if it doesn't exist
               if (!info[baseServiceName]) {
                 info[baseServiceName] = {
@@ -546,7 +545,6 @@ export default function App(){
               
               // Store thumbnail if available (from Notion)
               if (svc.thumbnail) {
-                console.log(`📸 Thumbnail found for ${baseServiceName}:`, svc.thumbnail);
                 info[baseServiceName].thumbnail = svc.thumbnail;
               }
               
@@ -563,9 +561,6 @@ export default function App(){
             }
           });
           
-          console.log('✅ Built service info:', info);
-          console.log('✅ Built restrictions:', restrictions);
-          
           // Update state with API data
           if (Object.keys(restrictions).length > 0) {
             setServiceRestrictions(prev => ({ ...prev, ...restrictions }));
@@ -576,8 +571,10 @@ export default function App(){
         }
       })
       .catch(err => {
-        console.error('❌ Failed to load service data:', err);
         // Keep using defaults on error
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to load service data:', err);
+        }
       });
   }, []);
 
@@ -659,11 +656,8 @@ export default function App(){
   function onAllocationChange(key:string,value:string){ const v=Math.max(0, Number(value)||0); setAllocations(prev=>({ ...prev, [key]: v })); }
 
 async function submitBooking(){
-  console.log('🎯 submitBooking called!');
-  
   // Prevent duplicate submissions
   if (bookingInProgress.current) {
-    console.warn('⚠️ Booking already in progress, ignoring duplicate call');
     return;
   }
   
@@ -682,10 +676,7 @@ async function submitBooking(){
     totals: { sessionPrice, addonsTotal, grandTotal }
   };
   
-  console.log('📤 About to send payload:', payload);
-  
   try {
-    console.log('🌐 Calling fetch /api/bookings...');
     const response = await fetch('/api/bookings', {
       method: 'POST',
       headers: {
@@ -694,24 +685,18 @@ async function submitBooking(){
       body: JSON.stringify(payload),
     });
 
-    console.log('📨 Fetch response received, status:', response.status);
     const result = await response.json();
-    console.log('📋 Result:', result);
     
     if (result.success) {
-      console.log('✅ Booking created:', result.bookingId);
       setStep(STEPS.length-1); // Go to confirmation
     } else {
-      console.error('❌ Booking failed:', result.error);
       setModalMessage('Failed to create booking. Please try again.');
       setShowErrorModal(true);
     }
   } catch (error) {
-    console.error('❌ Network error:', error);
     setModalMessage('Network error. Please check your connection.');
     setShowErrorModal(true);
   } finally {
-    console.log('🏁 setBusy(false)');
     setBusy(false);
     bookingInProgress.current = false;
   }
@@ -722,16 +707,7 @@ async function submitBooking(){
       case 0: return !!service;
       case 1: return !!date && !!time;
       case 2: {
-        const result = !!firstName && !!lastName && !!email && !!phone && emailVerified;
-        console.log('🔍 Step 2 validation:', {
-          firstName: !!firstName,
-          lastName: !!lastName,
-          email: !!email,
-          phone: !!phone,
-          emailVerified,
-          canContinue: result
-        });
-        return result;
+        return !!firstName && !!lastName && !!email && !!phone && emailVerified;
       }
       case 3: { // consent conditional questions - CHANGED
         if (!socialConsent) return false; // Always required
@@ -1520,14 +1496,6 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                                   src={photoPath} 
                                   alt={s}
                                   className="w-full h-full object-cover"
-                                  onError={(e) => {
-                                    console.error(`Failed to load image for ${s}:`, photoPath);
-                                    // Try to show a placeholder on error
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                  onLoad={() => {
-                                    console.log(`Successfully loaded image for ${s}:`, photoPath);
-                                  }}
                                 />
                               </div>
                             )}
@@ -1675,7 +1643,6 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     // Skip if we already have data cached
     if (Object.keys(availabilityCache).length > 0) return;
     
-    console.log('Fetching batch availability for', next90Days.length, 'days');
     setLoadingDates(true);
     
     fetch('/api/calendar/availability-batch', {
@@ -1695,7 +1662,9 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
         }
       })
       .catch(err => {
-        console.error('Failed to load availability:', err);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Failed to load availability:', err);
+        }
       })
       .finally(() => setLoadingDates(false));
   }, [duration, bookingPolicies.schedulingWindow, bookingPolicies.schedulingWindowUnit, next90Days]);
@@ -1726,13 +1695,17 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           setRealAvailableSlots(data.availableSlots);
           setUsingMockData(data.usingMockData || false);
         } else {
-          console.error('Failed to fetch availability:', data.error);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Failed to fetch availability:', data.error);
+          }
           setRealAvailableSlots(availableSlots);
           setUsingMockData(true);
         }
       })
       .catch(err => {
-        console.error('Error fetching availability:', err);
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Error fetching availability:', err);
+        }
         setRealAvailableSlots(availableSlots);
         setUsingMockData(true);
       })
@@ -1983,18 +1956,11 @@ function StepCustomer(props: {
   }
 
   function verifyCode() {
-    console.log('🔍 Verifying code...');
-    console.log('  Entered code:', verificationCode);
-    console.log('  Expected code:', sentCode);
-    console.log('  Match:', verificationCode === sentCode);
-    
     if (verificationCode === sentCode) {
-      console.log('✅ Setting emailVerified to TRUE');
       setEmailVerified(true);
       setModalMessage('Email verified successfully!');
       setShowSuccessModal(true);
     } else {
-      console.log('❌ Codes do not match');
       setModalMessage('Invalid verification code. Please try again.');
       setShowErrorModal(true);
     }

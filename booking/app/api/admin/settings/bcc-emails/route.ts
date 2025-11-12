@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
         throw new Error(`Failed to update setting: ${updateResponse.statusText}`);
       }
 
-      console.log('✅ BCC email addresses updated in Notion');
+
     } else {
       // Create new setting
       const createResponse = await fetch('https://api.notion.com/v1/pages', {
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
         throw new Error(`Failed to create setting: ${createResponse.statusText}`);
       }
 
-      console.log('✅ BCC email addresses setting created in Notion');
+
     }
 
     return NextResponse.json({

@@ -135,9 +135,7 @@ export async function POST(request: NextRequest) {
 
     // Send OTP via SendGrid
     try {
-      console.log(`[OTP] Sending verification code to ${email} via SendGrid...`);
       await sendOTPEmail(email, code);
-      console.log(`[OTP] ✅ Verification code sent successfully to ${email}`);
     } catch (error) {
       console.error('[OTP] ❌ Failed to send via SendGrid:', error);
       
@@ -165,9 +163,9 @@ export async function POST(request: NextRequest) {
         }
       }
       
-      // In development, always show the code in console
+      // In development, always show the code in console (without PII)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[OTP] 🔑 DEV MODE - Code for ${email}: ${code}`);
+        console.log(`[OTP] 🔑 DEV MODE - Code generated: ${code}`);
       }
     }
 

@@ -6,14 +6,10 @@ function generateVerificationCode() {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('🔔 Verify email API hit');
-  
   try {
     const { email } = await request.json();
-    console.log('📧 Email to verify:', email);
     
     if (!email || !email.includes('@')) {
-      console.log('❌ Invalid email');
       return NextResponse.json(
         { success: false, error: 'Invalid email address' },
         { status: 400 }
@@ -21,21 +17,19 @@ export async function POST(request: NextRequest) {
     }
 
     const code = generateVerificationCode();
-    console.log('✅ Generated code:', code);
 
     // Send verification email via SendGrid
     try {
-      console.log('📧 Sending verification email via SendGrid...');
       await sendEmailVerificationCode(email, code);
-      console.log('✅ Verification email sent successfully');
     } catch (emailError) {
-      console.error('❌ SendGrid email failed:', emailError);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('SendGrid email failed:', emailError);
+      }
       
       // Try n8n as fallback if configured
       const n8nWebhookUrl = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL?.replace('booking-created', 'send-verification');
       if (n8nWebhookUrl) {
         try {
-          console.log('🔔 Attempting n8n fallback...');
           await fetch(n8nWebhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -45,14 +39,14 @@ export async function POST(request: NextRequest) {
               code
             }),
           });
-          console.log('✅ Sent via n8n fallback');
         } catch (n8nError) {
-          console.error('⚠️ n8n fallback also failed:', n8nError);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('n8n fallback also failed:', n8nError);
+          }
         }
       }
     }
 
-    console.log('📤 Returning success');
     return NextResponse.json({
       success: true,
       message: 'Verification code sent',
@@ -60,7 +54,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('💥 Error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Verify email error:', error);
+    }
     return NextResponse.json(
       { success: false, error: 'Failed to send verification code' },
       { status: 500 }

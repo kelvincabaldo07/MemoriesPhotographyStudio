@@ -217,8 +217,10 @@ async function handleBookingCreated(pageId: string, props: any) {
 
   // Only create calendar event if booking is confirmed and has required data
   if (status === 'Booking Confirmed' && email && date && time) {
-    console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
-    console.log(`[Notion Webhook] Details: ${firstName} ${lastName}, ${email}, ${date} ${time}, ${service} (${duration}min)`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
+      console.log(`[Notion Webhook] Details: ${firstName} ${lastName}, [REDACTED], ${date} ${time}, ${service} (${duration}min)`);
+    }
     
     try {
       const eventId = await createCalendarEvent({
@@ -246,7 +248,9 @@ async function handleBookingCreated(pageId: string, props: any) {
       throw error;
     }
   } else {
-    console.log(`[Notion Webhook] Skipping calendar creation: status=${status}, hasEmail=${!!email}, hasDate=${!!date}, hasTime=${!!time}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Notion Webhook] Skipping calendar creation: status=${status}, hasEmail=${!!email}, hasDate=${!!date}, hasTime=${!!time}`);
+    }
   }
 }
 
@@ -280,11 +284,10 @@ async function handleBookingUpdated(pageId: string, props: any) {
       await updateCalendarEvent(calendarEventId, { date, time, duration } as any);
       
       // Send update notification email
-      const email = extractEmail(props['Email']);
-      if (email) {
-        // TODO: Create sendBookingUpdateEmail function
-        console.log(`[Notion Webhook] TODO: Send update email to ${email}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Notion Webhook] TODO: Send update email`);
       }
+      // TODO: Create sendBookingUpdateEmail function
     }
   }
 }
