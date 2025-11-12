@@ -1,0 +1,18 @@
+# Service Photo Placeholders
+
+Place individual service photos here with these exact filenames:
+
+## Kids Pre-birthday (Girls)
+- princess-themed.jpg
+- fairy-garden.jpg
+- pastel-dreams.jpg
+- ballerina-studio.jpg
+
+## Kids Pre-birthday (Boys)
+- superhero-adventure.jpg
+- race-car-fun.jpg
+- space-explorer.jpg
+- dinosaur-world.jpg
+
+Note: The system automatically converts service names to lowercase with hyphens.
+Example: "Princess Themed" → "princess-themed.jpg"

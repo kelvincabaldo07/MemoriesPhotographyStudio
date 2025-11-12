@@ -1477,12 +1477,18 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                         // Use classic details if Classic category is selected, otherwise use digital details
                         const displayDetails = serviceCategory === "Classic" && info.classicDetails ? info.classicDetails : info.details;
                         const displayPrice = serviceCategory === "Classic" ? info.price + 50 : info.price;
+                        
+                        // Check if this is a pre-birthday service that should have a photo
+                        const isPreBirthdayService = (serviceGroup === "Kids Pre-birthday (Girls)" || serviceGroup === "Kids Pre-birthday (Boys)");
+                        const serviceName = s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                        const photoPath = isPreBirthdayService ? `/placeholders/services/${serviceName}.jpg` : null;
+                        
                         return (
                           <button 
                             key={s} 
                             onClick={()=> setService(s)} 
                             className={cn(
-                              "text-left border rounded-xl p-3 hover:shadow-md transition",
+                              "text-left border rounded-xl overflow-hidden hover:shadow-md transition",
                               service === s && "shadow-lg"
                             )}
                             style={{ 
@@ -1490,25 +1496,46 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                               backgroundColor: service === s ? "#e8f5f0" : BRAND.white
                             }}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <div className="font-semibold" style={{ color: BRAND.forest }}>{s}</div>
-                                {displayDetails && (
-                                <ul className="text-sm text-neutral-600 mt-2 space-y-1">
-                                  {displayDetails.split('\n').map((line, idx) => (
-                                    <li key={idx} className="flex items-start gap-1">
-                                      <span className="text-green-600 mt-0.5">•</span>
-                                      <span>{line}</span>
-                                    </li>
-                                  ))}
-                                </ul>
+                            {/* Service Photo (for pre-birthday services) */}
+                            {isPreBirthdayService && photoPath && (
+                              <div className="relative h-40 bg-neutral-100 overflow-hidden">
+                                <img 
+                                  src={photoPath} 
+                                  alt={s}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    // Hide image if not found, show placeholder gradient
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                                {/* Gradient overlay fallback */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center text-4xl">
+                                  🎂
+                                </div>
+                              </div>
+                            )}
+                            
+                            <div className="p-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="font-semibold" style={{ color: BRAND.forest }}>{s}</div>
+                                  {displayDetails && (
+                                  <ul className="text-sm text-neutral-600 mt-2 space-y-1">
+                                    {displayDetails.split('\n').map((line, idx) => (
+                                      <li key={idx} className="flex items-start gap-1">
+                                        <span className="text-green-600 mt-0.5">•</span>
+                                        <span>{line}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                                </div>
+                                {displayPrice > 0 && (
+                                <Badge style={{ backgroundColor: BRAND.forest, color: BRAND.white }}>
+                                  {currency(displayPrice)}
+                                </Badge>
                               )}
                               </div>
-                              {displayPrice > 0 && (
-                              <Badge style={{ backgroundColor: BRAND.forest, color: BRAND.white }}>
-                                {currency(displayPrice)}
-                              </Badge>
-                            )}
                             </div>
                           </button>
                         );
