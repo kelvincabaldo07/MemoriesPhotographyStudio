@@ -192,23 +192,39 @@ async function syncCalendarToNotion() {
           const notionDate = props['Date']?.date?.start;
           const notionTime = props['Time']?.rich_text?.[0]?.text?.content;
           
-          // Parse calendar event date/time in Manila timezone (UTC+8)
-          const calendarDateTime = new Date(calendarEvent.start.dateTime);
+          // Parse calendar event date/time
+          const calendarDateTimeStr = calendarEvent.start.dateTime;
           
-          // Convert to Manila time (Asia/Manila is UTC+8)
-          const manilaTime = new Date(calendarDateTime.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+          // Google Calendar returns ISO 8601 with timezone offset (e.g., "2025-11-15T10:00:00+08:00")
+          // Extract date and time from the ISO string
+          let calendarDate: string;
+          let calendarTime: string;
           
-          // Extract date and time in Manila timezone
-          const calendarDate = manilaTime.toISOString().split('T')[0];
-          const hours = manilaTime.getHours().toString().padStart(2, '0');
-          const minutes = manilaTime.getMinutes().toString().padStart(2, '0');
-          const calendarTime = `${hours}:${minutes}`;
+          if (calendarDateTimeStr.includes('+08:00') || calendarDateTimeStr.includes('+08')) {
+            // Already in Manila timezone (+08:00)
+            const [datePart, timePart] = calendarDateTimeStr.split('T');
+            calendarDate = datePart;
+            calendarTime = timePart.substring(0, 5); // HH:MM
+          } else {
+            // Convert from other timezone to Manila
+            const dt = new Date(calendarDateTimeStr);
+            const manilaStr = dt.toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: false });
+            // Parse "MM/DD/YYYY, HH:MM:SS" format
+            const [dateStr, timeStr] = manilaStr.split(', ');
+            const [month, day, year] = dateStr.split('/');
+            calendarDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            calendarTime = timeStr.substring(0, 5);
+          }
+
+          // Debug logging
+          console.log(`[Calendar Sync] � Checking event ${calendarEventId.substring(0, 8)}...`);
+          console.log(`[Calendar Sync]    Notion: ${notionDate} ${notionTime}`);
+          console.log(`[Calendar Sync]    Calendar: ${calendarDate} ${calendarTime}`);
+          console.log(`[Calendar Sync]    Raw calendar time: ${calendarDateTimeStr}`);
 
           // Check if date or time changed
           if (notionDate !== calendarDate || notionTime !== calendarTime) {
-            console.log(`[Calendar Sync] 🔄 Event ${calendarEventId} time changed - updating Notion booking ${booking.id}`);
-            console.log(`[Calendar Sync]    Notion: ${notionDate} ${notionTime}`);
-            console.log(`[Calendar Sync]    Calendar: ${calendarDate} ${calendarTime}`);
+            console.log(`[Calendar Sync] 🔄 MISMATCH DETECTED - updating Notion booking ${booking.id.substring(0, 8)}`);
 
             await fetch(`https://api.notion.com/v1/pages/${booking.id}`, {
               method: 'PATCH',
