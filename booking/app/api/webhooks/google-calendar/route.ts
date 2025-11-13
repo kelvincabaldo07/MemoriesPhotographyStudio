@@ -42,16 +42,18 @@ export async function POST(request: NextRequest) {
 
     // 'exists' means the calendar has changed
     if (resourceState === 'exists') {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Google Calendar Webhook] Calendar changed - triggering sync');
-      }
+      // Always log calendar change notifications (even in production) for debugging
+      console.log('[Google Calendar Webhook] 📅 Calendar changed - triggering sync at', new Date().toISOString());
       
       // Sync Google Calendar changes to Notion
       await syncCalendarToNotion();
       
+      console.log('[Google Calendar Webhook] ✅ Sync completed');
+      
       return NextResponse.json({ 
         success: true, 
-        message: 'Calendar sync triggered' 
+        message: 'Calendar sync triggered',
+        timestamp: new Date().toISOString()
       });
     }
 
@@ -106,9 +108,8 @@ async function syncCalendarToNotion() {
         .map(event => event.id)
     );
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Calendar Sync] Found ${calendarEventIds.size} calendar events`);
-    }
+    // Always log sync attempts for debugging
+    console.log(`[Calendar Sync] 🔍 Starting sync - Found ${calendarEventIds.size} calendar events`);
 
     // Query Notion for all bookings with Calendar Event IDs
     const notionResponse = await fetch('https://api.notion.com/v1/databases/' + notionDatabaseId + '/query', {
@@ -145,9 +146,7 @@ async function syncCalendarToNotion() {
     const notionData = await notionResponse.json();
     const notionBookings = notionData.results || [];
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Calendar Sync] Found ${notionBookings.length} Notion bookings with calendar events`);
-    }
+    console.log(`[Calendar Sync] 📋 Found ${notionBookings.length} Notion bookings with calendar events`);
 
     // Check each Notion booking to see if its calendar event still exists
     let deletedCount = 0;
@@ -193,17 +192,23 @@ async function syncCalendarToNotion() {
           const notionDate = props['Date']?.date?.start;
           const notionTime = props['Time']?.rich_text?.[0]?.text?.content;
           
-          // Parse calendar event date/time
+          // Parse calendar event date/time in Manila timezone (UTC+8)
           const calendarDateTime = new Date(calendarEvent.start.dateTime);
-          const calendarDate = calendarDateTime.toISOString().split('T')[0];
-          const calendarTime = calendarDateTime.toTimeString().slice(0, 5); // HH:MM format
+          
+          // Convert to Manila time (Asia/Manila is UTC+8)
+          const manilaTime = new Date(calendarDateTime.toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+          
+          // Extract date and time in Manila timezone
+          const calendarDate = manilaTime.toISOString().split('T')[0];
+          const hours = manilaTime.getHours().toString().padStart(2, '0');
+          const minutes = manilaTime.getMinutes().toString().padStart(2, '0');
+          const calendarTime = `${hours}:${minutes}`;
 
           // Check if date or time changed
           if (notionDate !== calendarDate || notionTime !== calendarTime) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log(`[Calendar Sync] Event ${calendarEventId} time changed - updating Notion booking`);
-              console.log(`[Calendar Sync] Old: ${notionDate} ${notionTime} -> New: ${calendarDate} ${calendarTime}`);
-            }
+            console.log(`[Calendar Sync] 🔄 Event ${calendarEventId} time changed - updating Notion booking ${booking.id}`);
+            console.log(`[Calendar Sync]    Notion: ${notionDate} ${notionTime}`);
+            console.log(`[Calendar Sync]    Calendar: ${calendarDate} ${calendarTime}`);
 
             await fetch(`https://api.notion.com/v1/pages/${booking.id}`, {
               method: 'PATCH',
@@ -238,9 +243,7 @@ async function syncCalendarToNotion() {
       }
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Calendar Sync] Complete - Cancelled: ${deletedCount}, Updated: ${updatedCount}`);
-    }
+    console.log(`[Calendar Sync] ✅ Complete - Cancelled: ${deletedCount}, Updated: ${updatedCount}`);
 
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
