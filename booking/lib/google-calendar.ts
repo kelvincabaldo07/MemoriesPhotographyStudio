@@ -293,3 +293,61 @@ export async function deleteCalendarEvent(eventId: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Fetch a single calendar event by ID
+ */
+export async function getCalendarEvent(eventId: string): Promise<any | null> {
+  try {
+    const oauth2Client = getOAuth2Client();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    const response = await calendar.events.get({
+      calendarId: CALENDAR_ID,
+      eventId: eventId,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    if (error.code === 404 || error.status === 404) {
+      // Event doesn't exist
+      return null;
+    }
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching calendar event:', error);
+    }
+    return null;
+  }
+}
+
+/**
+ * Fetch all calendar events within a date range
+ * Used for syncing Google Calendar changes back to Notion
+ */
+export async function getCalendarEvents(startDate?: Date, endDate?: Date): Promise<any[]> {
+  try {
+    const oauth2Client = getOAuth2Client();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    // Default to fetching events from 30 days ago to 90 days in the future
+    const timeMin = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const timeMax = endDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+
+    const response = await calendar.events.list({
+      calendarId: CALENDAR_ID,
+      timeMin: timeMin.toISOString(),
+      timeMax: timeMax.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+      maxResults: 2500, // Get all events
+    });
+
+    return response.data.items || [];
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching calendar events:', error);
+    }
+    return [];
+  }
+}
