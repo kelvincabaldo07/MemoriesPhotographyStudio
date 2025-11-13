@@ -26,14 +26,7 @@ export async function GET(request: NextRequest) {
     // Fetch all calendar events from the past 30 days to 90 days in the future
     const calendarEvents = await getCalendarEvents();
     
-    // Create a map of calendar event IDs for quick lookup
-    const calendarEventMap = new Map(
-      calendarEvents
-        .filter(event => event.id)
-        .map(event => [event.id, event])
-    );
-
-    console.log(`[Manual Sync] 📅 Found ${calendarEventMap.size} calendar events`);
+    console.log(`[Manual Sync] 📅 Found ${calendarEvents.length} calendar events`);
 
     // Query Notion for all bookings with Calendar Event IDs
     const notionResponse = await fetch('https://api.notion.com/v1/databases/' + notionDatabaseId + '/query', {
@@ -85,7 +78,9 @@ export async function GET(request: NextRequest) {
       if (!calendarEventId) continue;
 
       // Check if the calendar event still exists
-      if (!calendarEventMap.has(calendarEventId)) {
+      const calendarEvent = calendarEvents.find(e => e.id === calendarEventId);
+      
+      if (!calendarEvent) {
         // Event was deleted from calendar - update Notion to Cancelled
         console.log(`[Manual Sync] ❌ Event ${calendarEventId} deleted - cancelling booking ${bookingId}`);
 
@@ -114,11 +109,8 @@ export async function GET(request: NextRequest) {
           action: 'cancelled',
           reason: 'Event deleted from calendar'
         });
-      } else {
+      } else if (calendarEvent?.start?.dateTime) {
         // Event still exists - check if date/time changed
-        const calendarEvent = calendarEventMap.get(calendarEventId);
-        
-        if (calendarEvent?.start?.dateTime) {
           const notionDate = props['Date']?.date?.start;
           const notionTime = props['Time']?.rich_text?.[0]?.text?.content;
           
@@ -176,7 +168,6 @@ export async function GET(request: NextRequest) {
               newDateTime: `${calendarDate} ${calendarTime}`
             });
           }
-        }
       }
     }
 
@@ -187,7 +178,7 @@ export async function GET(request: NextRequest) {
       message: 'Manual sync completed',
       timestamp: new Date().toISOString(),
       stats: {
-        calendarEvents: calendarEventMap.size,
+        calendarEvents: calendarEvents.length,
         notionBookings: notionBookings.length,
         cancelled: deletedCount,
         updated: updatedCount,
