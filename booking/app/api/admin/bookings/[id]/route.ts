@@ -149,11 +149,11 @@ export async function PATCH(
       const endTime = calculateEndTime(body.time, totalDuration);
       
       // Use the provided date or get from old properties
-      const dateForTime = body.date || oldProps.Date?.date?.start || new Date().toISOString().split('T')[0];
+      const dateForTime = body.date || oldProps.Date?.date?.start?.split('T')[0] || new Date().toISOString().split('T')[0];
       
-      // Create datetime strings with Manila timezone
-      const startDateTime = `${dateForTime}T${body.time}:00.000+08:00`;
-      const endDateTime = `${dateForTime}T${endTime}:00.000+08:00`;
+      // When time_zone is provided, Notion expects local time WITHOUT UTC offset
+      const startDateTime = `${dateForTime}T${body.time}:00`;
+      const endDateTime = `${dateForTime}T${endTime}:00`;
       
       notionProperties.Time = {
         date: {
