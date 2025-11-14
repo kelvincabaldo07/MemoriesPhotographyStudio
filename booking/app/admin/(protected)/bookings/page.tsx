@@ -383,12 +383,12 @@ export default function BookingsPage() {
              matchesServiceCategory && matchesService;
     })
     .sort((a, b) => {
-      // Sort by date (descending), then by time (descending)
-      const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+      // Sort by date (ascending), then by time (ascending)
+      const dateCompare = new Date(a.date).getTime() - new Date(b.date).getTime();
       if (dateCompare !== 0) return dateCompare;
       
-      // Compare times if dates are the same
-      return b.time.localeCompare(a.time);
+      // Compare times if dates are the same (earliest first)
+      return a.time.localeCompare(b.time);
     });
 
   const getStatusColor = (status: string) => {
@@ -515,8 +515,8 @@ export default function BookingsPage() {
             {/* Total Bookings */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
-                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/10 rounded-lg flex items-center justify-center mb-2">
+                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
                 </div>
                 <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
                 <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
@@ -526,8 +526,8 @@ export default function BookingsPage() {
             {/* Revenue */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
-                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#A62F20]/10 rounded-lg flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#A62F20]" />
                 </div>
                 <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
                 <p className="text-xl lg:text-3xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
@@ -537,8 +537,8 @@ export default function BookingsPage() {
             {/* Customers */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
-                  <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#8B5E3C]/10 rounded-lg flex items-center justify-center mb-2">
+                  <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-[#8B5E3C]" />
                 </div>
                 <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Customers</p>
                 <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
@@ -548,8 +548,8 @@ export default function BookingsPage() {
             {/* Avg. Value */}
             <div className="text-center">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
-                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/10 rounded-lg flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
                 </div>
                 <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Value</p>
                 <p className="text-xl lg:text-3xl font-bold text-foreground">
@@ -577,40 +577,32 @@ export default function BookingsPage() {
 
           {/* Status Filters */}
           <div>
-            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status (select multiple)</label>
-            <div className="flex flex-wrap gap-2">
-              {["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
-                <label
-                  key={status}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-lg border cursor-pointer transition ${
-                    statusFilter.includes(status)
-                      ? "bg-[#0b3d2e] text-white border-[#0b3d2e]"
-                      : "bg-white hover:bg-neutral-50 border-neutral-300"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={statusFilter.includes(status)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setStatusFilter([...statusFilter, status]);
-                      } else {
-                        setStatusFilter(statusFilter.filter(s => s !== status));
-                      }
-                    }}
-                    className="sr-only"
-                  />
-                  {status}
-                </label>
-              ))}
+            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status (multi-select dropdown)</label>
+            <div className="relative">
+              <select
+                multiple
+                value={statusFilter}
+                onChange={(e) => {
+                  const selected = Array.from(e.target.selectedOptions, option => option.value);
+                  setStatusFilter(selected);
+                }}
+                className="w-full px-3 py-2 border rounded-lg text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[#0b3d2e]"
+              >
+                {["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
+                  <option key={status} value={status} className="py-1">
+                    {status}
+                  </option>
+                ))}
+              </select>
               {statusFilter.length > 0 && (
                 <button
                   onClick={() => setStatusFilter([])}
-                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition"
+                  className="mt-2 px-3 py-1.5 text-xs font-medium rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition"
                 >
-                  Clear All
+                  Clear All ({statusFilter.length} selected)
                 </button>
               )}
+              <p className="text-xs text-neutral-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
             </div>
           </div>
 
@@ -725,18 +717,24 @@ export default function BookingsPage() {
               key={booking.id}
               className="p-4 hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => {
-                setSelectedBooking(booking);
-                setEditedBooking(booking);
+                // Create deep copy with all fields properly set
+                const bookingCopy = {
+                  ...booking,
+                  serviceGroup: booking.serviceGroup || '',
+                  service: booking.service || ''
+                };
+                setSelectedBooking(bookingCopy);
+                setEditedBooking(bookingCopy);
                 setIsEditing(false);
               }}
             >
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {/* Date & Time */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-[#0b3d2e]" />
-                    <span className="font-semibold">{formatDate(booking.date)}</span>
-                    <Clock className="w-4 h-4 text-neutral-500 ml-2" />
+                  <div className="flex items-center gap-2 text-xs">
+                    <Calendar className="w-3 h-3 text-[#0b3d2e]" />
+                    <span className="font-semibold text-xs">{formatDate(booking.date)}</span>
+                    <Clock className="w-3 h-3 text-neutral-500 ml-2" />
                     <span className="text-neutral-600">{formatTimeTo12Hour(booking.time)}</span>
                   </div>
                   <Badge variant="outline" className={getStatusColor(booking.status)}>

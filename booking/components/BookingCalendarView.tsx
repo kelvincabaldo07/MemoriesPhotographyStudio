@@ -83,12 +83,13 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
     const newDate = new Date(currentDate);
     if (viewMode === 'day' || viewMode === 'agenda') {
       newDate.setDate(newDate.getDate() - 1);
-    } else if (viewMode === '2day') {
-      newDate.setDate(newDate.getDate() - 2);
     } else if (viewMode === '3day') {
       newDate.setDate(newDate.getDate() - 3);
-    } else if (viewMode === 'week') {
-      newDate.setDate(newDate.getDate() - 7);
+    } else if (viewMode === 'week' || viewMode === 'weekagenda') {
+      // Go to previous Monday
+      const dayOfWeek = newDate.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      newDate.setDate(newDate.getDate() + diff - 7);
     } else {
       newDate.setMonth(newDate.getMonth() - 1);
     }
@@ -99,12 +100,13 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
     const newDate = new Date(currentDate);
     if (viewMode === 'day' || viewMode === 'agenda') {
       newDate.setDate(newDate.getDate() + 1);
-    } else if (viewMode === '2day') {
-      newDate.setDate(newDate.getDate() + 2);
     } else if (viewMode === '3day') {
       newDate.setDate(newDate.getDate() + 3);
-    } else if (viewMode === 'week') {
-      newDate.setDate(newDate.getDate() + 7);
+    } else if (viewMode === 'week' || viewMode === 'weekagenda') {
+      // Go to next Monday
+      const dayOfWeek = newDate.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      newDate.setDate(newDate.getDate() + diff + 7);
     } else {
       newDate.setMonth(newDate.getMonth() + 1);
     }
@@ -619,7 +621,7 @@ function MultiDayView({
   );
 }
 
-// Day View Component
+// Day View Component with Working Hours
 function DayView({ 
   date, 
   bookings, 
@@ -629,21 +631,50 @@ function DayView({
   getStatusColor 
 }: any) {
   const [draggedBooking, setDraggedBooking] = useState<any>(null);
-  const hours = Array.from({ length: 13 }, (_, i) => i + 8); // 8 AM to 8 PM
+  const hours = Array.from({ length: 24 }, (_, i) => i); // All 24 hours
+
+  // Working hours by day of week (0=Sunday, 6=Saturday)
+  const getWorkingHours = (dayOfWeek: number) => {
+    switch(dayOfWeek) {
+      case 0: // Sunday
+        return { open: 13, close: 20, lunch: null };
+      case 6: // Saturday
+        return { open: 10, close: 20, lunch: { start: 12, end: 13 } };
+      default: // Monday-Friday
+        return { open: 8, close: 20, lunch: { start: 12, end: 13 } };
+    }
+  };
+
+  const dayOfWeek = date.getDay();
+  const workingHours = getWorkingHours(dayOfWeek);
+
+  const isWorkingHour = (hour: number) => {
+    if (hour < workingHours.open || hour >= workingHours.close) return false;
+    if (workingHours.lunch && hour >= workingHours.lunch.start && hour < workingHours.lunch.end) return false;
+    return true;
+  };
+
+  const isBreakTime = (hour: number) => {
+    return workingHours.lunch && hour >= workingHours.lunch.start && hour < workingHours.lunch.end;
+  };
 
   const handleDragStart = (e: React.DragEvent, booking: any) => {
     setDraggedBooking(booking);
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, hour: number) => {
+    if (!isWorkingHour(hour)) {
+      e.dataTransfer.dropEffect = 'none';
+      return;
+    }
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
 
   const handleDrop = async (e: React.DragEvent, hour: number) => {
     e.preventDefault();
-    if (!draggedBooking || !onReschedule) return;
+    if (!draggedBooking || !onReschedule || !isWorkingHour(hour)) return;
 
     const newTime = `${String(hour).padStart(2, '0')}:00`;
     const dateStr = date.toISOString().split('T')[0];
@@ -662,50 +693,67 @@ function DayView({
 
   return (
     <div className="bg-white rounded-lg border">
-      <div className="p-4 border-b bg-neutral-50">
-        <h3 className="font-semibold">
+      <div className="p-3 border-b bg-neutral-50">
+        <h3 className="font-semibold text-sm">
           {date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
         </h3>
       </div>
-      <div className="divide-y">
-        {hours.map(hour => (
-          <div 
-            key={hour} 
-            className="flex border-l border-r"
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, hour)}
-          >
-            <div className="w-20 p-3 text-sm text-neutral-600 border-r bg-neutral-50">
-              {hour % 12 || 12}:00 {hour >= 12 ? 'PM' : 'AM'}
-            </div>
-            <div className="flex-1 p-2 min-h-[80px]">
-              {bookings
-                .filter((b: any) => {
-                  const bookingHour = parseInt(b.time.split(':')[0]);
-                  return bookingHour === hour;
-                })
-                .map((booking: any) => (
+      <div className="divide-y max-h-[70vh] overflow-y-auto">
+        {hours.map(hour => {
+          const isWorking = isWorkingHour(hour);
+          const isBreak = isBreakTime(hour);
+          const hourBookings = bookings.filter((b: any) => {
+            const bookingHour = parseInt(b.time.split(':')[0]);
+            return bookingHour === hour;
+          });
+
+          return (
+            <div 
+              key={hour} 
+              className={cn(
+                "flex border-l border-r",
+                !isWorking && "bg-gray-100"
+              )}
+              onDragOver={(e) => handleDragOver(e, hour)}
+              onDrop={(e) => handleDrop(e, hour)}
+            >
+              <div className={cn(
+                "w-16 p-2 text-xs border-r",
+                isBreak ? "bg-yellow-50" : "bg-neutral-50",
+                !isWorking && "text-gray-400"
+              )}>
+                <div className="font-medium">{hour % 12 || 12}:00</div>
+                <div className="text-[10px]">{hour >= 12 ? 'PM' : 'AM'}</div>
+                {isBreak && <div className="text-[9px] text-yellow-700 mt-1">LUNCH</div>}
+                {!isWorking && !isBreak && <div className="text-[9px]">Closed</div>}
+              </div>
+              <div className={cn(
+                "flex-1 p-1 min-h-[60px]",
+                !isWorking && "cursor-not-allowed"
+              )}>
+                {hourBookings.map((booking: any) => (
                   <div
                     key={booking.id}
-                    draggable={!!onReschedule}
+                    draggable={!!onReschedule && isWorking}
                     onDragStart={(e) => handleDragStart(e, booking)}
                     onClick={() => onBookingClick(booking)}
                     className={cn(
-                      "p-2 mb-2 rounded-lg border-l-4 cursor-move hover:shadow-md transition",
+                      "p-1.5 mb-1 rounded border-l-4 hover:shadow-md transition text-xs",
                       getStatusColor(booking.status),
+                      onReschedule && isWorking ? "cursor-move" : "cursor-pointer",
                       draggedBooking?.id === booking.id && "opacity-50"
                     )}
                   >
-                    <div className="font-medium text-sm">{booking.name}</div>
-                    <div className="text-xs text-neutral-600">
-                      {formatTime(booking.time)} • {booking.duration} min
+                    <div className="font-medium text-xs truncate">{booking.name}</div>
+                    <div className="text-[10px] text-neutral-600">
+                      {formatTime(booking.time)} • {booking.duration}m
                     </div>
-                    <div className="text-xs text-neutral-600 truncate">{booking.service}</div>
                   </div>
                 ))}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
