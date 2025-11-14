@@ -40,12 +40,13 @@ interface Booking {
 interface BookingCalendarViewProps {
   bookings: Booking[];
   onBookingClick: (booking: Booking) => void;
+  onReschedule?: (bookingId: string, newDate: string, newTime: string) => Promise<void>;
 }
 
 type DesktopViewMode = 'day' | 'week' | 'month';
-type MobileViewMode = 'agenda' | 'day' | '2day' | '3day';
+type MobileViewMode = 'agenda' | 'weekagenda' | 'day' | '2day' | '3day';
 
-export function BookingCalendarView({ bookings, onBookingClick }: BookingCalendarViewProps) {
+export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: BookingCalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [desktopViewMode, setDesktopViewMode] = useState<DesktopViewMode>('week');
   const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('agenda');
@@ -255,23 +256,12 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
 
         {/* View Mode Toggle - Mobile */}
         {isMobile && (
-          <div className="flex gap-2">
+          <div className="flex gap-1 overflow-x-auto">
             <button
               onClick={() => setMobileViewMode('agenda')}
               className={cn(
-                "px-2 py-1.5 text-xs font-medium rounded-lg transition",
+                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
                 mobileViewMode === 'agenda' 
-                  ? 'bg-[#0b3d2e] text-white' 
-                  : 'border hover:bg-neutral-50'
-              )}
-            >
-              Agenda
-            </button>
-            <button
-              onClick={() => setMobileViewMode('day')}
-              className={cn(
-                "px-2 py-1.5 text-xs font-medium rounded-lg transition",
-                mobileViewMode === 'day' 
                   ? 'bg-[#0b3d2e] text-white' 
                   : 'border hover:bg-neutral-50'
               )}
@@ -279,9 +269,20 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
               Day
             </button>
             <button
+              onClick={() => setMobileViewMode('weekagenda')}
+              className={cn(
+                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
+                mobileViewMode === 'weekagenda' 
+                  ? 'bg-[#0b3d2e] text-white' 
+                  : 'border hover:bg-neutral-50'
+              )}
+            >
+              Week
+            </button>
+            <button
               onClick={() => setMobileViewMode('2day')}
               className={cn(
-                "px-2 py-1.5 text-xs font-medium rounded-lg transition",
+                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
                 mobileViewMode === '2day' 
                   ? 'bg-[#0b3d2e] text-white' 
                   : 'border hover:bg-neutral-50'
@@ -292,7 +293,7 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
             <button
               onClick={() => setMobileViewMode('3day')}
               className={cn(
-                "px-2 py-1.5 text-xs font-medium rounded-lg transition",
+                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
                 mobileViewMode === '3day' 
                   ? 'bg-[#0b3d2e] text-white' 
                   : 'border hover:bg-neutral-50'
@@ -316,11 +317,23 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
           />
         )}
 
+        {viewMode === 'weekagenda' && (
+          <WeekAgendaView 
+            startDate={currentDate}
+            bookings={bookings}
+            today={today}
+            onBookingClick={onBookingClick}
+            formatTime={formatTime}
+            getStatusColor={getStatusColor}
+          />
+        )}
+
         {viewMode === 'day' && (
           <DayView 
             date={currentDate} 
             bookings={getBookingsForDate(currentDate.toISOString().split('T')[0])}
             onBookingClick={onBookingClick}
+            onReschedule={onReschedule}
             formatTime={formatTime}
             getStatusColor={getStatusColor}
           />
@@ -333,6 +346,7 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
             bookings={bookings}
             today={today}
             onBookingClick={onBookingClick}
+            onReschedule={onReschedule}
             formatTime={formatTime}
             getStatusColor={getStatusColor}
           />
@@ -345,6 +359,7 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
             bookings={bookings}
             today={today}
             onBookingClick={onBookingClick}
+            onReschedule={onReschedule}
             formatTime={formatTime}
             getStatusColor={getStatusColor}
           />
@@ -356,6 +371,7 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
             bookings={bookings}
             today={today}
             onBookingClick={onBookingClick}
+            onReschedule={onReschedule}
             formatTime={formatTime}
             getStatusColor={getStatusColor}
           />
@@ -370,6 +386,90 @@ export function BookingCalendarView({ bookings, onBookingClick }: BookingCalenda
           />
         )}
       </div>
+    </div>
+  );
+}
+
+// Week Agenda View Component - List view of bookings for entire week
+function WeekAgendaView({ 
+  startDate, 
+  bookings, 
+  today, 
+  onBookingClick, 
+  formatTime, 
+  getStatusColor 
+}: any) {
+  // Get week days starting from Sunday
+  const getWeekDays = () => {
+    const days = [];
+    const start = new Date(startDate);
+    const dayOfWeek = start.getDay();
+    start.setDate(start.getDate() - dayOfWeek); // Go to Sunday
+
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(start);
+      date.setDate(date.getDate() + i);
+      days.push(date);
+    }
+    return days;
+  };
+
+  const weekDays = getWeekDays();
+
+  return (
+    <div className="space-y-3">
+      {weekDays.map((day, idx) => {
+        const dateStr = day.toISOString().split('T')[0];
+        const dayBookings = bookings.filter((b: any) => b.date === dateStr);
+        const isToday = dateStr === today;
+
+        return (
+          <div key={idx} className="bg-white rounded-lg border overflow-hidden">
+            <div className={cn(
+              "p-3 border-b font-semibold text-sm",
+              isToday ? "bg-[#0b3d2e] text-white" : "bg-neutral-50"
+            )}>
+              {day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </div>
+            <div className="divide-y">
+              {dayBookings.length === 0 ? (
+                <div className="p-6 text-center text-neutral-400 text-sm">
+                  No bookings scheduled
+                </div>
+              ) : (
+                dayBookings.map((booking: any) => (
+                  <div
+                    key={booking.id}
+                    onClick={() => onBookingClick(booking)}
+                    className={cn(
+                      "p-3 cursor-pointer hover:bg-neutral-50 transition",
+                      getStatusColor(booking.status).replace('bg-', 'border-l-4 border-l-')
+                    )}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="font-semibold text-sm">{booking.name}</div>
+                        <div className="text-xs text-neutral-600 mt-1">{booking.service}</div>
+                      </div>
+                      <div className={cn(
+                        "px-2 py-1 rounded-full text-[10px] font-medium",
+                        getStatusColor(booking.status)
+                      )}>
+                        {booking.status}
+                      </div>
+                    </div>
+                    <div className="flex gap-4 text-xs text-neutral-600">
+                      <span className="font-medium">{formatTime(booking.time)}</span>
+                      <span>{booking.duration} min</span>
+                      {booking.phone && <span>{booking.phone}</span>}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -436,15 +536,42 @@ function MultiDayView({
   bookings, 
   today, 
   onBookingClick, 
+  onReschedule,
   formatTime, 
   getStatusColor 
 }: any) {
+  const [draggedBooking, setDraggedBooking] = useState<any>(null);
+  
   const days = [];
   for (let i = 0; i < dayCount; i++) {
     const date = new Date(startDate);
     date.setDate(date.getDate() + i);
     days.push(date);
   }
+
+  const handleDragStart = (e: React.DragEvent, booking: any) => {
+    setDraggedBooking(booking);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, dateStr: string) => {
+    e.preventDefault();
+    if (!draggedBooking || !onReschedule) return;
+
+    try {
+      await onReschedule(draggedBooking.bookingId, dateStr, draggedBooking.time);
+    } catch (error) {
+      console.error('Failed to reschedule:', error);
+      alert('Failed to reschedule booking. Please try again.');
+    } finally {
+      setDraggedBooking(null);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg border overflow-x-auto">
@@ -455,7 +582,12 @@ function MultiDayView({
           const isToday = dateStr === today;
 
           return (
-            <div key={idx} className="min-w-[200px]">
+            <div 
+              key={idx} 
+              className="min-w-[200px]"
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, dateStr)}
+            >
               <div className={cn(
                 "p-3 border-b text-center",
                 isToday ? "bg-[#0b3d2e] text-white" : "bg-neutral-50"
@@ -474,10 +606,13 @@ function MultiDayView({
                   dayBookings.map((booking: any) => (
                     <div
                       key={booking.id}
+                      draggable={!!onReschedule}
+                      onDragStart={(e) => handleDragStart(e, booking)}
                       onClick={() => onBookingClick(booking)}
                       className={cn(
-                        "p-2 rounded-lg border cursor-pointer hover:shadow-md transition text-xs",
-                        getStatusColor(booking.status)
+                        "p-2 rounded-lg border cursor-move hover:shadow-md transition text-xs",
+                        getStatusColor(booking.status),
+                        draggedBooking?.id === booking.id && "opacity-50"
                       )}
                     >
                       <div className="font-semibold truncate">{booking.name}</div>
@@ -507,10 +642,39 @@ function DayView({
   date, 
   bookings, 
   onBookingClick, 
+  onReschedule,
   formatTime, 
   getStatusColor 
 }: any) {
+  const [draggedBooking, setDraggedBooking] = useState<any>(null);
   const hours = Array.from({ length: 13 }, (_, i) => i + 8); // 8 AM to 8 PM
+
+  const handleDragStart = (e: React.DragEvent, booking: any) => {
+    setDraggedBooking(booking);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, hour: number) => {
+    e.preventDefault();
+    if (!draggedBooking || !onReschedule) return;
+
+    const newTime = `${String(hour).padStart(2, '0')}:00`;
+    const dateStr = date.toISOString().split('T')[0];
+
+    try {
+      await onReschedule(draggedBooking.bookingId, dateStr, newTime);
+    } catch (error) {
+      console.error('Failed to reschedule:', error);
+      alert('Failed to reschedule booking. Please try again.');
+    } finally {
+      setDraggedBooking(null);
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg border">
@@ -521,7 +685,12 @@ function DayView({
       </div>
       <div className="divide-y">
         {hours.map(hour => (
-          <div key={hour} className="flex border-l border-r">
+          <div 
+            key={hour} 
+            className="flex border-l border-r"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, hour)}
+          >
             <div className="w-20 p-3 text-sm text-neutral-600 border-r bg-neutral-50">
               {hour % 12 || 12}:00 {hour >= 12 ? 'PM' : 'AM'}
             </div>
@@ -534,10 +703,13 @@ function DayView({
                 .map((booking: any) => (
                   <div
                     key={booking.id}
+                    draggable={!!onReschedule}
+                    onDragStart={(e) => handleDragStart(e, booking)}
                     onClick={() => onBookingClick(booking)}
                     className={cn(
-                      "p-2 mb-2 rounded-lg border-l-4 cursor-pointer hover:shadow-md transition",
-                      getStatusColor(booking.status)
+                      "p-2 mb-2 rounded-lg border-l-4 cursor-move hover:shadow-md transition",
+                      getStatusColor(booking.status),
+                      draggedBooking?.id === booking.id && "opacity-50"
                     )}
                   >
                     <div className="font-medium text-sm">{booking.name}</div>
@@ -561,9 +733,36 @@ function WeekView({
   bookings, 
   today, 
   onBookingClick, 
+  onReschedule,
   formatTime, 
   getStatusColor 
 }: any) {
+  const [draggedBooking, setDraggedBooking] = useState<any>(null);
+
+  const handleDragStart = (e: React.DragEvent, booking: any) => {
+    setDraggedBooking(booking);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = async (e: React.DragEvent, dateStr: string) => {
+    e.preventDefault();
+    if (!draggedBooking || !onReschedule) return;
+
+    try {
+      await onReschedule(draggedBooking.bookingId, dateStr, draggedBooking.time);
+    } catch (error) {
+      console.error('Failed to reschedule:', error);
+      alert('Failed to reschedule booking. Please try again.');
+    } finally {
+      setDraggedBooking(null);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       {/* Week header */}
@@ -594,14 +793,22 @@ function WeekView({
           const dayBookings = bookings.filter((b: any) => b.date === dateStr);
           
           return (
-            <div key={idx} className="p-2 space-y-1 overflow-y-auto max-h-[600px]">
+            <div 
+              key={idx} 
+              className="p-2 space-y-1 overflow-y-auto max-h-[600px]"
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, dateStr)}
+            >
               {dayBookings.map((booking: any) => (
                 <div
                   key={booking.id}
+                  draggable={!!onReschedule}
+                  onDragStart={(e) => handleDragStart(e, booking)}
                   onClick={() => onBookingClick(booking)}
                   className={cn(
-                    "p-2 rounded text-xs cursor-pointer hover:shadow-md transition border-l-2",
-                    getStatusColor(booking.status)
+                    "p-2 rounded text-xs cursor-move hover:shadow-md transition border-l-2",
+                    getStatusColor(booking.status),
+                    draggedBooking?.id === booking.id && "opacity-50"
                   )}
                 >
                   <div className="font-medium truncate">{formatTime(booking.time)}</div>

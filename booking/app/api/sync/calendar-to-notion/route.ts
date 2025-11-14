@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCalendarEvents } from '@/lib/google-calendar';
 
+type SyncUpdate = {
+  bookingId: string;
+  eventId: string;
+  action: 'cancelled' | 'updated';
+  reason?: string;
+  oldDateTime?: string;
+  newDateTime?: string;
+};
+
 /**
  * Manual Google Calendar to Notion Sync Endpoint
  * Use this to manually trigger sync when Google push notifications aren't working
@@ -12,11 +21,22 @@ export async function GET(request: NextRequest) {
     console.log('[Manual Sync] ========================================');
     console.log('[Manual Sync] Starting manual Calendar → Notion sync');
     console.log('[Manual Sync] Timestamp:', new Date().toISOString());
+
+    const cronSecret = process.env.CRON_SECRET;
+    if (cronSecret) {
+      const providedSecret = request.headers.get('x-cron-key');
+      if (!providedSecret || providedSecret !== cronSecret) {
+        return NextResponse.json({
+          success: false,
+          error: 'Unauthorized'
+        }, { status: 401 });
+      }
+    }
     
     const notionApiKey = process.env.NOTION_API_KEY;
     const notionDatabaseId = process.env.NOTION_DATABASE_ID;
 
-    if (!notionApiKey || !notionDatabaseId) {
+  if (!notionApiKey || !notionDatabaseId) {
       return NextResponse.json({ 
         success: false, 
         error: 'Missing Notion credentials' 
@@ -75,9 +95,9 @@ export async function GET(request: NextRequest) {
     console.log(`[Manual Sync] 📋 Found ${notionBookings.length} Notion bookings with calendar events`);
 
     // Check each Notion booking
-    let deletedCount = 0;
-    let updatedCount = 0;
-    const updates: any[] = [];
+  let deletedCount = 0;
+  let updatedCount = 0;
+  const updates: SyncUpdate[] = [];
 
     for (const booking of notionBookings) {
       const props = booking.properties;

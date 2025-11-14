@@ -70,7 +70,8 @@ export default function BookingsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [timeRangeFilter, setTimeRangeFilter] = useState<string>("all");
-  const [dateFilter, setDateFilter] = useState<string>("");
+  const [startDateFilter, setStartDateFilter] = useState<string>("");
+  const [endDateFilter, setEndDateFilter] = useState<string>("");
   const [serviceTypeFilter, setServiceTypeFilter] = useState<string>("All");
   const [serviceCategoryFilter, setServiceCategoryFilter] = useState<string>("All");
   const [serviceFilter, setServiceFilter] = useState<string>("All");
@@ -205,6 +206,30 @@ export default function BookingsPage() {
     }
   };
 
+  const handleReschedule = async (bookingId: string, newDate: string, newTime: string) => {
+    try {
+      const response = await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: newDate,
+          time: newTime,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchBookings();
+        alert('Booking rescheduled successfully!');
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to reschedule');
+      }
+    } catch (error) {
+      console.error("Error rescheduling booking:", error);
+      throw error;
+    }
+  };
+
   const saveBookingChanges = async () => {
     if (!editedBooking) return;
 
@@ -254,32 +279,59 @@ export default function BookingsPage() {
     }
   };
 
-  // Filter bookings by time range
-  const getFilteredByTimeRange = () => {
+  // Set date range based on time filter selection
+  const applyTimeRangeFilter = (range: string) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
+    setTimeRangeFilter(range);
+    
+    switch (range) {
+      case "today":
+        const todayStr = today.toISOString().split('T')[0];
+        setStartDateFilter(todayStr);
+        setEndDateFilter(todayStr);
+        break;
+      case "week":
+        const weekStart = new Date(today);
+        weekStart.setDate(weekStart.getDate() - today.getDay()); // Start of this week (Sunday)
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6); // End of this week (Saturday)
+        setStartDateFilter(weekStart.toISOString().split('T')[0]);
+        setEndDateFilter(weekEnd.toISOString().split('T')[0]);
+        break;
+      case "month":
+        const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        setStartDateFilter(monthStart.toISOString().split('T')[0]);
+        setEndDateFilter(monthEnd.toISOString().split('T')[0]);
+        break;
+      case "year":
+        const yearStart = new Date(today.getFullYear(), 0, 1);
+        const yearEnd = new Date(today.getFullYear(), 11, 31);
+        setStartDateFilter(yearStart.toISOString().split('T')[0]);
+        setEndDateFilter(yearEnd.toISOString().split('T')[0]);
+        break;
+      default: // "all"
+        setStartDateFilter("");
+        setEndDateFilter("");
+        break;
+    }
+  };
+
+  // Filter bookings by date range
+  const getFilteredByTimeRange = () => {
     return bookings.filter((booking) => {
-      const bookingDate = new Date(booking.date);
+      // If no date filters set, show all
+      if (!startDateFilter && !endDateFilter) return true;
       
-      switch (timeRangeFilter) {
-        case "today":
-          return bookingDate.toDateString() === today.toDateString();
-        case "week":
-          const weekAgo = new Date(today);
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          return bookingDate >= weekAgo;
-        case "month":
-          const monthAgo = new Date(today);
-          monthAgo.setMonth(monthAgo.getMonth() - 1);
-          return bookingDate >= monthAgo;
-        case "year":
-          const yearAgo = new Date(today);
-          yearAgo.setFullYear(yearAgo.getFullYear() - 1);
-          return bookingDate >= yearAgo;
-        default:
-          return true;
-      }
+      const bookingDate = booking.date;
+      
+      // Check if booking falls within date range
+      if (startDateFilter && bookingDate < startDateFilter) return false;
+      if (endDateFilter && bookingDate > endDateFilter) return false;
+      
+      return true;
     });
   };
 
@@ -292,8 +344,6 @@ export default function BookingsPage() {
       
       const matchesStatus = statusFilter === "All" || booking.status === statusFilter;
       
-      const matchesDate = !dateFilter || booking.date === dateFilter;
-      
       const matchesServiceType = 
         serviceTypeFilter === "All" || booking.serviceType === serviceTypeFilter;
       
@@ -302,8 +352,8 @@ export default function BookingsPage() {
       
       const matchesService = serviceFilter === "All" || booking.service === serviceFilter;
 
-      return matchesSearch && matchesStatus && matchesDate && 
-             matchesServiceType && matchesServiceCategory && matchesService;
+      return matchesSearch && matchesStatus && matchesServiceType && 
+             matchesServiceCategory && matchesService;
     })
     .sort((a, b) => {
       // Sort by date (descending), then by time (descending)
@@ -418,7 +468,7 @@ export default function BookingsPage() {
             key={range.value}
             variant={timeRangeFilter === range.value ? "default" : "outline"}
             size="sm"
-            onClick={() => setTimeRangeFilter(range.value)}
+            onClick={() => applyTimeRangeFilter(range.value)}
             className={`whitespace-nowrap ${
               timeRangeFilter === range.value
                 ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
@@ -520,18 +570,36 @@ export default function BookingsPage() {
             </div>
           </div>
 
-          {/* Service Filters - 2 rows on mobile */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* Service Filters */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div>
               <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
-                Date
+                Start Date
               </label>
               <Input
                 type="date"
-                value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
-                placeholder="Filter by date"
+                value={startDateFilter}
+                onChange={(e) => {
+                  setStartDateFilter(e.target.value);
+                  setTimeRangeFilter(""); // Clear preset when manually selecting
+                }}
+                placeholder="From date"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                End Date
+              </label>
+              <Input
+                type="date"
+                value={endDateFilter}
+                onChange={(e) => {
+                  setEndDateFilter(e.target.value);
+                  setTimeRangeFilter(""); // Clear preset when manually selecting
+                }}
+                placeholder="To date"
               />
             </div>
             <div>
@@ -600,6 +668,7 @@ export default function BookingsPage() {
               setEditedBooking(bookingCopy);
               setIsEditing(false);
             }}
+            onReschedule={handleReschedule}
           />
         ) : filteredBookings.length === 0 ? (
           <Card className="p-8 text-center text-neutral-600">
