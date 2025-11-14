@@ -41,12 +41,17 @@ interface BookingCalendarViewProps {
   bookings: Booking[];
   onBookingClick: (booking: Booking) => void;
   onReschedule?: (bookingId: string, newDate: string, newTime: string) => Promise<void>;
+  availability?: {
+    isTimeSlotAvailable: (date: string, time: string) => boolean;
+    isDateBlocked: (date: string) => boolean;
+    getWorkingHours: (dayOfWeek: string) => { open: string; close: string; breaks: any[] } | null;
+  };
 }
 
 type DesktopViewMode = 'day' | 'week' | 'month';
 type MobileViewMode = 'agenda' | 'weekagenda' | 'day' | '2day' | '3day';
 
-export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: BookingCalendarViewProps) {
+export function BookingCalendarView({ bookings, onBookingClick, onReschedule, availability }: BookingCalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [desktopViewMode, setDesktopViewMode] = useState<DesktopViewMode>('day');
   const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('weekagenda');
@@ -356,6 +361,7 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
             onReschedule={onReschedule}
             formatTime={formatTime}
             getStatusColor={getStatusColor}
+            availability={availability}
           />
         )}
 
@@ -784,7 +790,6 @@ function DayView({
     </div>
   );
 }
-
 // Week View Component
 function WeekView({ 
   days, 
@@ -793,7 +798,8 @@ function WeekView({
   onBookingClick, 
   onReschedule,
   formatTime, 
-  getStatusColor 
+  getStatusColor,
+  availability 
 }: any) {
   const [draggedBooking, setDraggedBooking] = useState<any>(null);
 
@@ -806,7 +812,6 @@ function WeekView({
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
   };
-
   const handleDrop = async (e: React.DragEvent, dateStr: string, time?: string) => {
     e.preventDefault();
     if (!draggedBooking || !onReschedule) return;
@@ -814,6 +819,15 @@ function WeekView({
     try {
       // Use the dropped time slot or keep original time
       const newTime = time || draggedBooking.time;
+      
+      // Check availability if provided
+      if (availability && !availability.isTimeSlotAvailable(dateStr, newTime)) {
+        alert('\u274c Cannot reschedule to this time slot. The studio is closed or blocked during this time.');
+        setDraggedBooking(null);
+        return;
+      }
+      
+      await onReschedule(draggedBooking.bookingId, dateStr, newTime);
       await onReschedule(draggedBooking.bookingId, dateStr, newTime);
     } catch (error) {
       console.error('Failed to reschedule:', error);
@@ -876,12 +890,19 @@ function WeekView({
                   return bookingHour === hour;
                 });
                 
+                // Check if this time slot is available
+                const isAvailable = !availability || availability.isTimeSlotAvailable(dateStr, hourStr);
+                
                 return (
                   <div
                     key={hour}
-                    className="h-16 border-b hover:bg-blue-50/30 transition relative"
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, dateStr, hourStr)}
+                    className={cn(
+                      "h-16 border-b transition relative",
+                      isAvailable ? "hover:bg-blue-50/30" : "bg-gray-100 cursor-not-allowed"
+                    )}
+                    onDragOver={isAvailable ? handleDragOver : undefined}
+                    onDrop={isAvailable ? (e) => handleDrop(e, dateStr, hourStr) : undefined}
+                    title={!isAvailable ? "Studio closed or blocked" : ""}
                   >
                     {/* Bookings at this hour */}
                     {hourBookings.map((booking: any) => (

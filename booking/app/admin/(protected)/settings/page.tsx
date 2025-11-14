@@ -155,6 +155,19 @@ export default function SettingsPage() {
     }
   };
 
+  // Load text size preference on mount
+  useEffect(() => {
+    const savedTextSize = localStorage.getItem('textSize') || 'medium';
+    const root = document.documentElement;
+    if (savedTextSize === 'small') {
+      root.style.setProperty('--text-scale', '1.4');
+    } else if (savedTextSize === 'medium') {
+      root.style.setProperty('--text-scale', '1.6');
+    } else {
+      root.style.setProperty('--text-scale', '1.8');
+    }
+  }, []);
+
   // Load booking settings and BCC emails on mount
   useEffect(() => {
     const loadSettings = async () => {
@@ -433,6 +446,48 @@ export default function SettingsPage() {
           💡 <strong>Note:</strong> These emails will receive blind carbon copies (BCC) of booking confirmations.
           Customers won't see these addresses in their email.
         </p>
+      </Card>
+
+      {/* UI Preferences */}
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <SettingsIcon className="w-5 h-5 text-[#0b3d2e]" />
+          <h2 className="text-xl font-bold text-[#0b3d2e]">UI Preferences</h2>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-base font-medium text-neutral-900 mb-2">
+              Text Size
+              <span className="block text-sm text-neutral-600 font-normal mt-1">
+                Adjust the global text size for better readability
+              </span>
+            </label>
+            <select 
+              className="w-full px-4 py-2.5 border rounded-lg bg-white text-base"
+              defaultValue="medium"
+              onChange={(e) => {
+                const size = e.target.value;
+                const root = document.documentElement;
+                if (size === 'small') {
+                  root.style.setProperty('--text-scale', '1.4');
+                } else if (size === 'medium') {
+                  root.style.setProperty('--text-scale', '1.6');
+                } else {
+                  root.style.setProperty('--text-scale', '1.8');
+                }
+                localStorage.setItem('textSize', size);
+              }}
+            >
+              <option value="small">Small (1.4x)</option>
+              <option value="medium">Medium (1.6x) - Recommended</option>
+              <option value="large">Large (1.8x)</option>
+            </select>
+            <p className="text-sm text-neutral-500 mt-2">
+              💡 Changes apply immediately. The setting is saved to your browser.
+            </p>
+          </div>
+        </div>
       </Card>
 
       {/* Email Notifications */}

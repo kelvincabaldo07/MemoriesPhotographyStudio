@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatTimeTo12Hour, formatManilaDate } from "@/lib/time-utils";
 import { BookingCalendar } from "@/components/Calendar";
 import { BookingCalendarView } from "@/components/BookingCalendarView";
+import { useAvailability } from "@/lib/useAvailability";
 import { 
   Search, 
   Filter, 
@@ -80,8 +81,11 @@ export default function BookingsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedBooking, setEditedBooking] = useState<Booking | null>(null);
   const [updating, setUpdating] = useState(false);
-  const [availability, setAvailability] = useState<{date: string, slots: string[]}>({date: "", slots: []});
+  const [availabilitySlots, setAvailabilitySlots] = useState<{date: string, slots: string[]}>({date: "", slots: []});
   const [checkingAvailability, setCheckingAvailability] = useState(false);
+  
+  // Fetch availability settings
+  const availabilityData = useAvailability();
   
   // Service options from Notion
   const [serviceOptions, setServiceOptions] = useState<{
@@ -170,13 +174,13 @@ export default function BookingsPage() {
       const data = await response.json();
       
       if (response.ok && data.available) {
-        setAvailability({ date, slots: data.slots || [] });
+        setAvailabilitySlots({ date, slots: data.slots || [] });
       } else {
-        setAvailability({ date, slots: [] });
+        setAvailabilitySlots({ date, slots: [] });
       }
     } catch (error) {
       console.error("Error checking availability:", error);
-      setAvailability({ date, slots: [] });
+      setAvailabilitySlots({ date, slots: [] });
     } finally {
       setCheckingAvailability(false);
     }
@@ -716,6 +720,7 @@ export default function BookingsPage() {
               setIsEditing(false);
             }}
             onReschedule={handleReschedule}
+            availability={availabilityData.loading ? undefined : availabilityData}
           />
         ) : filteredBookings.length === 0 ? (
           <Card className="p-8 text-center text-neutral-600">
@@ -876,7 +881,7 @@ export default function BookingsPage() {
                 {/* Customer Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">Customer Name</label>
+                    <label className="text-base font-semibold text-neutral-700">Customer Name</label>
                     {isEditing ? (
                       <Input
                         value={editedBooking?.name || ""}
@@ -890,7 +895,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">Email</label>
+                    <label className="text-base font-semibold text-neutral-700">Email</label>
                     {isEditing ? (
                       <Input
                         type="email"
@@ -905,7 +910,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">Phone</label>
+                    <label className="text-base font-semibold text-neutral-700">Phone</label>
                     {isEditing ? (
                       <Input
                         value={editedBooking?.phone || ""}
@@ -919,7 +924,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">Address</label>
+                    <label className="text-base font-semibold text-neutral-700">Address</label>
                     {isEditing ? (
                       <Input
                         value={editedBooking?.address || ""}
@@ -935,10 +940,10 @@ export default function BookingsPage() {
                 </div>
                 {/* Service Details */}
                 <div className="border-t pt-4">
-                  <h3 className="text-lg font-bold text-[#0b3d2e] mb-3">Service Details</h3>
+                  <h3 className="text-xl font-bold text-[#0b3d2e] mb-3">Service Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-semibold text-neutral-700">Service Type</label>
+                      <label className="text-base font-semibold text-neutral-700">Service Type</label>
                       {isEditing ? (
                         <select
                           value={editedBooking?.serviceType || ""}
