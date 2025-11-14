@@ -27,7 +27,8 @@ import {
   Layers,
   Tag,
   List,
-  CalendarDays
+  CalendarDays,
+  ChevronRight
 } from "lucide-react";
 
 interface Booking {
@@ -256,6 +257,7 @@ export default function BookingsPage() {
   const saveBookingChanges = async () => {
     if (!editedBooking) return;
 
+    console.log('💾 Saving booking changes:', editedBooking);
     setUpdating(true);
     try {
       // Admin update - send booking ID in URL and updates in body
@@ -551,8 +553,8 @@ export default function BookingsPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/10 rounded-lg flex items-center justify-center mb-2">
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Value</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">
+                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Avg. Value</p>
+                <p className="text-2xl lg:text-4xl font-bold text-foreground">
                   ₱{stats.total > 0 ? Math.round(stats.revenue / stats.total).toLocaleString() : 0}
                 </p>
               </div>
@@ -577,33 +579,42 @@ export default function BookingsPage() {
 
           {/* Status Filters */}
           <div>
-            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status (multi-select dropdown)</label>
-            <div className="relative">
-              <select
-                multiple
-                value={statusFilter}
-                onChange={(e) => {
-                  const selected = Array.from(e.target.selectedOptions, option => option.value);
-                  setStatusFilter(selected);
-                }}
-                className="w-full px-3 py-2 border rounded-lg text-sm min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[#0b3d2e]"
-              >
+            <label className="text-base font-semibold text-neutral-700 mb-2 block">Status Filter</label>
+            <details className="relative border rounded-lg">
+              <summary className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-base">
+                <span>
+                  {statusFilter.length === 0 ? 'All Statuses' : `${statusFilter.length} selected`}
+                </span>
+                <ChevronRight className="w-4 h-4" />
+              </summary>
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
+                {statusFilter.length > 0 && (
+                  <button
+                    onClick={() => setStatusFilter([])}
+                    className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 border-b"
+                  >
+                    Clear All ({statusFilter.length})
+                  </button>
+                )}
                 {["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
-                  <option key={status} value={status} className="py-1">
+                  <label key={status} className="flex items-center px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-base">
+                    <input
+                      type="checkbox"
+                      checked={statusFilter.includes(status)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setStatusFilter([...statusFilter, status]);
+                        } else {
+                          setStatusFilter(statusFilter.filter(s => s !== status));
+                        }
+                      }}
+                      className="mr-3 w-4 h-4"
+                    />
                     {status}
-                  </option>
+                  </label>
                 ))}
-              </select>
-              {statusFilter.length > 0 && (
-                <button
-                  onClick={() => setStatusFilter([])}
-                  className="mt-2 px-3 py-1.5 text-xs font-medium rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition"
-                >
-                  Clear All ({statusFilter.length} selected)
-                </button>
-              )}
-              <p className="text-xs text-neutral-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
-            </div>
+              </div>
+            </details>
           </div>
 
           {/* Service Filters */}
@@ -721,8 +732,11 @@ export default function BookingsPage() {
                 const bookingCopy = {
                   ...booking,
                   serviceGroup: booking.serviceGroup || '',
-                  service: booking.service || ''
+                  service: booking.service || '',
+                  firstName: booking.firstName || '',
+                  lastName: booking.lastName || ''
                 };
+                console.log('📋 Opening booking from list:', bookingCopy);
                 setSelectedBooking(bookingCopy);
                 setEditedBooking(bookingCopy);
                 setIsEditing(false);
@@ -731,10 +745,10 @@ export default function BookingsPage() {
               <div className="space-y-2">
                 {/* Date & Time */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs">
-                    <Calendar className="w-3 h-3 text-[#0b3d2e]" />
-                    <span className="font-semibold text-xs">{formatDate(booking.date)}</span>
-                    <Clock className="w-3 h-3 text-neutral-500 ml-2" />
+                  <div className="flex items-center gap-2 text-base">
+                    <Calendar className="w-4 h-4 text-[#0b3d2e]" />
+                    <span className="font-semibold text-base">{formatDate(booking.date)}</span>
+                    <Clock className="w-4 h-4 text-neutral-500 ml-2" />
                     <span className="text-neutral-600">{formatTimeTo12Hour(booking.time)}</span>
                   </div>
                   <Badge variant="outline" className={getStatusColor(booking.status)}>
@@ -744,21 +758,21 @@ export default function BookingsPage() {
 
                 {/* Customer Info */}
                 <div>
-                  <p className="font-bold text-[#0b3d2e]">{booking.name}</p>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-xs text-neutral-600">
+                  <p className="font-bold text-lg text-[#0b3d2e]">{booking.name}</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-base text-neutral-600">
                     <span className="flex items-center gap-1">
-                      <Mail className="w-3 h-3" />
+                      <Mail className="w-4 h-4" />
                       {booking.email}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Phone className="w-3 h-3" />
+                      <Phone className="w-4 h-4" />
                       {booking.phone}
                     </span>
                   </div>
                 </div>
 
                 {/* Service Info */}
-                <div className="space-y-1 text-sm">
+                <div className="space-y-1 text-base">
                   <div className="flex items-start gap-2">
                     <Package className="w-4 h-4 text-neutral-500 mt-0.5" />
                     <div>
@@ -784,7 +798,7 @@ export default function BookingsPage() {
 
                 {/* Add-ons and Backdrops */}
                 {(booking.addons.length > 0 || booking.backdrops.length > 0) && (
-                  <div className="space-y-1 text-xs pt-2 border-t">
+                  <div className="space-y-1 text-base pt-2 border-t">
                     {booking.addons.length > 0 && (
                       <div className="flex items-start gap-1">
                         <span className="text-neutral-600">Add-ons:</span>
@@ -802,8 +816,8 @@ export default function BookingsPage() {
 
                 {/* Price */}
                 <div className="flex items-center justify-between pt-2 border-t">
-                  <span className="text-sm text-neutral-600">Total</span>
-                  <span className="text-lg font-bold text-[#0b3d2e]">
+                  <span className="text-base text-neutral-600">Total</span>
+                  <span className="text-xl font-bold text-[#0b3d2e]">
                     ₱{booking.grandTotal.toLocaleString()}
                   </span>
                 </div>

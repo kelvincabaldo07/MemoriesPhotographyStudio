@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { calculateEndTime } from '@/lib/time-utils';
 import { updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
 
 /**
  * PATCH (update) booking by ID - Admin endpoint
- * No email verification required (admin authenticated via session)
+ * Admin must be authenticated via session
  * Syncs changes to both Notion and Google Calendar
  */
 export async function PATCH(
@@ -13,8 +15,15 @@ export async function PATCH(
 ) {
   const { id: bookingId } = await params;
   
+  // Check authentication
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  
   try {
     const body = await request.json();
+    console.log('[Admin PATCH] Updating booking:', bookingId, body);
     const notionApiKey = process.env.NOTION_API_KEY;
     const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
 
@@ -328,6 +337,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: bookingId } = await params;
+  
+  // Check authentication
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
   
   try {
     const notionApiKey = process.env.NOTION_API_KEY;

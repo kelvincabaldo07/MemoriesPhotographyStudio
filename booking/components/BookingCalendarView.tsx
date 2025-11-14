@@ -381,6 +381,8 @@ function WeekAgendaView({
   formatTime, 
   getStatusColor 
 }: any) {
+  const [showCalendar, setShowCalendar] = useState(false);
+  
   // Get week days starting from Monday
   const getWeekDays = () => {
     const days = [];
@@ -401,7 +403,31 @@ function WeekAgendaView({
   const weekDays = getWeekDays();
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 overflow-x-hidden">
+      {/* Mini Calendar Picker - Like Google Calendar Mobile */}
+      <div className="bg-white rounded-lg border p-3">
+        <button 
+          onClick={() => setShowCalendar(!showCalendar)}
+          className="w-full flex items-center justify-between p-2 hover:bg-gray-50 rounded"
+        >
+          <span className="text-lg font-semibold">
+            {startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </span>
+          <CalendarIcon className="w-5 h-5" />
+        </button>
+        
+        {showCalendar && (
+          <div className="mt-3 pt-3 border-t">
+            <MiniMonthCalendar currentDate={startDate} onDateSelect={(date) => {
+              // Navigate to the week containing this date
+              const newDate = new Date(date);
+              startDate.setFullYear(newDate.getFullYear(), newDate.getMonth(), newDate.getDate());
+              setShowCalendar(false);
+            }} today={today} />
+          </div>
+        )}
+      </div>
+      
       {weekDays.map((day, idx) => {
         const dateStr = day.toISOString().split('T')[0];
         const dayBookings = bookings.filter((b: any) => b.date === dateStr);
@@ -908,6 +934,96 @@ function MonthView({ days, bookings, today, onBookingClick }: any) {
                 )}
               </div>
             </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Mini Month Calendar Component - Compact calendar for date selection
+function MiniMonthCalendar({ currentDate, onDateSelect, today }: { currentDate: Date, onDateSelect: (date: string) => void, today: string }) {
+  const [viewDate, setViewDate] = useState(new Date(currentDate));
+
+  const getDaysInMonth = () => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    
+    const days: (Date | null)[] = [];
+    
+    // Add empty cells for days before month starts (Monday = 0)
+    const firstDayOfWeek = firstDay.getDay();
+    const emptyDays = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+    for (let i = 0; i < emptyDays; i++) {
+      days.push(null);
+    }
+    
+    // Add all days in month
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+      days.push(new Date(year, month, d));
+    }
+    
+    return days;
+  };
+
+  const days = getDaysInMonth();
+
+  return (
+    <div className="overflow-x-hidden">
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-2">
+        <button
+          onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1))}
+          className="p-1 hover:bg-gray-100 rounded"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        <span className="text-base font-medium">
+          {viewDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+        </span>
+        <button
+          onClick={() => setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + 1))}
+          className="p-1 hover:bg-gray-100 rounded"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 gap-1 mb-1">
+        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, idx) => (
+          <div key={idx} className="text-center text-xs font-medium text-gray-500 py-1">
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((day, idx) => {
+          if (!day) {
+            return <div key={`empty-${idx}`} className="aspect-square" />;
+          }
+
+          const dateStr = day.toISOString().split('T')[0];
+          const isToday = dateStr === today;
+          const isCurrentMonth = day.getMonth() === viewDate.getMonth();
+
+          return (
+            <button
+              key={idx}
+              onClick={() => onDateSelect(dateStr)}
+              className={cn(
+                "aspect-square flex items-center justify-center text-sm rounded-full hover:bg-gray-100 transition",
+                isToday && "bg-[#0b3d2e] text-white hover:bg-[#0b3d2e]/90",
+                !isCurrentMonth && "text-gray-300"
+              )}
+            >
+              {day.getDate()}
+            </button>
           );
         })}
       </div>
