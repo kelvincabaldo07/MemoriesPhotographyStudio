@@ -66,10 +66,10 @@ interface Booking {
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("All");
-  const [timeRangeFilter, setTimeRangeFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [timeRangeFilter, setTimeRangeFilter] = useState<string>("today");
   const [startDateFilter, setStartDateFilter] = useState<string>("");
   const [endDateFilter, setEndDateFilter] = useState<string>("");
   const [serviceTypeFilter, setServiceTypeFilter] = useState<string>("All");
@@ -98,6 +98,8 @@ export default function BookingsPage() {
   useEffect(() => {
     fetchBookings();
     fetchServiceOptions();
+    // Set today as default date range
+    applyTimeRangeFilter('today');
   }, []);
 
   const fetchServiceOptions = async () => {
@@ -207,25 +209,46 @@ export default function BookingsPage() {
   };
 
   const handleReschedule = async (bookingId: string, newDate: string, newTime: string) => {
+    console.log('[Reschedule] Starting:', { bookingId, newDate, newTime });
     try {
+      // Find the booking to get its current details
+      const booking = bookings.find(b => b.bookingId === bookingId);
+      if (!booking) {
+        throw new Error('Booking not found');
+      }
+
       const response = await fetch(`/api/admin/bookings/${bookingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: newDate,
           time: newTime,
+          // Include other required fields to ensure update works
+          name: booking.name,
+          firstName: booking.firstName,
+          lastName: booking.lastName,
+          email: booking.email,
+          phone: booking.phone,
+          service: booking.service,
+          serviceType: booking.serviceType,
+          serviceCategory: booking.serviceCategory,
+          serviceGroup: booking.serviceGroup,
+          duration: booking.duration,
+          sessionPrice: booking.sessionPrice,
         }),
       });
 
       if (response.ok) {
         await fetchBookings();
+        console.log('[Reschedule] Success!');
         alert('Booking rescheduled successfully!');
       } else {
         const errorData = await response.json();
+        console.error('[Reschedule] API Error:', errorData);
         throw new Error(errorData.error || 'Failed to reschedule');
       }
     } catch (error) {
-      console.error("Error rescheduling booking:", error);
+      console.error("[Reschedule] Error:", error);
       throw error;
     }
   };
@@ -293,10 +316,14 @@ export default function BookingsPage() {
         setEndDateFilter(todayStr);
         break;
       case "week":
+        // Get Monday of this week
         const weekStart = new Date(today);
-        weekStart.setDate(weekStart.getDate() - today.getDay()); // Start of this week (Sunday)
+        const dayOfWeek = weekStart.getDay();
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday, go back 6 days, else go to Monday
+        weekStart.setDate(weekStart.getDate() + diff);
+        // Get Sunday of this week
         const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6); // End of this week (Saturday)
+        weekEnd.setDate(weekEnd.getDate() + 6);
         setStartDateFilter(weekStart.toISOString().split('T')[0]);
         setEndDateFilter(weekEnd.toISOString().split('T')[0]);
         break;
@@ -342,7 +369,7 @@ export default function BookingsPage() {
         booking.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
         booking.phone.includes(searchQuery);
       
-      const matchesStatus = statusFilter === "All" || booking.status === statusFilter;
+      const matchesStatus = statusFilter.length === 0 || statusFilter.includes(booking.status);
       
       const matchesServiceType = 
         serviceTypeFilter === "All" || booking.serviceType === serviceTypeFilter;
@@ -550,23 +577,40 @@ export default function BookingsPage() {
 
           {/* Status Filters */}
           <div>
-            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status</label>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {["All", "Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
-                <Button
+            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status (select multiple)</label>
+            <div className="flex flex-wrap gap-2">
+              {["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
+                <label
                   key={status}
-                  variant={statusFilter === status ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStatusFilter(status)}
-                  className={`whitespace-nowrap ${
-                    statusFilter === status
-                      ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
-                      : ""
+                  className={`px-3 py-1.5 text-sm font-medium rounded-lg border cursor-pointer transition ${
+                    statusFilter.includes(status)
+                      ? "bg-[#0b3d2e] text-white border-[#0b3d2e]"
+                      : "bg-white hover:bg-neutral-50 border-neutral-300"
                   }`}
                 >
+                  <input
+                    type="checkbox"
+                    checked={statusFilter.includes(status)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setStatusFilter([...statusFilter, status]);
+                      } else {
+                        setStatusFilter(statusFilter.filter(s => s !== status));
+                      }
+                    }}
+                    className="sr-only"
+                  />
                   {status}
-                </Button>
+                </label>
               ))}
+              {statusFilter.length > 0 && (
+                <button
+                  onClick={() => setStatusFilter([])}
+                  className="px-3 py-1.5 text-sm font-medium rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition"
+                >
+                  Clear All
+                </button>
+              )}
             </div>
           </div>
 

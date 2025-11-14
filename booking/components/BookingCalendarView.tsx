@@ -48,8 +48,8 @@ type MobileViewMode = 'agenda' | 'weekagenda' | 'day' | '2day' | '3day';
 
 export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: BookingCalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [desktopViewMode, setDesktopViewMode] = useState<DesktopViewMode>('week');
-  const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('agenda');
+  const [desktopViewMode, setDesktopViewMode] = useState<DesktopViewMode>('day');
+  const [mobileViewMode, setMobileViewMode] = useState<MobileViewMode>('weekagenda');
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile on mount and resize
@@ -128,12 +128,14 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
     return currentDate.toLocaleDateString('en-US', options);
   };
 
-  // Get week days
+  // Get week days (Monday to Sunday)
   const getWeekDays = () => {
     const days = [];
     const startOfWeek = new Date(currentDate);
     const day = startOfWeek.getDay();
-    startOfWeek.setDate(startOfWeek.getDate() - day);
+    // Adjust to get Monday: if Sunday (0), go back 6 days, else go back (day - 1) days
+    const diff = day === 0 ? -6 : 1 - day;
+    startOfWeek.setDate(startOfWeek.getDate() + diff);
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
@@ -143,7 +145,7 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
     return days;
   };
 
-  // Get month days
+  // Get month days (aligned to Monday-Sunday week)
   const getMonthDays = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -154,7 +156,9 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
 
     const days: (Date | null)[] = [];
     
-    for (let i = 0; i < startDayOfWeek; i++) {
+    // Adjust for Monday start: if first day is Sunday (0), need 6 empty cells, else (day - 1) empty cells
+    const emptyDays = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+    for (let i = 0; i < emptyDays; i++) {
       days.push(null);
     }
 
@@ -269,28 +273,6 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
               Day
             </button>
             <button
-              onClick={() => setMobileViewMode('weekagenda')}
-              className={cn(
-                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
-                mobileViewMode === 'weekagenda' 
-                  ? 'bg-[#0b3d2e] text-white' 
-                  : 'border hover:bg-neutral-50'
-              )}
-            >
-              Week
-            </button>
-            <button
-              onClick={() => setMobileViewMode('2day')}
-              className={cn(
-                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
-                mobileViewMode === '2day' 
-                  ? 'bg-[#0b3d2e] text-white' 
-                  : 'border hover:bg-neutral-50'
-              )}
-            >
-              2 Days
-            </button>
-            <button
               onClick={() => setMobileViewMode('3day')}
               className={cn(
                 "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
@@ -300,6 +282,17 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
               )}
             >
               3 Days
+            </button>
+            <button
+              onClick={() => setMobileViewMode('weekagenda')}
+              className={cn(
+                "px-2 py-1.5 text-xs font-medium rounded-lg transition whitespace-nowrap",
+                mobileViewMode === 'weekagenda' 
+                  ? 'bg-[#0b3d2e] text-white' 
+                  : 'border hover:bg-neutral-50'
+              )}
+            >
+              Week
             </button>
           </div>
         )}
@@ -332,19 +325,6 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule }: 
           <DayView 
             date={currentDate} 
             bookings={getBookingsForDate(currentDate.toISOString().split('T')[0])}
-            onBookingClick={onBookingClick}
-            onReschedule={onReschedule}
-            formatTime={formatTime}
-            getStatusColor={getStatusColor}
-          />
-        )}
-
-        {viewMode === '2day' && (
-          <MultiDayView 
-            startDate={currentDate}
-            dayCount={2}
-            bookings={bookings}
-            today={today}
             onBookingClick={onBookingClick}
             onReschedule={onReschedule}
             formatTime={formatTime}
@@ -399,12 +379,14 @@ function WeekAgendaView({
   formatTime, 
   getStatusColor 
 }: any) {
-  // Get week days starting from Sunday
+  // Get week days starting from Monday
   const getWeekDays = () => {
     const days = [];
     const start = new Date(startDate);
     const dayOfWeek = start.getDay();
-    start.setDate(start.getDate() - dayOfWeek); // Go to Sunday
+    // Adjust to Monday: if Sunday, go back 6 days, else go back (day - 1) days
+    const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    start.setDate(start.getDate() + diff);
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(start);
@@ -666,10 +648,12 @@ function DayView({
     const newTime = `${String(hour).padStart(2, '0')}:00`;
     const dateStr = date.toISOString().split('T')[0];
 
+    console.log('[DayView Drop]', { booking: draggedBooking.bookingId, date: dateStr, time: newTime, hour });
+
     try {
       await onReschedule(draggedBooking.bookingId, dateStr, newTime);
     } catch (error) {
-      console.error('Failed to reschedule:', error);
+      console.error('[DayView] Failed to reschedule:', error);
       alert('Failed to reschedule booking. Please try again.');
     } finally {
       setDraggedBooking(null);
@@ -765,7 +749,7 @@ function WeekView({
 
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
-      {/* Week header */}
+      {/* Week header (Monday to Sunday) */}
       <div className="grid grid-cols-7 border-b bg-neutral-50">
         {days.map((day: Date, idx: number) => {
           const dateStr = day.toISOString().split('T')[0];
@@ -828,9 +812,9 @@ function WeekView({
 function MonthView({ days, bookings, today, onBookingClick }: any) {
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
-      {/* Month header */}
+      {/* Month header (Monday to Sunday) */}
       <div className="grid grid-cols-7 border-b bg-neutral-50">
-        {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
+        {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map(day => (
           <div key={day} className="p-3 text-center text-xs font-medium text-neutral-600 border-r last:border-r-0">
             {day}
           </div>
