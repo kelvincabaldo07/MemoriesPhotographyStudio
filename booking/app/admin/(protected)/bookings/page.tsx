@@ -524,8 +524,8 @@ export default function BookingsPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/10 rounded-lg flex items-center justify-center mb-2">
                   <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Bookings</p>
+                <p className="text-2xl lg:text-4xl font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
@@ -583,7 +583,7 @@ export default function BookingsPage() {
 
           {/* Status Filters */}
           <div>
-            <label className="text-base font-semibold text-neutral-700 mb-2 block">Status Filter</label>
+            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status Filter</label>
             <details className="relative border rounded-lg">
               <summary className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-base">
                 <span>

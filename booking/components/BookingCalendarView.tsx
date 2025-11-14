@@ -223,7 +223,7 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule, av
           >
             Today
           </button>
-          <h2 className="text-xl font-bold text-[#0b3d2e]">{formatDateDisplay()}</h2>
+          <h2 className="text-lg md:text-xl font-bold text-[#0b3d2e]">{formatDateDisplay()}</h2>
         </div>
 
         {/* View Mode Toggle - Desktop */}
@@ -306,7 +306,7 @@ export function BookingCalendarView({ bookings, onBookingClick, onReschedule, av
       </div>
 
       {/* Calendar Grid */}
-      <div className="flex-1 overflow-auto p-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden p-4">
         {viewMode === 'agenda' && (
           <AgendaView 
             date={currentDate}
