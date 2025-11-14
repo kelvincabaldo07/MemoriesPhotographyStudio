@@ -528,29 +528,29 @@ export default function BookingsPage() {
             {/* Revenue */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#A62F20]/10 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#A62F20]/20 rounded-lg flex items-center justify-center mb-2">
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#A62F20]" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
+                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Revenue</p>
+                <p className="text-2xl lg:text-4xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
               </div>
             </div>
 
             {/* Customers */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#8B5E3C]/10 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#8B5E3C]/20 rounded-lg flex items-center justify-center mb-2">
                   <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-[#8B5E3C]" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Customers</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Customers</p>
+                <p className="text-2xl lg:text-4xl font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
             {/* Avg. Value */}
             <div className="text-center">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/10 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/20 rounded-lg flex items-center justify-center mb-2">
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
                 </div>
                 <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Avg. Value</p>

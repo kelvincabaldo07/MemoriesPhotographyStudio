@@ -807,12 +807,14 @@ function WeekView({
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = async (e: React.DragEvent, dateStr: string) => {
+  const handleDrop = async (e: React.DragEvent, dateStr: string, time?: string) => {
     e.preventDefault();
     if (!draggedBooking || !onReschedule) return;
 
     try {
-      await onReschedule(draggedBooking.bookingId, dateStr, draggedBooking.time);
+      // Use the dropped time slot or keep original time
+      const newTime = time || draggedBooking.time;
+      await onReschedule(draggedBooking.bookingId, dateStr, newTime);
     } catch (error) {
       console.error('Failed to reschedule:', error);
       alert('Failed to reschedule booking. Please try again.');
@@ -821,10 +823,14 @@ function WeekView({
     }
   };
 
+  // Generate working hours (8 AM to 8 PM)
+  const hours = Array.from({ length: 13 }, (_, i) => i + 8); // 8-20 (8am-8pm)
+
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       {/* Week header (Monday to Sunday) */}
-      <div className="grid grid-cols-7 border-b bg-neutral-50">
+      <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b bg-neutral-50">
+        <div className="p-3 border-r" /> {/* Empty corner for time column */}
         {days.map((day: Date, idx: number) => {
           const dateStr = day.toISOString().split('T')[0];
           const isToday = dateStr === today;
@@ -844,36 +850,59 @@ function WeekView({
         })}
       </div>
 
-      {/* Week grid */}
-      <div className="grid grid-cols-7 divide-x min-h-[500px]">
-        {days.map((day: Date, idx: number) => {
+      {/* Week grid with time slots */}
+      <div className="grid grid-cols-[60px_repeat(7,1fr)] divide-x overflow-y-auto max-h-[600px]">
+        {/* Time column */}
+        <div className="bg-neutral-50 border-r">
+          {hours.map((hour) => (
+            <div key={hour} className="h-16 border-b px-2 py-1 text-xs text-neutral-600 text-right">
+              {hour % 12 || 12}:00 {hour < 12 ? 'AM' : 'PM'}
+            </div>
+          ))}
+        </div>
+        
+        {/* Day columns with hourly slots */}
+        {days.map((day: Date, dayIdx: number) => {
           const dateStr = day.toISOString().split('T')[0];
           const dayBookings = bookings.filter((b: any) => b.date === dateStr);
           
           return (
-            <div 
-              key={idx} 
-              className="p-2 space-y-1 overflow-y-auto max-h-[600px]"
-              onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, dateStr)}
-            >
-              {dayBookings.map((booking: any) => (
-                <div
-                  key={booking.id}
-                  draggable={!!onReschedule}
-                  onDragStart={(e) => handleDragStart(e, booking)}
-                  onClick={() => onBookingClick(booking)}
-                  className={cn(
-                    "p-2 rounded text-xs cursor-move hover:shadow-md transition border-l-2",
-                    getStatusColor(booking.status),
-                    draggedBooking?.id === booking.id && "opacity-50"
-                  )}
-                >
-                  <div className="font-medium truncate">{formatTime(booking.time)}</div>
-                  <div className="truncate">{booking.name}</div>
-                  <div className="text-[10px] opacity-75 truncate">{booking.service}</div>
-                </div>
-              ))}
+            <div key={dayIdx} className="relative">
+              {/* Hour slots for drag-drop targeting */}
+              {hours.map((hour) => {
+                const hourStr = `${hour.toString().padStart(2, '0')}:00`;
+                const hourBookings = dayBookings.filter((b: any) => {
+                  const bookingHour = parseInt(b.time.split(':')[0]);
+                  return bookingHour === hour;
+                });
+                
+                return (
+                  <div
+                    key={hour}
+                    className="h-16 border-b hover:bg-blue-50/30 transition relative"
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, dateStr, hourStr)}
+                  >
+                    {/* Bookings at this hour */}
+                    {hourBookings.map((booking: any) => (
+                      <div
+                        key={booking.id}
+                        draggable={!!onReschedule}
+                        onDragStart={(e) => handleDragStart(e, booking)}
+                        onClick={() => onBookingClick(booking)}
+                        className={cn(
+                          "absolute left-1 right-1 top-1 p-1.5 rounded text-xs cursor-move hover:shadow-md transition border-l-2 bg-white z-10",
+                          getStatusColor(booking.status),
+                          draggedBooking?.id === booking.id && "opacity-50"
+                        )}
+                      >
+                        <div className="font-medium text-xs truncate">{formatTime(booking.time)}</div>
+                        <div className="text-[10px] truncate">{booking.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           );
         })}
