@@ -795,11 +795,11 @@ async function submitBooking(){
       <div className="w-full max-w-5xl">
         {/* Simple Logo/Title Header */}
         <div className="text-center mb-6 pt-4">
-          <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-3 mb-2">
             <img 
               src="/logo.png" 
               alt="Memories Photography Studio" 
-              className="w-12 h-12 md:w-14 md:h-14"
+              className="w-16 h-16 md:w-14 md:h-14"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             <div>

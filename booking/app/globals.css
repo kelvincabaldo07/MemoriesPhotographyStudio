@@ -6,11 +6,11 @@
 /* Typography Scale - 4 Level System */
 @layer utilities {
   .text-base-body {
-    font-size: 10px;
+    font-size: 12px;
     font-family: var(--font-open-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
   .text-h3 {
-    font-size: 12px;
+    font-size: 14px;
     font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
   .text-h2 {
@@ -35,7 +35,7 @@
   body {
     font-family: var(--font-open-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     @apply bg-background text-foreground;
-    font-size: 10px; /* Base body text */
+    font-size: 12px; /* Base body text */
   }
   
   h1 {
@@ -52,7 +52,7 @@
   
   h3 {
     font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
   }
   
