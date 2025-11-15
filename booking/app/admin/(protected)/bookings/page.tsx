@@ -503,7 +503,7 @@ export default function BookingsPage() {
             variant={timeRangeFilter === range.value ? "default" : "outline"}
             size="sm"
             onClick={() => applyTimeRangeFilter(range.value)}
-            className={`whitespace-nowrap ${
+            className={`whitespace-nowrap text-h3 ${
               timeRangeFilter === range.value
                 ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
                 : ""
@@ -526,7 +526,7 @@ export default function BookingsPage() {
                   <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
-                <p className="text-h2 font-bold text-foreground">{stats.total}</p>
+                <p className="text-h3 font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
@@ -537,7 +537,7 @@ export default function BookingsPage() {
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
-                <p className="text-h2 font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
+                <p className="text-h3 font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
               </div>
             </div>
 
@@ -548,7 +548,7 @@ export default function BookingsPage() {
                   <Users className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Customers</p>
-                <p className="text-h2 font-bold text-foreground">{stats.total}</p>
+                <p className="text-h3 font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
@@ -559,7 +559,7 @@ export default function BookingsPage() {
                   <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Value</p>
-                <p className="text-h2 font-bold text-foreground">
+                <p className="text-h3 font-bold text-foreground">
                   ₱{stats.total > 0 ? Math.round(stats.revenue / stats.total).toLocaleString() : 0}
                 </p>
               </div>

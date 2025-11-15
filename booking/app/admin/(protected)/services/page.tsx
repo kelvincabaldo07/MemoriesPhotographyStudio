@@ -255,7 +255,7 @@ export default function ServicesPage() {
                   <Package className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Services</p>
-                <p className="text-h2 font-bold text-foreground">{totalStats.totalServices}</p>
+                <p className="text-h3 font-bold text-foreground">{totalStats.totalServices}</p>
               </div>
             </div>
 
@@ -266,7 +266,7 @@ export default function ServicesPage() {
                   <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
-                <p className="text-h2 font-bold text-foreground">{totalStats.totalBookings}</p>
+                <p className="text-h3 font-bold text-foreground">{totalStats.totalBookings}</p>
               </div>
             </div>
 
@@ -277,7 +277,7 @@ export default function ServicesPage() {
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
-                <p className="text-h2 font-bold text-foreground">₱{totalStats.totalRevenue.toLocaleString()}</p>
+                <p className="text-h3 font-bold text-foreground">₱{totalStats.totalRevenue.toLocaleString()}</p>
               </div>
             </div>
 
@@ -288,7 +288,7 @@ export default function ServicesPage() {
                   <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Price</p>
-                <p className="text-h2 font-bold text-foreground">₱{totalStats.avgPrice.toLocaleString()}</p>
+                <p className="text-h3 font-bold text-foreground">₱{totalStats.avgPrice.toLocaleString()}</p>
               </div>
             </div>
           </div>

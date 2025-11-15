@@ -1342,7 +1342,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
           >
             <div className="flex items-center justify-between p-3 bg-neutral-50">
               <button className="text-left flex-1" onClick={()=>toggleType(String(t))}>
-                <div className="font-medium">
+                <div className="text-h3 font-bold">
                   {t === "Self-Shoot" ? "📸 Self-Shoot" : t === "With Photographer" ? "👩‍🎨 With Photographer" : "🎄 Seasonal Sessions"}
                 </div>
                 <div className="text-base-body text-neutral-500">
@@ -1378,7 +1378,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                         }}
                       >
                         <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
-                          <div className="font-medium" style={{ color: serviceCategory === c ? BRAND.white : BRAND.charcoal }}>
+                          <div className="text-h3 font-bold" style={{ color: serviceCategory === c ? BRAND.white : BRAND.charcoal }}>
                             {c === "Classic" ? "🖼 Classic Package" : "💻 Digital Package"}
                           </div>
                           <div className="text-base-body" style={{ color: serviceCategory === c ? BRAND.white : "#737373" }}>
@@ -1403,7 +1403,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {/* Groups */}
                 {serviceCategory && (
                   <div className="mt-4">
-                    <div className="text-h3 font-medium mb-2">Service Group</div>
+                    <div className="text-h3 font-bold mb-2">Service Group</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {groups.map((g)=> {
                         return (
@@ -1422,7 +1422,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           <div className="p-3 flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                             <div className="flex-1">
-                              <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
+                              <div className="text-h3 font-bold" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
                               <div className="text-base-body" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
                             </div>
                           </div>
@@ -1441,7 +1441,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     {t === "Seasonal Sessions" && (
                       <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} — {CHRISTMAS_2025.desc}</div>
                     )}
-                    <div className="text-h3 font-medium mb-2">Services</div>
+                    <div className="text-h3 font-bold mb-2">Services</div>
                     <div className={cn("grid gap-3", service ? "grid-cols-1" : "md:grid-cols-3")}>
                       {(service ? [service] : services).map((s: string)=> {
                         const info: { details: string; price: number; classicDetails?: string; thumbnail?: string } = serviceInfo[s] || { details: "", price: 0, thumbnail: undefined };
@@ -1503,9 +1503,9 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                             <div className="p-3">
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex-1 min-w-0">
-                                  <div className="font-semibold" style={{ color: BRAND.forest }}>{s}</div>
+                                  <div className="text-h3 font-bold" style={{ color: BRAND.forest }}>{s}</div>
                                   {displayDetails && (
-                                  <ul className="text-h3 text-neutral-600 mt-2 space-y-1">
+                                  <ul className="text-base-body text-neutral-600 mt-2 space-y-1">
                                     {displayDetails.split('\n').map((line, idx) => (
                                       <li key={idx} className="flex items-start gap-1">
                                         <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>

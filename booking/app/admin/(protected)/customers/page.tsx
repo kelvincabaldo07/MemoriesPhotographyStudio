@@ -97,23 +97,23 @@ export default function CustomersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <p className="text-base-body text-neutral-600">Total Customers</p>
-          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">{stats.total}</p>
+          <p className="text-h3 font-bold text-[#0b3d2e] mt-1">{stats.total}</p>
         </Card>
         <Card className="p-4">
           <p className="text-base-body text-neutral-600">Total Revenue</p>
-          <p className="text-h2 font-bold text-green-600 mt-1">
+          <p className="text-h3 font-bold text-green-600 mt-1">
             ₱{stats.totalRevenue.toLocaleString()}
           </p>
         </Card>
         <Card className="p-4">
           <p className="text-base-body text-neutral-600">Avg Revenue/Customer</p>
-          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
+          <p className="text-h3 font-bold text-[#0b3d2e] mt-1">
             ₱{Math.round(stats.avgRevenue).toLocaleString()}
           </p>
         </Card>
         <Card className="p-4">
           <p className="text-base-body text-neutral-600">Total Bookings</p>
-          <p className="text-h2 font-bold text-blue-600 mt-1">
+          <p className="text-h3 font-bold text-blue-600 mt-1">
             {stats.totalBookings}
           </p>
         </Card>

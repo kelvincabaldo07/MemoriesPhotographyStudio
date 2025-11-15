@@ -125,7 +125,7 @@ export default function AnalyticsPage() {
             </Badge>
           </div>
           <p className="text-base-body text-neutral-600 mt-4">Total Revenue</p>
-          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
+          <p className="text-h3 font-bold text-[#0b3d2e] mt-1">
             ₱{stats.totalRevenue.toLocaleString()}
           </p>
         </Card>
@@ -144,7 +144,7 @@ export default function AnalyticsPage() {
             </Badge>
           </div>
           <p className="text-base-body text-neutral-600 mt-4">Total Bookings</p>
-          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
+          <p className="text-h3 font-bold text-[#0b3d2e] mt-1">
             {stats.totalBookings}
           </p>
         </Card>
@@ -163,7 +163,7 @@ export default function AnalyticsPage() {
             </Badge>
           </div>
           <p className="text-base-body text-neutral-600 mt-4">Avg Booking Value</p>
-          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
+          <p className="text-h3 font-bold text-[#0b3d2e] mt-1">
             ₱{stats.avgBookingValue.toLocaleString()}
           </p>
         </Card>
@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
             </Badge>
           </div>
           <p className="text-base-body text-neutral-600 mt-4">New Customers</p>
-          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
+          <p className="text-h3 font-bold text-[#0b3d2e] mt-1">
             {stats.newCustomers}
           </p>
         </Card>

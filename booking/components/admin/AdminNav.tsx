@@ -2,6 +2,7 @@
 import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -42,10 +43,16 @@ export default function AdminNav({ session }: { session: any }) {
             {/* Logo & Current Section */}
             <div className="flex items-center gap-3 min-w-0">
               <div 
-                className="w-8 h-8 rounded-full bg-white flex items-center justify-center cursor-pointer flex-shrink-0"
+                className="w-8 h-8 rounded-full bg-white flex items-center justify-center cursor-pointer flex-shrink-0 overflow-hidden"
                 onClick={() => router.push("/admin/dashboard")}
               >
-                <span className="text-[#0b3d2e] font-bold text-sm">M</span>
+                <Image 
+                  src="/logo.png" 
+                  alt="Memories Studio" 
+                  width={32} 
+                  height={32}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="min-w-0">
                 <span className="font-semibold text-white text-base truncate block lg:hidden">

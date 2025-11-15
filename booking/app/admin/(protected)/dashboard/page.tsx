@@ -167,6 +167,7 @@ export default function AdminDashboard() {
           variant={statsTimeFilter === 'day' ? "default" : "outline"}
           size="sm"
           onClick={() => setStatsTimeFilter('day')}
+          className="text-h3"
         >
           Today
         </Button>
@@ -174,6 +175,7 @@ export default function AdminDashboard() {
           variant={statsTimeFilter === 'week' ? "default" : "outline"}
           size="sm"
           onClick={() => setStatsTimeFilter('week')}
+          className="text-h3"
         >
           This Week
         </Button>
@@ -181,6 +183,7 @@ export default function AdminDashboard() {
           variant={statsTimeFilter === 'month' ? "default" : "outline"}
           size="sm"
           onClick={() => setStatsTimeFilter('month')}
+          className="text-h3"
         >
           This Month
         </Button>
@@ -188,6 +191,7 @@ export default function AdminDashboard() {
           variant={statsTimeFilter === 'year' ? "default" : "outline"}
           size="sm"
           onClick={() => setStatsTimeFilter('year')}
+          className="text-h3"
         >
           This Year
         </Button>
@@ -206,7 +210,7 @@ export default function AdminDashboard() {
                     <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
-                  <p className="text-h2 font-bold text-foreground">{filteredTotalBookings}</p>
+                  <p className="text-h3 font-bold text-foreground">{filteredTotalBookings}</p>
                 </div>
               </div>
 
@@ -217,7 +221,7 @@ export default function AdminDashboard() {
                     <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
-                  <p className="text-h2 font-bold text-foreground">₱{filteredStats.monthlyRevenue.toLocaleString()}</p>
+                  <p className="text-h3 font-bold text-foreground">₱{filteredStats.monthlyRevenue.toLocaleString()}</p>
                 </div>
               </div>
 
@@ -228,7 +232,7 @@ export default function AdminDashboard() {
                     <Users className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Customers</p>
-                  <p className="text-h2 font-bold text-foreground">{filteredStats.totalCustomers}</p>
+                  <p className="text-h3 font-bold text-foreground">{filteredStats.totalCustomers}</p>
                 </div>
               </div>
 
@@ -239,7 +243,7 @@ export default function AdminDashboard() {
                     <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Value</p>
-                  <p className="text-h2 font-bold text-foreground">₱{filteredTotalBookings > 0 ? Math.round((filteredStats.monthlyRevenue / filteredTotalBookings)).toLocaleString() : 0}</p>
+                  <p className="text-h3 font-bold text-foreground">₱{filteredTotalBookings > 0 ? Math.round((filteredStats.monthlyRevenue / filteredTotalBookings)).toLocaleString() : 0}</p>
                 </div>
               </div>
             </div>
@@ -288,8 +292,8 @@ export default function AdminDashboard() {
                     return (
                       <div key={booking.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
                         <div className="flex-1 min-w-0">
-                          <p className="text-h3 font-medium truncate">{booking.name}</p>
-                          <p className="text-h3 text-neutral-600 truncate">{booking.service || booking.serviceType}</p>
+                          <p className="text-h3 font-semibold truncate">{booking.name}</p>
+                          <p className="text-base-body text-neutral-600 truncate">{booking.service || booking.serviceType}</p>
                           <p className="text-base-body text-neutral-500">{formatDate(booking.date)}</p>
                         </div>
                         <Badge variant="outline" className={`${getStatusColor(booking.status)} ml-2 flex-shrink-0`}>{booking.status}</Badge>
@@ -307,23 +311,24 @@ export default function AdminDashboard() {
       {analyticsData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Revenue Trend - show last 12 months as a line chart */}
-          <Card className="p-6">
-            <h3 className="text-h2 font-bold text-primary mb-4">Revenue Trend (Last 12 Months)</h3>
-            <div className="mt-4">
+          <div>
+            <h2 className="text-h2 font-semibold text-primary mb-3">Revenue Trend (Last 12 Months)</h2>
+            <Card className="p-6">
               <RevenueLineChart 
                 data={analyticsData.revenueByMonth} 
                 height={280}
                 strokeColor="#10b981"
                 fillColor="#10b981"
               />
-            </div>
-          </Card>
+            </Card>
+          </div>
 
           {/* Top Services */}
-          <Card className="p-6">
-            <h3 className="text-h2 font-bold text-primary mb-4">
+          <div>
+            <h2 className="text-h2 font-semibold text-primary mb-3">
               Top Services
-            </h3>
+            </h2>
+            <Card className="p-6">
             <div className="space-y-4">
               {analyticsData.topServices.map((service, index) => (
                 <div key={service.name}>
@@ -356,12 +361,13 @@ export default function AdminDashboard() {
             </div>
           </Card>
         </div>
-      )}
+      </div>
+    )}
 
       {/* Quick Actions */}
       <div>
+        <h2 className="text-h2 font-semibold text-primary mb-3">Quick Actions</h2>
         <Card className="p-6">
-          <h2 className="text-h2 font-bold text-primary mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-4">
             <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group">
               <Calendar className="w-6 h-6 mx-auto mb-2 text-primary group-hover:text-primary-foreground" />
