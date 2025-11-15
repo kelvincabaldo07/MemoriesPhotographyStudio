@@ -454,8 +454,8 @@ export default function BookingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#0b3d2e] hidden md:block">Bookings</h1>
-          <p className="text-neutral-600 mt-1 text-sm">
+          <h1 className="text-h1 font-bold text-[#0b3d2e] hidden md:block">Bookings</h1>
+          <p className="text-base-body text-neutral-600 mt-1">
             Manage all studio bookings and reservations
           </p>
         </div>
@@ -463,7 +463,7 @@ export default function BookingsPage() {
           <div className="flex border rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 text-sm font-medium transition ${
+              className={`px-3 py-2 text-h3 font-medium transition ${
                 viewMode === 'list' 
                   ? 'bg-[#0b3d2e] text-white' 
                   : 'bg-white text-neutral-600 hover:bg-neutral-50'
@@ -473,7 +473,7 @@ export default function BookingsPage() {
             </button>
             <button
               onClick={() => setViewMode('calendar')}
-              className={`px-3 py-2 text-sm font-medium transition ${
+              className={`px-3 py-2 text-h3 font-medium transition ${
                 viewMode === 'calendar' 
                   ? 'bg-[#0b3d2e] text-white' 
                   : 'bg-white text-neutral-600 hover:bg-neutral-50'
@@ -482,7 +482,7 @@ export default function BookingsPage() {
               <CalendarDays className="w-4 h-4" />
             </button>
           </div>
-          <Button className="bg-[#0b3d2e] hover:bg-[#0a3426] text-xs md:text-sm">
+          <Button className="bg-[#0b3d2e] hover:bg-[#0a3426] text-h3">
             <Download className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Export CSV</span>
           </Button>
@@ -516,7 +516,7 @@ export default function BookingsPage() {
 
       {/* Summary - Dashboard Style */}
       <div>
-        <h2 className="text-lg font-semibold text-[#0b3d2e] mb-3">Summary</h2>
+        <h2 className="text-h2 font-semibold text-[#0b3d2e] mb-3">Summary</h2>
         <Card className="p-6">
           <div className="grid grid-cols-4 gap-4 lg:gap-6">
             {/* Total Bookings */}
@@ -525,8 +525,8 @@ export default function BookingsPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
                   <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
+                <p className="text-h2 font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
@@ -536,8 +536,8 @@ export default function BookingsPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
+                <p className="text-h2 font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
               </div>
             </div>
 
@@ -547,8 +547,8 @@ export default function BookingsPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
                   <Users className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Customers</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Customers</p>
+                <p className="text-h2 font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
@@ -558,8 +558,8 @@ export default function BookingsPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
                   <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Value</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Value</p>
+                <p className="text-h2 font-bold text-foreground">
                   ₱{stats.total > 0 ? Math.round(stats.revenue / stats.total).toLocaleString() : 0}
                 </p>
               </div>
@@ -584,9 +584,9 @@ export default function BookingsPage() {
 
           {/* Status Filters */}
           <div>
-            <label className="text-sm font-semibold text-neutral-700 mb-2 block">Status Filter</label>
+            <label className="text-h3 font-semibold text-neutral-700 mb-2 block">Status Filter</label>
             <details className="relative border rounded-lg">
-              <summary className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-base">
+              <summary className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-base-body">
                 <span>
                   {statusFilter.length === 0 ? 'All Statuses' : `${statusFilter.length} selected`}
                 </span>
@@ -596,13 +596,13 @@ export default function BookingsPage() {
                 {statusFilter.length > 0 && (
                   <button
                     onClick={() => setStatusFilter([])}
-                    className="w-full px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 border-b"
+                    className="w-full px-4 py-2 text-h3 font-medium text-red-600 hover:bg-red-50 border-b"
                   >
                     Clear All ({statusFilter.length})
                   </button>
                 )}
                 {["Booking Confirmed", "Attendance Confirmed", "Session Completed", "RAW Photos Sent", "Final Deliverables Sent", "Access Granted - Completed", "No Show", "Cancelled", "Rescheduled"].map((status) => (
-                  <label key={status} className="flex items-center px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-base">
+                  <label key={status} className="flex items-center px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-base-body">
                     <input
                       type="checkbox"
                       checked={statusFilter.includes(status)}
@@ -625,7 +625,7 @@ export default function BookingsPage() {
           {/* Service Filters */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div>
-              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 Start Date
               </label>
@@ -640,7 +640,7 @@ export default function BookingsPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 End Date
               </label>
@@ -655,14 +655,14 @@ export default function BookingsPage() {
               />
             </div>
             <div>
-              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Package className="w-3 h-3" />
                 Service Type
               </label>
               <select
                 value={serviceTypeFilter}
                 onChange={(e) => setServiceTypeFilter(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm"
+                className="w-full px-3 py-2 border rounded-md text-h3"
               >
                 {uniqueServiceTypes.map((type) => (
                   <option key={type} value={type}>{type}</option>
@@ -670,14 +670,14 @@ export default function BookingsPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Layers className="w-3 h-3" />
                 Category
               </label>
               <select
                 value={serviceCategoryFilter}
                 onChange={(e) => setServiceCategoryFilter(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm"
+                className="w-full px-3 py-2 border rounded-md text-h3"
               >
                 {uniqueServiceCategories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -685,14 +685,14 @@ export default function BookingsPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Tag className="w-3 h-3" />
                 Service
               </label>
               <select
                 value={serviceFilter}
                 onChange={(e) => setServiceFilter(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-sm"
+                className="w-full px-3 py-2 border rounded-md text-h3"
               >
                 {uniqueServices.map((svc) => (
                   <option key={svc} value={svc}>{svc}</option>
@@ -706,7 +706,7 @@ export default function BookingsPage() {
       {/* Bookings List - Mobile Optimized */}
       <div className="space-y-3">
         {loading ? (
-          <Card className="p-8 text-center text-neutral-600">
+          <Card className="p-8 text-center text-base-body text-neutral-600">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0b3d2e] mx-auto"></div>
             <p className="mt-4">Loading bookings...</p>
           </Card>
@@ -724,7 +724,7 @@ export default function BookingsPage() {
             availability={availabilityData.loading ? undefined : availabilityData}
           />
         ) : filteredBookings.length === 0 ? (
-          <Card className="p-8 text-center text-neutral-600">
+          <Card className="p-8 text-center text-base-body text-neutral-600">
             <Calendar className="w-12 h-12 mx-auto text-neutral-400 mb-4" />
             <p>No bookings found</p>
           </Card>
@@ -751,9 +751,9 @@ export default function BookingsPage() {
               <div className="space-y-2">
                 {/* Date & Time */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-base">
+                  <div className="flex items-center gap-2 text-h3">
                     <Calendar className="w-4 h-4 text-[#0b3d2e]" />
-                    <span className="font-semibold text-base">{formatDate(booking.date)}</span>
+                    <span className="font-semibold">{formatDate(booking.date)}</span>
                     <Clock className="w-4 h-4 text-neutral-500 ml-2" />
                     <span className="text-neutral-600">{formatTimeTo12Hour(booking.time)}</span>
                   </div>
@@ -764,8 +764,8 @@ export default function BookingsPage() {
 
                 {/* Customer Info */}
                 <div>
-                  <p className="font-bold text-lg text-[#0b3d2e]">{booking.name}</p>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-base text-neutral-600">
+                  <p className="font-bold text-h2 text-[#0b3d2e]">{booking.name}</p>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-base-body text-neutral-600">
                     <span className="flex items-center gap-1">
                       <Mail className="w-4 h-4" />
                       {booking.email}
@@ -778,7 +778,7 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Service Info */}
-                <div className="space-y-1 text-base">
+                <div className="space-y-1 text-base-body">
                   <div className="flex items-start gap-2">
                     <Package className="w-4 h-4 text-neutral-500 mt-0.5" />
                     <div>
@@ -804,7 +804,7 @@ export default function BookingsPage() {
 
                 {/* Add-ons and Backdrops */}
                 {(booking.addons.length > 0 || booking.backdrops.length > 0) && (
-                  <div className="space-y-1 text-base pt-2 border-t">
+                  <div className="space-y-1 text-base-body pt-2 border-t">
                     {booking.addons.length > 0 && (
                       <div className="flex items-start gap-1">
                         <span className="text-neutral-600">Add-ons:</span>
@@ -822,8 +822,8 @@ export default function BookingsPage() {
 
                 {/* Price */}
                 <div className="flex items-center justify-between pt-2 border-t">
-                  <span className="text-base text-neutral-600">Total</span>
-                  <span className="text-xl font-bold text-[#0b3d2e]">
+                  <span className="text-base-body text-neutral-600">Total</span>
+                  <span className="text-h2 font-bold text-[#0b3d2e]">
                     ₱{booking.grandTotal.toLocaleString()}
                   </span>
                 </div>
@@ -849,7 +849,7 @@ export default function BookingsPage() {
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#0b3d2e]">
+                <h2 className="text-h1 font-bold text-[#0b3d2e]">
                   Booking Details
                 </h2>
                 <div className="flex items-center gap-2">
@@ -882,7 +882,7 @@ export default function BookingsPage() {
                 {/* Customer Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-base font-semibold text-neutral-700">Customer Name</label>
+                    <label className="text-h3 font-semibold text-neutral-700">Customer Name</label>
                     {isEditing ? (
                       <Input
                         value={editedBooking?.name || ""}
@@ -896,7 +896,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-base font-semibold text-neutral-700">Email</label>
+                    <label className="text-h3 font-semibold text-neutral-700">Email</label>
                     {isEditing ? (
                       <Input
                         type="email"
@@ -911,7 +911,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-base font-semibold text-neutral-700">Phone</label>
+                    <label className="text-h3 font-semibold text-neutral-700">Phone</label>
                     {isEditing ? (
                       <Input
                         value={editedBooking?.phone || ""}
@@ -925,7 +925,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div>
-                    <label className="text-base font-semibold text-neutral-700">Address</label>
+                    <label className="text-h3 font-semibold text-neutral-700">Address</label>
                     {isEditing ? (
                       <Input
                         value={editedBooking?.address || ""}
@@ -941,10 +941,10 @@ export default function BookingsPage() {
                 </div>
                 {/* Service Details */}
                 <div className="border-t pt-4">
-                  <h3 className="text-xl font-bold text-[#0b3d2e] mb-3">Service Details</h3>
+                  <h3 className="text-h2 font-bold text-[#0b3d2e] mb-3">Service Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-base font-semibold text-neutral-700">Service Type</label>
+                      <label className="text-h3 font-semibold text-neutral-700">Service Type</label>
                       {isEditing ? (
                         <select
                           value={editedBooking?.serviceType || ""}
@@ -964,11 +964,11 @@ export default function BookingsPage() {
                               duration: 30 // Reset duration
                             });
                           }}
-                          className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                          className="mt-1 w-full px-3 py-2 border rounded-lg text-h3"
                         >
                           <option value="">Select Type</option>
                           {serviceOptions.types.map((type) => (
-                            <option key={type} value={type} className="text-sm">{type}</option>
+                            <option key={type} value={type} className="text-h3">{type}</option>
                           ))}
                         </select>
                       ) : (
@@ -996,12 +996,12 @@ export default function BookingsPage() {
                                   duration: 30
                                 });
                               }}
-                              className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                              className="mt-1 w-full px-3 py-2 border rounded-lg text-h3"
                               disabled={!editedBooking?.serviceType}
                             >
                               <option value="">Select Category</option>
                               {serviceOptions.categories.map((category) => (
-                                <option key={category} value={category} className="text-sm">{category}</option>
+                                <option key={category} value={category} className="text-h3">{category}</option>
                               ))}
                             </select>
                           )}
@@ -1024,7 +1024,7 @@ export default function BookingsPage() {
                               duration: 30 // Reset duration
                             });
                           }}
-                          className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                          className="mt-1 w-full px-3 py-2 border rounded-lg text-h3"
                           disabled={!editedBooking?.serviceType || !editedBooking?.serviceCategory}
                         >
                           <option value="">Select Group</option>
@@ -1036,7 +1036,7 @@ export default function BookingsPage() {
                                 return servicesInGroup.some(s => s.category === editedBooking.serviceCategory);
                               })
                               .map((group) => (
-                                <option key={group} value={group} className="text-sm">{group}</option>
+                                <option key={group} value={group} className="text-h3">{group}</option>
                               ))
                           }
                         </select>
@@ -1072,7 +1072,7 @@ export default function BookingsPage() {
                               checkAvailability(editedBooking.date, serviceData.duration);
                             }
                           }}
-                          className="mt-1 w-full px-3 py-2 border rounded-lg text-sm"
+                          className="mt-1 w-full px-3 py-2 border rounded-lg text-h3"
                           disabled={!editedBooking?.serviceGroup || !editedBooking?.serviceCategory}
                         >
                           <option value="">Select Service</option>
@@ -1080,7 +1080,7 @@ export default function BookingsPage() {
                             serviceOptions.servicesByGroup[editedBooking.serviceGroup]
                               ?.filter(service => service.category === editedBooking.serviceCategory)
                               .map((service) => (
-                                <option key={service.name} value={service.name} className="text-sm">
+                                <option key={service.name} value={service.name} className="text-h3">
                                   {service.name} ({service.duration} min - ₱{service.price})
                                 </option>
                               ))
@@ -1105,7 +1105,7 @@ export default function BookingsPage() {
                   {/* Date & Time Picker - Full Width Calendar */}
                   {isEditing ? (
                     <div className="mt-6">
-                      <h4 className="text-sm font-semibold text-neutral-700 mb-4">Select Date & Time</h4>
+                      <h4 className="text-h3 font-semibold text-neutral-700 mb-4">Select Date & Time</h4>
                       <BookingCalendar
                         selectedDate={editedBooking?.date || ""}
                         selectedTime={editedBooking?.time || ""}
@@ -1142,7 +1142,7 @@ export default function BookingsPage() {
                 {/* Add-ons & Backdrops Section */}
                 {isEditing && (
                   <div className="border-t pt-4">
-                    <h3 className="text-lg font-bold text-[#0b3d2e] mb-3">Add-ons & Extras</h3>
+                    <h3 className="text-h2 font-bold text-[#0b3d2e] mb-3">Add-ons & Extras</h3>
                     
                     {/* Add-ons */}
                     <div className="mb-4">
@@ -1158,8 +1158,8 @@ export default function BookingsPage() {
                           return (
                             <div key={addon.id} className="flex items-center justify-between p-3 border rounded-lg">
                               <div className="flex-1">
-                                <p className="text-sm font-medium">{addon.label}</p>
-                                <p className="text-xs text-neutral-500">₱{addon.price} each</p>
+                                <p className="text-h3 font-medium">{addon.label}</p>
+                                <p className="text-base-body text-neutral-500">₱{addon.price} each</p>
                               </div>
                               <div className="flex items-center gap-2">
                                 <button
@@ -1175,11 +1175,11 @@ export default function BookingsPage() {
                                     });
                                   }}
                                   disabled={currentQty === 0}
-                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30 text-sm"
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30 text-h3"
                                 >
                                   -
                                 </button>
-                                <span className="w-8 text-center font-medium text-sm">{currentQty}</span>
+                                <span className="w-8 text-center font-medium text-h3">{currentQty}</span>
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1188,7 +1188,7 @@ export default function BookingsPage() {
                                       return { ...prev!, addons: newAddons };
                                     });
                                   }}
-                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 text-sm"
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 text-h3"
                                 >
                                   +
                                 </button>
@@ -1260,7 +1260,7 @@ export default function BookingsPage() {
                                   });
                                 }}
                                 disabled={isDisabled}
-                                className={`p-3 text-sm rounded-lg border-2 transition ${
+                                className={`p-3 text-h3 rounded-lg border-2 transition ${
                                   isSelected
                                     ? 'border-[#0b3d2e] bg-[#0b3d2e]/10 font-medium'
                                     : isDisabled
@@ -1273,9 +1273,9 @@ export default function BookingsPage() {
                             );
                           })}
                         </div>
-                        <p className="text-xs text-neutral-500 mt-2">
+                        <p className="text-base-body text-neutral-500 mt-2">
                           {editedBooking?.backdrops?.length || 0} of {editedBooking?.duration && editedBooking.duration >= 60 ? '4' : '2'} backdrops selected
-                          <span className="ml-2 text-xs">({editedBooking?.backdrops?.join(', ') || 'none'})</span>
+                          <span className="ml-2">({editedBooking?.backdrops?.join(', ') || 'none'})</span>
                         </p>
                       </div>
                     )}
@@ -1285,18 +1285,18 @@ export default function BookingsPage() {
                 {/* Pricing */}
                 <div className="grid grid-cols-3 gap-4 border-t pt-4">
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">
+                    <label className="text-h3 font-semibold text-neutral-700">
                       Session Price
                     </label>
-                    <p className="mt-1 text-lg font-bold text-[#0b3d2e]">
+                    <p className="mt-1 text-h2 font-bold text-[#0b3d2e]">
                       ₱{(isEditing ? editedBooking?.sessionPrice : selectedBooking.sessionPrice)?.toLocaleString()}
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">
+                    <label className="text-h3 font-semibold text-neutral-700">
                       Add-ons
                     </label>
-                    <p className="mt-1 text-lg font-bold text-blue-600">
+                    <p className="mt-1 text-h2 font-bold text-blue-600">
                       ₱{(() => {
                         if (!isEditing) return selectedBooking.addonsTotal.toLocaleString();
                         const addonsTotal = (editedBooking?.addons || []).reduce((sum, id) => {
@@ -1308,10 +1308,10 @@ export default function BookingsPage() {
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-neutral-700">
+                    <label className="text-h3 font-semibold text-neutral-700">
                       Grand Total
                     </label>
-                    <p className="mt-1 text-lg font-bold text-green-600">
+                    <p className="mt-1 text-h2 font-bold text-green-600">
                       ₱{(() => {
                         if (!isEditing) return selectedBooking.grandTotal.toLocaleString();
                         const addonsTotal = (editedBooking?.addons || []).reduce((sum, id) => {
@@ -1325,7 +1325,7 @@ export default function BookingsPage() {
                 </div>
                 {/* Status */}
                 <div>
-                  <label className="text-sm font-semibold text-neutral-700">Status</label>
+                  <label className="text-h3 font-semibold text-neutral-700">Status</label>
                   <div className="mt-1">
                     <Badge variant="outline" className={getStatusColor(selectedBooking.status)}>
                       {selectedBooking.status}
@@ -1339,7 +1339,7 @@ export default function BookingsPage() {
                 {isEditing ? (
                   <>
                     <Button
-                      className="flex-1 bg-[#0b3d2e] hover:bg-[#0a3426]"
+                      className="flex-1 bg-[#0b3d2e] hover:bg-[#0a3426] text-h3"
                       onClick={saveBookingChanges}
                       disabled={updating}
                     >
@@ -1347,7 +1347,7 @@ export default function BookingsPage() {
                       {updating ? "Saving..." : "Save Changes"}
                     </Button>
                     <Button
-                      className="flex-1"
+                      className="flex-1 text-h3"
                       variant="outline"
                       onClick={() => {
                         setIsEditing(false);
@@ -1361,7 +1361,7 @@ export default function BookingsPage() {
                 ) : selectedBooking.status === "Confirmed" ? (
                   <>
                     <Button
-                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-h3"
                       onClick={() => updateBookingStatus(selectedBooking.id, "Completed")}
                       disabled={updating}
                     >
@@ -1369,7 +1369,7 @@ export default function BookingsPage() {
                       {updating ? "Updating..." : "Mark as Completed"}
                     </Button>
                     <Button
-                      className="flex-1 bg-red-600 hover:bg-red-700"
+                      className="flex-1 bg-red-600 hover:bg-red-700 text-h3"
                       onClick={() => cancelBooking(selectedBooking.id)}
                       disabled={updating}
                     >

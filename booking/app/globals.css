@@ -3,6 +3,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Typography Scale - 4 Level System */
+@layer utilities {
+  .text-base-body {
+    font-size: 10px;
+    font-family: var(--font-open-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  .text-h3 {
+    font-size: 12px;
+    font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  .text-h2 {
+    font-size: 20px;
+    font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  .text-h1 {
+    font-size: 32px;
+    font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
 /* (Optional) keep your own CSS variables without @theme */
 
 /* Your global styles */
@@ -15,9 +35,28 @@
   body {
     font-family: var(--font-open-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     @apply bg-background text-foreground;
+    font-size: 10px; /* Base body text */
   }
   
-  h1, h2, h3, h4, h5, h6 {
+  h1 {
+    font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  
+  h3 {
+    font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  h4, h5, h6 {
     font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
 

@@ -155,7 +155,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-primary">Dashboard</h1>
+        <h1 className="text-h1 font-bold text-primary">Dashboard</h1>
         <p className="text-muted-foreground mt-1">
           Welcome back! Here's an overview of your studio.
         </p>
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
       {/* Summary and Upcoming Bookings (upcoming moved beside summary) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <h2 className="text-lg font-semibold text-primary mb-3">Summary</h2>
+          <h2 className="text-h2 font-semibold text-primary mb-3">Summary</h2>
           <Card className="p-6">
             <div className="grid grid-cols-4 gap-4 lg:gap-6">
               {/* Total Bookings */}
@@ -205,8 +205,8 @@ export default function AdminDashboard() {
                   <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
                     <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
-                  <p className="text-xl lg:text-3xl font-bold text-foreground">{filteredTotalBookings}</p>
+                  <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
+                  <p className="text-h2 font-bold text-foreground">{filteredTotalBookings}</p>
                 </div>
               </div>
 
@@ -216,8 +216,8 @@ export default function AdminDashboard() {
                   <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
                     <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                   </div>
-                  <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
-                  <p className="text-xl lg:text-3xl font-bold text-foreground">₱{filteredStats.monthlyRevenue.toLocaleString()}</p>
+                  <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
+                  <p className="text-h2 font-bold text-foreground">₱{filteredStats.monthlyRevenue.toLocaleString()}</p>
                 </div>
               </div>
 
@@ -227,8 +227,8 @@ export default function AdminDashboard() {
                   <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
                     <Users className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Customers</p>
-                  <p className="text-xl lg:text-3xl font-bold text-foreground">{filteredStats.totalCustomers}</p>
+                  <p className="text-base-body font-medium text-muted-foreground mb-1">Customers</p>
+                  <p className="text-h2 font-bold text-foreground">{filteredStats.totalCustomers}</p>
                 </div>
               </div>
 
@@ -238,8 +238,8 @@ export default function AdminDashboard() {
                   <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
                     <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                   </div>
-                  <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Value</p>
-                  <p className="text-xl lg:text-3xl font-bold text-foreground">₱{filteredTotalBookings > 0 ? Math.round((filteredStats.monthlyRevenue / filteredTotalBookings)).toLocaleString() : 0}</p>
+                  <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Value</p>
+                  <p className="text-h2 font-bold text-foreground">₱{filteredTotalBookings > 0 ? Math.round((filteredStats.monthlyRevenue / filteredTotalBookings)).toLocaleString() : 0}</p>
                 </div>
               </div>
             </div>
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-primary mb-3">Upcoming Bookings</h2>
+          <h2 className="text-h2 font-semibold text-primary mb-3">Upcoming Bookings</h2>
           <Card className="p-6">
             <div className="space-y-3">
               {loading ? (
@@ -288,9 +288,9 @@ export default function AdminDashboard() {
                     return (
                       <div key={booking.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{booking.name}</p>
-                          <p className="text-sm text-neutral-600 truncate">{booking.service || booking.serviceType}</p>
-                          <p className="text-xs text-neutral-500">{formatDate(booking.date)}</p>
+                          <p className="text-h3 font-medium truncate">{booking.name}</p>
+                          <p className="text-h3 text-neutral-600 truncate">{booking.service || booking.serviceType}</p>
+                          <p className="text-base-body text-neutral-500">{formatDate(booking.date)}</p>
                         </div>
                         <Badge variant="outline" className={`${getStatusColor(booking.status)} ml-2 flex-shrink-0`}>{booking.status}</Badge>
                       </div>
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Revenue Trend - show last 12 months as a line chart */}
           <Card className="p-6">
-            <h3 className="text-lg font-bold text-primary mb-4">Revenue Trend (Last 12 Months)</h3>
+            <h3 className="text-h2 font-bold text-primary mb-4">Revenue Trend (Last 12 Months)</h3>
             <div className="mt-4">
               <RevenueLineChart 
                 data={analyticsData.revenueByMonth} 
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
 
           {/* Top Services */}
           <Card className="p-6">
-            <h3 className="text-lg font-bold text-primary mb-4">
+            <h3 className="text-h2 font-bold text-primary mb-4">
               Top Services
             </h3>
             <div className="space-y-4">
@@ -329,14 +329,14 @@ export default function AdminDashboard() {
                 <div key={service.name}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+                      <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-base-body font-bold">
                         {index + 1}
                       </span>
-                      <span className="font-medium text-foreground text-sm">
+                      <span className="text-h3 font-medium text-foreground">
                         {service.name}
                       </span>
                     </div>
-                    <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    <span className="text-h3 font-semibold text-green-600 dark:text-green-400">
                       ₱{service.revenue.toLocaleString()}
                     </span>
                   </div>
@@ -347,7 +347,7 @@ export default function AdminDashboard() {
                         style={{ width: `${service.percentage}%` }}
                       />
                     </div>
-                    <span className="text-xs text-muted-foreground w-16 text-right">
+                    <span className="text-base-body text-muted-foreground w-16 text-right">
                       {service.bookings} bookings
                     </span>
                   </div>
@@ -361,23 +361,23 @@ export default function AdminDashboard() {
       {/* Quick Actions */}
       <div>
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-primary mb-4">Quick Actions</h2>
+          <h2 className="text-h2 font-bold text-primary mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-4">
             <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group">
               <Calendar className="w-6 h-6 mx-auto mb-2 text-primary group-hover:text-primary-foreground" />
-              <p className="font-medium text-sm">New Booking</p>
+              <p className="text-h3 font-medium">New Booking</p>
             </button>
             <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group">
               <Users className="w-6 h-6 mx-auto mb-2 text-primary group-hover:text-primary-foreground" />
-              <p className="font-medium text-sm">Add Customer</p>
+              <p className="text-h3 font-medium">Add Customer</p>
             </button>
             <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group">
               <TrendingUp className="w-6 h-6 mx-auto mb-2 text-primary group-hover:text-primary-foreground" />
-              <p className="font-medium text-sm">View Analytics</p>
+              <p className="text-h3 font-medium">View Analytics</p>
             </button>
             <button className="p-4 border-2 border-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group">
               <DollarSign className="w-6 h-6 mx-auto mb-2 text-primary group-hover:text-primary-foreground" />
-              <p className="font-medium text-sm">Revenue Report</p>
+              <p className="text-h3 font-medium">Revenue Report</p>
             </button>
           </div>
         </Card>
