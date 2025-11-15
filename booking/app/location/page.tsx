@@ -23,10 +23,10 @@ export default function LocationPage() {
 
         <Card className="shadow-lg">
           <CardContent className="p-8">
-            <h1 className="text-3xl font-semibold mb-2" style={{ color: BRAND.forest }}>
+            <h1 className="text-h1 font-semibold mb-2" style={{ color: BRAND.forest }}>
               📍 Studio Location
             </h1>
-            <p className="text-neutral-600 mb-6">
+            <p className="text-base-body text-neutral-600 mb-6">
               Find us easily and plan your visit
             </p>
 
@@ -60,8 +60,8 @@ export default function LocationPage() {
             <div className="space-y-4">
               {/* Address */}
               <div className="p-6 rounded-xl border bg-white shadow-sm">
-                <h3 className="font-semibold mb-3 text-lg" style={{ color: BRAND.forest }}>📍 Address & Directions</h3>
-                <p className="text-neutral-700 leading-relaxed">
+                <h3 className="text-h2 font-semibold mb-3" style={{ color: BRAND.forest }}>📍 Address & Directions</h3>
+                <p className="text-h3 text-neutral-700 leading-relaxed">
                   We are located inside <strong>Green Valley Field Subdivision, Indang, Cavite</strong> — between Indang Central Elementary School and Lintiw Road. 
                   Just go straight until it's the deadend then turn right. We are on the third gate to the left with the rambutan tree and a Memories Photography Studio tarpaulin.
                 </p>
@@ -69,7 +69,7 @@ export default function LocationPage() {
 
               {/* Parking */}
               <div className="p-6 rounded-xl border shadow-sm" style={{ backgroundColor: `${BRAND.terracotta}10`, borderColor: BRAND.terracotta }}>
-                <h3 className="font-semibold mb-3 text-lg flex items-center gap-2" style={{ color: BRAND.terracotta }}>
+                <h3 className="text-h2 font-semibold mb-3 flex items-center gap-2" style={{ color: BRAND.terracotta }}>
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
                   </svg>
@@ -93,7 +93,7 @@ export default function LocationPage() {
 
               {/* How to Find Us */}
               <div className="p-6 rounded-xl border bg-white shadow-sm">
-                <h3 className="font-semibold mb-3 text-lg" style={{ color: BRAND.forest }}>🏠 How to Find Us</h3>
+                <h3 className="text-h2 font-semibold mb-3" style={{ color: BRAND.forest }}>🏠 How to Find Us</h3>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600 mt-1">•</span>

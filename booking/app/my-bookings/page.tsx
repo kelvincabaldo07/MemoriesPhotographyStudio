@@ -103,7 +103,7 @@ export default function MyBookings() {
           <Button variant="ghost" onClick={() => (window.location.href = "/")} className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
           </Button>
-          <h1 className="text-3xl font-semibold mb-2" style={{ color: BRAND.forest }}>
+          <h1 className="text-h1 font-semibold mb-2" style={{ color: BRAND.forest }}>
             My Bookings
           </h1>
           <p className="text-neutral-600">Find and manage your photography session bookings</p>
@@ -146,7 +146,7 @@ export default function MyBookings() {
             {searchMethod === "email" ? (
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Email Address</label>
+                  <label className="text-h3 font-medium mb-1 block">Email Address</label>
                   <Input
                     type="email"
                     placeholder="Enter your email"
@@ -160,7 +160,7 @@ export default function MyBookings() {
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium mb-1 block">First Name</label>
+                    <label className="text-h3 font-medium mb-1 block">First Name</label>
                     <Input
                       placeholder="Enter first name"
                       value={firstName}
@@ -169,7 +169,7 @@ export default function MyBookings() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-1 block">Last Name</label>
+                    <label className="text-h3 font-medium mb-1 block">Last Name</label>
                     <Input
                       placeholder="Enter last name"
                       value={lastName}
@@ -203,7 +203,7 @@ export default function MyBookings() {
               )}
             </Button>
             {process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-              <p className="text-xs text-center text-neutral-500 mt-2 flex items-center justify-center gap-1">
+              <p className="text-base-body text-center text-neutral-500 mt-2 flex items-center justify-center gap-1">
                 <Shield className="w-3 h-3" />
                 Protected by reCAPTCHA
               </p>
@@ -218,7 +218,7 @@ export default function MyBookings() {
               <Card className="shadow-lg">
                 <CardContent className="p-8 text-center">
                   <Package className="w-16 h-16 mx-auto mb-4 opacity-20" />
-                  <h3 className="text-xl font-semibold mb-2" style={{ color: BRAND.charcoal }}>
+                  <h3 className="text-h2 font-semibold mb-2" style={{ color: BRAND.charcoal }}>
                     No Bookings Found
                   </h3>
                   <p className="text-neutral-600 mb-4">
@@ -231,7 +231,7 @@ export default function MyBookings() {
               </Card>
             ) : (
               <div>
-                <h2 className="text-xl font-semibold mb-4" style={{ color: BRAND.forest }}>
+                <h2 className="text-h2 font-semibold mb-4" style={{ color: BRAND.forest }}>
                   Your Bookings ({bookings.length})
                 </h2>
                 <div className="space-y-4">
@@ -247,7 +247,7 @@ export default function MyBookings() {
                             <h3 className="font-semibold text-lg" style={{ color: BRAND.forest }}>
                               {booking.selections?.service || "Photography Session"}
                             </h3>
-                            <p className="text-sm text-neutral-500">
+                            <p className="text-h3 text-neutral-500">
                               {booking.selections?.serviceType} • {booking.selections?.serviceCategory}
                             </p>
                           </div>
@@ -273,8 +273,8 @@ export default function MyBookings() {
                           <div className="flex items-center gap-2">
                             <Calendar className="w-4 h-4" style={{ color: BRAND.forest }} />
                             <div>
-                              <p className="text-xs text-neutral-500">Date</p>
-                              <p className="text-sm font-medium">
+                              <p className="text-base-body text-neutral-500">Date</p>
+                              <p className="text-h3 font-medium">
                                 {booking.schedule?.date
                                   ? formatDate(booking.schedule.date)
                                   : "N/A"}
@@ -285,8 +285,8 @@ export default function MyBookings() {
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4" style={{ color: BRAND.forest }} />
                             <div>
-                              <p className="text-xs text-neutral-500">Time</p>
-                              <p className="text-sm font-medium">
+                              <p className="text-base-body text-neutral-500">Time</p>
+                              <p className="text-h3 font-medium">
                                 {booking.schedule?.time
                                   ? to12Hour(booking.schedule.time)
                                   : "N/A"}
@@ -297,8 +297,8 @@ export default function MyBookings() {
                           <div className="flex items-center gap-2">
                             <User className="w-4 h-4" style={{ color: BRAND.forest }} />
                             <div>
-                              <p className="text-xs text-neutral-500">Customer</p>
-                              <p className="text-sm font-medium">
+                              <p className="text-base-body text-neutral-500">Customer</p>
+                              <p className="text-h3 font-medium">
                                 {booking.customer?.firstName} {booking.customer?.lastName}
                               </p>
                             </div>
@@ -307,8 +307,8 @@ export default function MyBookings() {
 
                         <div className="mt-4 pt-4 border-t flex items-center justify-between">
                           <div>
-                            <p className="text-xs text-neutral-500">Booking ID</p>
-                            <p className="text-sm font-mono font-medium">{booking.id}</p>
+                            <p className="text-base-body text-neutral-500">Booking ID</p>
+                            <p className="text-h3 font-mono font-medium">{booking.id}</p>
                           </div>
                           <Button
                             variant="outline"

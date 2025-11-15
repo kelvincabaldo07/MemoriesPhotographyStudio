@@ -803,10 +803,10 @@ async function submitBooking(){
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             <div>
-              <h1 className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: BRAND.forest }}>
+              <h1 className="text-h1 font-semibold tracking-tight" style={{ color: BRAND.forest }}>
                 Memories Photography Studio
               </h1>
-              <p className="text-xs text-neutral-500">Capture With Purpose. Create Change.</p>
+              <p className="text-base-body text-neutral-500">Capture With Purpose. Create Change.</p>
             </div>
           </div>
         </div>
@@ -816,7 +816,7 @@ async function submitBooking(){
         <Card className="mt-8 shadow-lg border-0 relative overflow-visible">
           {/* Sticky mini-summary */}
           <div className="hidden md:flex items-center gap-3 absolute -top-3 right-3 bg-white/90 backdrop-blur rounded-xl border px-3 py-2 shadow-sm">
-            <div className="text-xs text-neutral-500">Total</div>
+            <div className="text-base-body text-neutral-500">Total</div>
             <div className="font-semibold">{currency(grandTotal)}</div>
           </div>
 
@@ -1323,7 +1323,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
 
   return (
     <div>
-      <h2 className="text-xl font-semibold">Pick a service</h2>
+      <h2 className="text-h2 font-semibold">Pick a service</h2>
       <p className="text-neutral-600 mb-4">Tap to expand each level. Details & prices shown for each option.</p>
 
       {/* Types */}
@@ -1345,7 +1345,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 <div className="font-medium">
                   {t === "Self-Shoot" ? "📸 Self-Shoot" : t === "With Photographer" ? "👩‍🎨 With Photographer" : "🎄 Seasonal Sessions"}
                 </div>
-                <div className="text-xs text-neutral-500">
+                <div className="text-base-body text-neutral-500">
                   {t === "Self-Shoot" 
                     ? "Be your own photographer — strike a pose, click the remote, and have fun your way!" 
                     : t === "With Photographer" 
@@ -1381,7 +1381,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           <div className="font-medium" style={{ color: serviceCategory === c ? BRAND.white : BRAND.charcoal }}>
                             {c === "Classic" ? "🖼 Classic Package" : "💻 Digital Package"}
                           </div>
-                          <div className="text-xs" style={{ color: serviceCategory === c ? BRAND.white : "#737373" }}>
+                          <div className="text-base-body" style={{ color: serviceCategory === c ? BRAND.white : "#737373" }}>
                             {c === "Classic" 
                               ? "All enhanced digital copies + printed photos — the best of both worlds to keep and display!" 
                               : "All enhanced digital copies only, delivered through Lightroom for instant access."}
@@ -1396,14 +1396,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 ) : (
                     // Digital auto-selected for With Photographer and Seasonal Sessions
                     <div className="mb-3 p-3 border rounded-xl bg-neutral-50">
-                      <p className="text-sm text-neutral-600">📱 Digital-only package (photos delivered via Lightroom)</p>
+                      <p className="text-h3 text-neutral-600">📱 Digital-only package (photos delivered via Lightroom)</p>
                     </div>
                   )}
 
                 {/* Groups */}
                 {serviceCategory && (
                   <div className="mt-4">
-                    <div className="text-sm font-medium mb-2">Service Group</div>
+                    <div className="text-h3 font-medium mb-2">Service Group</div>
                     <div className="grid md:grid-cols-3 gap-3">
                       {groups.map((g)=> {
                         return (
@@ -1423,7 +1423,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                             <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "📷"}</div>
                             <div className="flex-1">
                               <div className="font-medium" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
-                              <div className="text-xs" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
+                              <div className="text-base-body" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
                             </div>
                           </div>
                         </button>
@@ -1441,7 +1441,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                     {t === "Seasonal Sessions" && (
                       <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} — {CHRISTMAS_2025.desc}</div>
                     )}
-                    <div className="text-sm font-medium mb-2">Services</div>
+                    <div className="text-h3 font-medium mb-2">Services</div>
                     <div className={cn("grid gap-3", service ? "grid-cols-1" : "md:grid-cols-3")}>
                       {(service ? [service] : services).map((s: string)=> {
                         const info: { details: string; price: number; classicDetails?: string; thumbnail?: string } = serviceInfo[s] || { details: "", price: 0, thumbnail: undefined };
@@ -1505,7 +1505,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                                 <div className="flex-1 min-w-0">
                                   <div className="font-semibold" style={{ color: BRAND.forest }}>{s}</div>
                                   {displayDetails && (
-                                  <ul className="text-sm text-neutral-600 mt-2 space-y-1">
+                                  <ul className="text-h3 text-neutral-600 mt-2 space-y-1">
                                     {displayDetails.split('\n').map((line, idx) => (
                                       <li key={idx} className="flex items-start gap-1">
                                         <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
@@ -1739,7 +1739,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     <div className="grid md:grid-cols-2 gap-6">
       {/* Left: Calendar */}
       <div>
-        <h2 className="text-xl font-semibold mb-4">Select date & time</h2>
+        <h2 className="text-h2 font-semibold mb-4">Select date & time</h2>
         
         {/* Calendar */}
         <div className="border rounded-xl p-4 bg-white">
@@ -1811,7 +1811,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           </div>
 
           {/* Timezone */}
-          <p className="text-xs text-neutral-500 mt-4 text-center">
+          <p className="text-base-body text-neutral-500 mt-4 text-center">
             Time zone: Asia/Manila
           </p>
         </div>
@@ -1825,21 +1825,21 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
 
       {/* Right: Time Slots */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">
+        <h3 className="text-h2 font-semibold mb-4">
           {date ? formatDateDisplay(date) : 'Select a date'}
         </h3>
 
         {!date && (
           <div className="border rounded-xl p-8 bg-neutral-50 text-center text-neutral-500">
             <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="text-sm">Please select a date to view available times</p>
+            <p className="text-h3">Please select a date to view available times</p>
           </div>
         )}
 
         {date && loading && (
           <div className="border rounded-xl p-8 bg-white text-center">
             <Clock className="w-8 h-8 animate-spin mx-auto mb-3 text-[#0b3d2e]" />
-            <p className="text-sm text-neutral-600">Loading available times...</p>
+            <p className="text-h3 text-neutral-600">Loading available times...</p>
           </div>
         )}
 
@@ -1855,8 +1855,8 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
               {realAvailableSlots.length === 0 && (
                 <div className="text-center py-8 text-neutral-500">
                   <XCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm font-medium">No available times</p>
-                  <p className="text-xs mt-1">
+                  <p className="text-h3 font-medium">No available times</p>
+                  <p className="text-base-body mt-1">
                     {date === today 
                       ? "Try selecting a future date"
                       : "Please choose another day"}
@@ -1968,7 +1968,7 @@ function StepCustomer(props: {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold">Your details</h2>
+      <h2 className="text-h2 font-semibold">Your details</h2>
       <p className="text-neutral-600 mb-4">We&apos;ll send your confirmation and reminders here.</p>
       
       <div className="grid md:grid-cols-2 gap-3">
@@ -2019,7 +2019,7 @@ function StepCustomer(props: {
 
         {sentCode && !emailVerified && (
           <div className="md:col-span-2 p-4 border-2 border-blue-600 rounded-xl bg-blue-50">
-            <p className="text-sm text-blue-900 mb-2">📧 Enter the 6-digit code sent to {email}</p>
+            <p className="text-h3 text-blue-900 mb-2">📧 Enter the 6-digit code sent to {email}</p>
             <div className="flex gap-2">
               <Input 
                 placeholder="Enter 6-digit code" 
@@ -2035,7 +2035,7 @@ function StepCustomer(props: {
                 Confirm
               </Button>
             </div>
-            <p className="text-xs text-blue-700 mt-2">Didn&apos;t receive it? <button onClick={sendVerificationCode} className="underline font-medium">Resend code</button></p>
+            <p className="text-base-body text-blue-700 mt-2">Didn&apos;t receive it? <button onClick={sendVerificationCode} className="underline font-medium">Resend code</button></p>
           </div>
         )}
 
@@ -2080,11 +2080,11 @@ function StepConsent(props:{
 
   return (
     <div>
-      <h2 className="text-xl font-semibold">Social & event information</h2>
+      <h2 className="text-h2 font-semibold">Social & event information</h2>
       <p className="text-neutral-600 mb-4">Let us know if we can share your special moments.</p>
       
       <div className="mb-4">
-        <label className="text-sm font-medium mb-2 block">
+        <label className="text-h3 font-medium mb-2 block">
           Is it OK for us to greet you on your milestone or post about your photos on our social media accounts? <span className="text-red-500">*</span>
         </label>
         <Select value={socialConsent} onValueChange={(v) => setSocialConsent(v as "yes" | "no")}>
@@ -2102,7 +2102,7 @@ function StepConsent(props:{
       {isPreBirthday && (
         <div className="mt-4 grid md:grid-cols-2 gap-3 p-4 border rounded-xl bg-neutral-50">
           <div className="md:col-span-2">
-            <p className="text-sm text-neutral-600 mb-3">Please tell us about the birthday celebrant:</p>
+            <p className="text-h3 text-neutral-600 mb-3">Please tell us about the birthday celebrant:</p>
           </div>
           <Input 
             placeholder="Celebrant's name *" 
@@ -2124,7 +2124,7 @@ function StepConsent(props:{
                 value={eventDate} 
                 onChange={(e) => setEventDate(e.target.value)} 
               />
-              <p className="text-xs text-neutral-500 mt-1">We'll use this date to greet the celebrant on social media</p>
+              <p className="text-base-body text-neutral-500 mt-1">We'll use this date to greet the celebrant on social media</p>
             </div>
           )}
         </div>
