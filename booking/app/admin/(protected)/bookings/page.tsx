@@ -29,6 +29,7 @@ import {
   Tag,
   List,
   CalendarDays,
+  TrendingUp,
   ChevronRight
 } from "lucide-react";
 
@@ -521,44 +522,44 @@ export default function BookingsPage() {
             {/* Total Bookings */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/10 rounded-lg flex items-center justify-center mb-2">
-                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Bookings</p>
-                <p className="text-2xl lg:text-4xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
             {/* Revenue */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#A62F20]/20 rounded-lg flex items-center justify-center mb-2">
-                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#A62F20]" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                 </div>
-                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Revenue</p>
-                <p className="text-2xl lg:text-4xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{stats.revenue.toLocaleString()}</p>
               </div>
             </div>
 
             {/* Customers */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#8B5E3C]/20 rounded-lg flex items-center justify-center mb-2">
-                  <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-[#8B5E3C]" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <Users className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Customers</p>
-                <p className="text-2xl lg:text-4xl font-bold text-foreground">{stats.total}</p>
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Customers</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
 
             {/* Avg. Value */}
             <div className="text-center">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e]/20 rounded-lg flex items-center justify-center mb-2">
-                  <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-[#0b3d2e]" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
+                  <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <p className="text-base lg:text-lg font-medium text-muted-foreground mb-1">Avg. Value</p>
-                <p className="text-2xl lg:text-4xl font-bold text-foreground">
+                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Value</p>
+                <p className="text-xl lg:text-3xl font-bold text-foreground">
                   ₱{stats.total > 0 ? Math.round(stats.revenue / stats.total).toLocaleString() : 0}
                 </p>
               </div>
