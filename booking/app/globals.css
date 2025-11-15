@@ -1,3 +1,6 @@
+/* Website fonts - Montserrat (headings) & Open Sans (body) */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 /* Tailwind v3 directives */
 @tailwind base;
 @tailwind components;
@@ -8,58 +11,66 @@
 /* Your global styles */
 
 @layer base {
+  body {
+    font-family: 'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+
   :root {
-    --background: 0 0% 100%;
-    --foreground: 163 50% 10%;
+    /* Website colors: charcoal, cream, forest, terracotta, clay */
+    --background: 0 0% 100%; /* white */
+    --foreground: 0 0% 17%; /* charcoal #2C2C2C */
     --card: 0 0% 100%;
-    --card-foreground: 163 50% 10%;
+    --card-foreground: 0 0% 17%;
     --popover: 0 0% 100%;
-    --popover-foreground: 163 50% 10%;
-    --primary: 163 67% 14%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 163 50% 10%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 163 67% 94%;
-    --accent-foreground: 163 67% 14%;
+    --popover-foreground: 0 0% 17%;
+    --primary: 163 67% 14%; /* forest #0b3d2e */
+    --primary-foreground: 43 63% 95%; /* cream #FAF3E0 */
+    --secondary: 43 63% 95%; /* cream */
+    --secondary-foreground: 0 0% 17%; /* charcoal */
+    --muted: 43 63% 95%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 9 66% 39%; /* terracotta #A62F20 */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
-    --ring: 163 67% 14%;
-    --chart-1: 163 67% 30%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --ring: 163 67% 14%; /* forest */
+    --chart-1: 163 67% 14%; /* forest */
+    --chart-2: 9 66% 39%; /* terracotta */
+    --chart-3: 28 35% 39%; /* clay #8B5E3C */
+    --chart-4: 43 63% 95%; /* cream */
+    --chart-5: 0 0% 17%; /* charcoal */
     --radius: 0.5rem
   }
   .dark {
-    --background: 163 50% 5%;
-    --foreground: 0 0% 98%;
-    --card: 163 50% 8%;
-    --card-foreground: 0 0% 98%;
-    --popover: 163 50% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 163 67% 85%;
-    --primary-foreground: 163 67% 14%;
-    --secondary: 163 30% 15%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 163 30% 15%;
+    --background: 163 67% 14%; /* forest dark #0b3d2e */
+    --foreground: 163 67% 94%; /* light forest text */
+    --card: 163 57% 19%; /* forest 800 */
+    --card-foreground: 163 67% 94%;
+    --popover: 163 57% 19%;
+    --popover-foreground: 163 67% 94%;
+    --primary: 28 35% 39%; /* clay #8B5E3C */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 163 57% 19%;
+    --secondary-foreground: 163 67% 94%;
+    --muted: 163 57% 19%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 163 30% 20%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 9 66% 39%; /* terracotta */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 163 30% 20%;
-    --input: 163 30% 20%;
-    --ring: 163 67% 85%;
+    --border: 163 30% 25%;
+    --input: 163 30% 25%;
+    --ring: 28 35% 39%; /* clay */
     --chart-1: 163 67% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-2: 9 66% 55%;
+    --chart-3: 28 45% 55%;
+    --chart-4: 43 63% 80%;
+    --chart-5: 163 67% 30%
   }
 }
 

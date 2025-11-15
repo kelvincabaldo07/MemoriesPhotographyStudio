@@ -14,6 +14,18 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
+  			// Website brand colors
+  			charcoal: '#2C2C2C',
+  			cream: '#FAF3E0',
+  			terracotta: '#A62F20',
+  			forest: {
+  				DEFAULT: '#0b3d2e',
+  				900: '#0b3d2e',
+  				800: '#115542',
+  				700: '#1A6B56',
+  			},
+  			clay: '#8B5E3C',
+  			// Tailwind theme colors
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
