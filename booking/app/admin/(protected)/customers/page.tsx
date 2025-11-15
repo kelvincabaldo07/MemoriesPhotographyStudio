@@ -87,8 +87,8 @@ export default function CustomersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#0b3d2e]">Customers</h1>
-        <p className="text-neutral-600 mt-1">
+        <h1 className="text-h1 font-bold text-[#0b3d2e]">Customers</h1>
+        <p className="text-base-body text-neutral-600 mt-1">
           Manage customer information and booking history
         </p>
       </div>
@@ -96,24 +96,24 @@ export default function CustomersPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
-          <p className="text-sm text-neutral-600">Total Customers</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">{stats.total}</p>
+          <p className="text-base-body text-neutral-600">Total Customers</p>
+          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">{stats.total}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-neutral-600">Total Revenue</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
+          <p className="text-base-body text-neutral-600">Total Revenue</p>
+          <p className="text-h2 font-bold text-green-600 mt-1">
             ₱{stats.totalRevenue.toLocaleString()}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-neutral-600">Avg Revenue/Customer</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">
+          <p className="text-base-body text-neutral-600">Avg Revenue/Customer</p>
+          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
             ₱{Math.round(stats.avgRevenue).toLocaleString()}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-sm text-neutral-600">Total Bookings</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
+          <p className="text-base-body text-neutral-600">Total Bookings</p>
+          <p className="text-h2 font-bold text-blue-600 mt-1">
             {stats.totalBookings}
           </p>
         </Card>
@@ -154,15 +154,15 @@ export default function CustomersPage() {
                   <User className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-neutral-900 truncate">
+                  <h3 className="text-h3 font-semibold text-neutral-900 truncate">
                     {customer.name}
                   </h3>
                   <div className="space-y-1 mt-2">
-                    <div className="flex items-center gap-1 text-xs text-neutral-600">
+                    <div className="flex items-center gap-1 text-base-body text-neutral-600">
                       <Mail className="w-3 h-3" />
                       <span className="truncate">{customer.email}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-neutral-600">
+                    <div className="flex items-center gap-1 text-base-body text-neutral-600">
                       <Phone className="w-3 h-3" />
                       <span>{customer.phone}</span>
                     </div>
@@ -170,22 +170,22 @@ export default function CustomersPage() {
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-3 text-sm">
+              <div className="mt-4 pt-4 border-t grid grid-cols-2 gap-3">
                 <div>
-                  <p className="text-neutral-600 text-xs">Bookings</p>
-                  <p className="font-semibold text-[#0b3d2e]">
+                  <p className="text-base-body text-neutral-600">Bookings</p>
+                  <p className="text-h3 font-semibold text-[#0b3d2e]">
                     {customer.totalBookings}
                   </p>
                 </div>
                 <div>
-                  <p className="text-neutral-600 text-xs">Revenue</p>
-                  <p className="font-semibold text-green-600">
+                  <p className="text-base-body text-neutral-600">Revenue</p>
+                  <p className="text-h3 font-semibold text-green-600">
                     ₱{customer.totalRevenue.toLocaleString()}
                   </p>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-neutral-600 text-xs">Last Booking</p>
-                  <p className="font-medium text-neutral-900 text-xs">
+                  <p className="text-base-body text-neutral-600">Last Booking</p>
+                  <p className="text-base-body font-medium text-neutral-900">
                     {formatDate(customer.lastBooking)}
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export default function CustomersPage() {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#0b3d2e]">
+                <h2 className="text-h2 font-bold text-[#0b3d2e]">
                   Customer Details
                 </h2>
                 <Button
@@ -226,23 +226,23 @@ export default function CustomersPage() {
                     <User className="w-8 h-8 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-neutral-900">
+                    <h3 className="text-h2 font-bold text-neutral-900">
                       {selectedCustomer.name}
                     </h3>
                     <div className="space-y-1 mt-2">
-                      <div className="flex items-center gap-2 text-sm text-neutral-600">
+                      <div className="flex items-center gap-2 text-h3 text-neutral-600">
                         <Mail className="w-4 h-4" />
                         {selectedCustomer.email}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-neutral-600">
+                      <div className="flex items-center gap-2 text-h3 text-neutral-600">
                         <Phone className="w-4 h-4" />
                         {selectedCustomer.phone}
                       </div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-neutral-600">Total Revenue</p>
-                    <p className="text-2xl font-bold text-green-600">
+                    <p className="text-base-body text-neutral-600">Total Revenue</p>
+                    <p className="text-h2 font-bold text-green-600">
                       ₱{selectedCustomer.totalRevenue.toLocaleString()}
                     </p>
                   </div>
@@ -251,7 +251,7 @@ export default function CustomersPage() {
 
               {/* Booking History */}
               <div>
-                <h3 className="text-lg font-bold text-[#0b3d2e] mb-4">
+                <h3 className="text-h2 font-bold text-[#0b3d2e] mb-4">
                   Booking History ({selectedCustomer.totalBookings})
                 </h3>
                 <div className="space-y-3">
@@ -263,10 +263,10 @@ export default function CustomersPage() {
                         className="flex items-center justify-between p-4 bg-neutral-50 rounded-lg"
                       >
                         <div className="flex-1">
-                          <p className="font-medium text-neutral-900">
+                          <p className="text-h3 font-medium text-neutral-900">
                             {booking.service}
                           </p>
-                          <div className="flex items-center gap-2 mt-1 text-sm text-neutral-600">
+                          <div className="flex items-center gap-2 mt-1 text-base-body text-neutral-600">
                             <Calendar className="w-3 h-3" />
                             {formatDate(booking.date)}
                           </div>
@@ -278,7 +278,7 @@ export default function CustomersPage() {
                           >
                             {booking.status}
                           </Badge>
-                          <p className="font-semibold text-[#0b3d2e] min-w-[80px] text-right">
+                          <p className="text-h3 font-semibold text-[#0b3d2e] min-w-[80px] text-right">
                             ₱{booking.price.toLocaleString()}
                           </p>
                         </div>

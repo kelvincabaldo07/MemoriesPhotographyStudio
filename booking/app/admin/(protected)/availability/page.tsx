@@ -159,14 +159,14 @@ export default function AvailabilityPage() {
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-neutral-900">Availability</h1>
-            <p className="text-sm text-neutral-600 mt-1">Configure when you are available for bookings</p>
+            <h1 className="text-h1 font-semibold text-neutral-900">Availability</h1>
+            <p className="text-base-body text-neutral-600 mt-1">Configure when you are available for bookings</p>
           </div>
           {hasChanges && (
             <Button 
               onClick={saveChanges} 
               disabled={syncing}
-              className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 shrink-0 w-full sm:w-auto"
+              className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 shrink-0 w-full sm:w-auto text-h3"
             >
               {syncing ? (
                 <>
@@ -185,15 +185,15 @@ export default function AvailabilityPage() {
         <div className="p-4 sm:p-6 border-b border-neutral-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h2 className="text-base font-semibold text-neutral-900 flex items-center gap-2">
+              <h2 className="text-h2 font-semibold text-neutral-900 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 Working Hours
               </h2>
-              <p className="text-sm text-neutral-500 mt-1">Set your weekly schedule and break times</p>
+              <p className="text-base-body text-neutral-500 mt-1">Set your weekly schedule and break times</p>
             </div>
-            <div className="flex items-center gap-2 text-sm text-neutral-600">
+            <div className="flex items-center gap-2 text-h3 text-neutral-600">
               <span className="shrink-0">Timezone</span>
-              <select className="border border-neutral-300 rounded-md px-3 py-1.5 text-sm bg-white min-w-0">
+              <select className="border border-neutral-300 rounded-md px-3 py-1.5 text-h3 bg-white min-w-0">
                 <option>{timezone}</option>
               </select>
             </div>
@@ -211,7 +211,7 @@ export default function AvailabilityPage() {
                       <input type="checkbox" checked={hours.enabled} onChange={(e) => updateDay(day, "enabled", e.target.checked)} className="sr-only peer" />
                       <div className="w-9 h-5 bg-neutral-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#0b3d2e]"></div>
                     </label>
-                    <span className="text-sm font-medium text-neutral-700 min-w-[80px]">{day}</span>
+                    <span className="text-h3 font-medium text-neutral-700 min-w-[80px]">{day}</span>
                   </div>
 
                   {/* Time Slots - Better Mobile Alignment */}
@@ -238,7 +238,7 @@ export default function AvailabilityPage() {
                         {/* Breaks */}
                         {hours.breaks.map((breakSlot, idx) => (
                           <div key={breakSlot.id} className="flex items-center gap-2 sm:pl-4">
-                            <span className="text-xs text-neutral-500 w-[50px] shrink-0">{idx === 0 ? "Break:" : `Break ${idx + 1}:`}</span>
+                            <span className="text-base-body text-neutral-500 w-[50px] shrink-0">{idx === 0 ? "Break:" : `Break ${idx + 1}:`}</span>
                             <Input 
                               type="time" 
                               value={breakSlot.start} 

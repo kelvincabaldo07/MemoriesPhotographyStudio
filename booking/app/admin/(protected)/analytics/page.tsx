@@ -87,8 +87,8 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#0b3d2e]">Analytics</h1>
-          <p className="text-neutral-600 mt-1">
+          <h1 className="text-h1 font-bold text-[#0b3d2e]">Analytics</h1>
+          <p className="text-base-body text-neutral-600 mt-1">
             Revenue insights and booking trends
           </p>
         </div>
@@ -97,7 +97,7 @@ export default function AnalyticsPage() {
             <button
               key={range}
               onClick={() => setTimeRange(range)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+              className={`px-4 py-2 rounded-lg text-h3 font-medium transition ${
                 timeRange === range
                   ? "bg-[#0b3d2e] text-white"
                   : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
@@ -124,8 +124,8 @@ export default function AnalyticsPage() {
               {stats.revenueChange}%
             </Badge>
           </div>
-          <p className="text-sm text-neutral-600 mt-4">Total Revenue</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">
+          <p className="text-base-body text-neutral-600 mt-4">Total Revenue</p>
+          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
             ₱{stats.totalRevenue.toLocaleString()}
           </p>
         </Card>
@@ -143,8 +143,8 @@ export default function AnalyticsPage() {
               {stats.bookingsChange}%
             </Badge>
           </div>
-          <p className="text-sm text-neutral-600 mt-4">Total Bookings</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">
+          <p className="text-base-body text-neutral-600 mt-4">Total Bookings</p>
+          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
             {stats.totalBookings}
           </p>
         </Card>
@@ -162,8 +162,8 @@ export default function AnalyticsPage() {
               {stats.valueChange}%
             </Badge>
           </div>
-          <p className="text-sm text-neutral-600 mt-4">Avg Booking Value</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">
+          <p className="text-base-body text-neutral-600 mt-4">Avg Booking Value</p>
+          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
             ₱{stats.avgBookingValue.toLocaleString()}
           </p>
         </Card>
@@ -181,8 +181,8 @@ export default function AnalyticsPage() {
               {stats.customersChange}%
             </Badge>
           </div>
-          <p className="text-sm text-neutral-600 mt-4">New Customers</p>
-          <p className="text-2xl font-bold text-[#0b3d2e] mt-1">
+          <p className="text-base-body text-neutral-600 mt-4">New Customers</p>
+          <p className="text-h2 font-bold text-[#0b3d2e] mt-1">
             {stats.newCustomers}
           </p>
         </Card>
@@ -192,7 +192,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Trend */}
         <Card className="p-6">
-          <h3 className="text-lg font-bold text-[#0b3d2e] mb-4">
+          <h3 className="text-h2 font-bold text-[#0b3d2e] mb-4">
             Revenue Trend (Last 5 Months)
           </h3>
           <div className="space-y-3">

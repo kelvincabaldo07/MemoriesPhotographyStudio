@@ -219,15 +219,15 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#0b3d2e]">Settings</h1>
-          <p className="text-neutral-600 mt-1">
+          <h1 className="text-h1 font-bold text-[#0b3d2e]">Settings</h1>
+          <p className="text-base-body text-neutral-600 mt-1">
             Configure integrations, notifications, and access control
           </p>
         </div>
         {hasChanges && (
           <Button
             onClick={saveSettings}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 text-h3"
           >
             <Save className="w-4 h-4 mr-2" />
             Save Changes
@@ -239,7 +239,7 @@ export default function SettingsPage() {
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-6">
           <Key className="w-5 h-5 text-[#0b3d2e]" />
-          <h2 className="text-xl font-bold text-[#0b3d2e]">Integrations</h2>
+          <h2 className="text-h2 font-bold text-[#0b3d2e]">Integrations</h2>
         </div>
 
         <div className="space-y-4">

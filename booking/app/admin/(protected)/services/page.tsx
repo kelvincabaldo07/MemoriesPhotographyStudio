@@ -226,8 +226,8 @@ export default function ServicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[#0b3d2e]">Services Management</h1>
-          <p className="text-neutral-600 mt-1">
+          <h1 className="text-h1 font-bold text-[#0b3d2e]">Services Management</h1>
+          <p className="text-base-body text-neutral-600 mt-1">
             Configure services, pricing, availability, and view booking statistics
           </p>
         </div>
@@ -245,7 +245,7 @@ export default function ServicesPage() {
 
       {/* Summary - Dashboard Style */}
       <div>
-        <h2 className="text-lg font-semibold text-[#0b3d2e] mb-3">Summary</h2>
+        <h2 className="text-h2 font-semibold text-[#0b3d2e] mb-3">Summary</h2>
         <Card className="p-6">
           <div className="grid grid-cols-4 gap-4 lg:gap-6">
             {/* Active Services */}
@@ -254,8 +254,8 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
                   <Package className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Services</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">{totalStats.totalServices}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Services</p>
+                <p className="text-h2 font-bold text-foreground">{totalStats.totalServices}</p>
               </div>
             </div>
 
@@ -265,8 +265,8 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
                   <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Bookings</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">{totalStats.totalBookings}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
+                <p className="text-h2 font-bold text-foreground">{totalStats.totalBookings}</p>
               </div>
             </div>
 
@@ -276,8 +276,8 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
                   <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Revenue</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{totalStats.totalRevenue.toLocaleString()}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
+                <p className="text-h2 font-bold text-foreground">₱{totalStats.totalRevenue.toLocaleString()}</p>
               </div>
             </div>
 
@@ -287,8 +287,8 @@ export default function ServicesPage() {
                 <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
                   <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <p className="text-xs lg:text-sm font-medium text-muted-foreground mb-1">Avg. Price</p>
-                <p className="text-xl lg:text-3xl font-bold text-foreground">₱{totalStats.avgPrice.toLocaleString()}</p>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Price</p>
+                <p className="text-h2 font-bold text-foreground">₱{totalStats.avgPrice.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -316,7 +316,7 @@ export default function ServicesPage() {
                     className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                   >
                     <Package className="w-5 h-5 text-[#0b3d2e]" />
-                    <h2 className="text-xl font-bold text-[#0b3d2e]">{type}</h2>
+                    <h2 className="text-h2 font-bold text-[#0b3d2e]">{type}</h2>
                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                       {typeCount} service{typeCount !== 1 ? 's' : ''}
                     </Badge>
@@ -329,7 +329,7 @@ export default function ServicesPage() {
                   <Button
                     size="sm"
                     onClick={() => startAdd(type)}
-                    className="bg-[#0b3d2e] hover:bg-[#0a3426]"
+                    className="bg-[#0b3d2e] hover:bg-[#0a3426] text-h3"
                   >
                     <Plus className="w-4 h-4 mr-1" />
                     Add Service
@@ -346,7 +346,7 @@ export default function ServicesPage() {
                     ) : (
                       Object.entries(typeServices).map(([group, groupServices]) => (
                         <div key={group}>
-                          <h3 className="font-semibold text-neutral-700 mb-2 flex items-center gap-2">
+                          <h3 className="text-h3 font-semibold text-neutral-700 mb-2 flex items-center gap-2">
                             <span className="w-1 h-4 bg-[#0b3d2e] rounded"></span>
                             {group}
                           </h3>
@@ -391,7 +391,7 @@ export default function ServicesPage() {
                                       />
                                       <div className="grid grid-cols-2 gap-2">
                                         <div>
-                                          <label className="text-xs text-neutral-600">Price (₱)</label>
+                                          <label className="text-base-body text-neutral-600">Price (₱)</label>
                                           <Input
                                             type="number"
                                             value={editForm.basePrice}
@@ -404,7 +404,7 @@ export default function ServicesPage() {
                                           />
                                         </div>
                                         <div>
-                                          <label className="text-xs text-neutral-600">Duration (min)</label>
+                                          <label className="text-base-body text-neutral-600">Duration (min)</label>
                                           <Input
                                             type="number"
                                             value={editForm.duration}
@@ -420,7 +420,7 @@ export default function ServicesPage() {
                                       {type === "With Photographer" && (
                                         <div className="grid grid-cols-2 gap-2">
                                           <div>
-                                            <label className="text-xs text-neutral-600">Available From (hour)</label>
+                                            <label className="text-base-body text-neutral-600">Available From (hour)</label>
                                             <Input
                                               type="number"
                                               min="0"
@@ -436,7 +436,7 @@ export default function ServicesPage() {
                                             />
                                           </div>
                                           <div>
-                                            <label className="text-xs text-neutral-600">Until (hour)</label>
+                                            <label className="text-base-body text-neutral-600">Until (hour)</label>
                                             <Input
                                               type="number"
                                               min="0"
@@ -478,7 +478,7 @@ export default function ServicesPage() {
                                     <>
                                       <div className="flex items-start justify-between mb-2">
                                         <div className="flex-1">
-                                          <h4 className="font-semibold text-neutral-900">
+                                          <h4 className="text-h3 font-semibold text-neutral-900">
                                             {service.name}
                                             {!service.enabled && (
                                               <Badge variant="outline" className="ml-2 bg-red-50 text-red-700 border-red-200">
@@ -486,7 +486,7 @@ export default function ServicesPage() {
                                               </Badge>
                                             )}
                                           </h4>
-                                          <p className="text-xs text-neutral-600 mt-1 line-clamp-2">
+                                          <p className="text-base-body text-neutral-600 mt-1 line-clamp-2">
                                             {service.description}
                                           </p>
                                         </div>
@@ -523,25 +523,25 @@ export default function ServicesPage() {
                                       <div className="grid grid-cols-3 gap-2 mt-3">
                                         <div className="text-center p-2 bg-blue-50 rounded">
                                           <DollarSign className="w-4 h-4 mx-auto text-blue-600 mb-1" />
-                                          <p className="text-xs text-neutral-600">Price</p>
-                                          <p className="font-semibold text-sm">₱{service.basePrice}</p>
+                                          <p className="text-base-body text-neutral-600">Price</p>
+                                          <p className="text-h3 font-semibold">₱{service.basePrice}</p>
                                         </div>
                                         <div className="text-center p-2 bg-purple-50 rounded">
                                           <Clock className="w-4 h-4 mx-auto text-purple-600 mb-1" />
-                                          <p className="text-xs text-neutral-600">Duration</p>
-                                          <p className="font-semibold text-sm">{service.duration} min</p>
+                                          <p className="text-base-body text-neutral-600">Duration</p>
+                                          <p className="text-h3 font-semibold">{service.duration} min</p>
                                         </div>
                                         <div className="text-center p-2 bg-green-50 rounded">
                                           <TrendingUp className="w-4 h-4 mx-auto text-green-600 mb-1" />
-                                          <p className="text-xs text-neutral-600">Bookings</p>
-                                          <p className="font-semibold text-sm">
+                                          <p className="text-base-body text-neutral-600">Bookings</p>
+                                          <p className="text-h3 font-semibold">
                                             {serviceStats?.count || 0}
                                           </p>
                                         </div>
                                       </div>
 
                                       {serviceStats && (
-                                        <div className="mt-2 pt-2 border-t text-xs text-neutral-600">
+                                        <div className="mt-2 pt-2 border-t text-base-body text-neutral-600">
                                           Revenue: <span className="font-semibold text-green-600">₱{serviceStats.totalRevenue.toLocaleString()}</span>
                                           {" • "}
                                           Avg: <span className="font-semibold">₱{Math.round(serviceStats.avgPrice).toLocaleString()}</span>
@@ -549,7 +549,7 @@ export default function ServicesPage() {
                                       )}
 
                                       {service.availableFrom !== undefined && service.availableUntil !== undefined && (
-                                        <div className="mt-2 flex items-center gap-1 text-xs text-orange-700 bg-orange-50 p-2 rounded">
+                                        <div className="mt-2 flex items-center gap-1 text-base-body text-orange-700 bg-orange-50 p-2 rounded">
                                           <Calendar className="w-3 h-3" />
                                           Available {service.availableFrom}:00 - {service.availableUntil}:00 only
                                         </div>
