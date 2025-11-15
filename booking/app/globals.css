@@ -8,9 +8,15 @@
 /* Your global styles */
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  
   body {
     font-family: var(--font-open-sans), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-background text-foreground;
   }
+  
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-montserrat), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   }
@@ -43,6 +49,7 @@
     --chart-5: 0 0% 17%; /* charcoal */
     --radius: 0.5rem
   }
+  
   .dark {
     --background: 163 67% 14%; /* forest dark #0b3d2e */
     --foreground: 163 67% 94%; /* light forest text */
@@ -68,14 +75,5 @@
     --chart-3: 28 45% 55%;
     --chart-4: 43 63% 80%;
     --chart-5: 163 67% 30%
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }
