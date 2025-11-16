@@ -93,7 +93,7 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   // default to today as requested
-  const [statsTimeFilter, setStatsTimeFilter] = useState<'day' | 'week' | 'month' | 'year'>('day');
+  const [statsTimeFilter, setStatsTimeFilter] = useState<'day' | 'week' | 'month' | 'year' | 'all'>('day');
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function fetchAnalytics() {
       try {
-        const rangeMap = { day: 'week', week: 'week', month: 'month', year: 'year' };
+        const rangeMap: Record<string, string> = { day: 'week', week: 'week', month: 'month', year: 'year', all: 'year' };
         const range = rangeMap[statsTimeFilter];
         const response = await fetch(`/api/admin/analytics?range=${range}`);
         if (!response.ok) {
@@ -140,28 +140,19 @@ export default function AdminDashboard() {
 
   // Filter bookings by stats time period
   const filterBookingsByTime = (bookings: Booking[], isUpcoming: boolean = false) => {
+    if (statsTimeFilter === 'all') {
+      return bookings;
+    }
+    
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
     return bookings.filter(booking => {
       const bookingDate = new Date(booking.date);
       
-      // For upcoming bookings, filter by future time ranges
+      // For upcoming bookings, always show all future bookings regardless of filter
       if (isUpcoming) {
-        switch (statsTimeFilter) {
-          case 'day':
-            return bookingDate.toDateString() === today.toDateString();
-          case 'week':
-            const weekAhead = new Date(today);
-            weekAhead.setDate(today.getDate() + 7);
-            return bookingDate >= today && bookingDate <= weekAhead;
-          case 'month':
-            return bookingDate.getMonth() === now.getMonth() && bookingDate.getFullYear() === now.getFullYear() && bookingDate >= today;
-          case 'year':
-            return bookingDate.getFullYear() === now.getFullYear() && bookingDate >= today;
-          default:
-            return true;
-        }
+        return bookingDate >= today;
       }
       
       // For past bookings, filter by past time ranges
@@ -204,76 +195,55 @@ export default function AdminDashboard() {
         </p>
       </div>
 
-      {/* Time Filter Toggles */}
-      <div className="flex gap-2">
-        <Button
-          variant={statsTimeFilter === 'day' ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setStatsTimeFilter('day');
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
-            setStartDate(todayStr);
-            setEndDate(todayStr);
-          }}
-          className={`text-base ${statsTimeFilter === 'day' ? 'text-white font-bold' : ''}`}
-        >
-          Today
-        </Button>
-        <Button
-          variant={statsTimeFilter === 'week' ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setStatsTimeFilter('week');
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            setStartDate(monday.toISOString().split('T')[0]);
-            setEndDate(sunday.toISOString().split('T')[0]);
-          }}
-          className={`text-base ${statsTimeFilter === 'week' ? 'text-white font-bold' : ''}`}
-        >
-          This Week
-        </Button>
-        <Button
-          variant={statsTimeFilter === 'month' ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setStatsTimeFilter('month');
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            setStartDate(firstDay.toISOString().split('T')[0]);
-            setEndDate(lastDay.toISOString().split('T')[0]);
-          }}
-          className={`text-base ${statsTimeFilter === 'month' ? 'text-white font-bold' : ''}`}
-        >
-          This Month
-        </Button>
-        <Button
-          variant={statsTimeFilter === 'year' ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setStatsTimeFilter('year');
-            const today = new Date();
-            const firstDay = new Date(today.getFullYear(), 0, 1);
-            const lastDay = new Date(today.getFullYear(), 11, 31);
-            setStartDate(firstDay.toISOString().split('T')[0]);
-            setEndDate(lastDay.toISOString().split('T')[0]);
-          }}
-          className={`text-base ${statsTimeFilter === 'year' ? 'text-white font-bold' : ''}`}
-        >
-          This Year
-        </Button>
-      </div>
-
-      {/* Date Range Picker */}
+      {/* Period Section */}
       <Card className="p-4">
-        <h3 className="text-h3 font-semibold text-primary mb-3">Custom Date Range</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <h3 className="text-h3 font-semibold text-primary mb-3">Period</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div>
+            <label className="text-base-body font-medium text-neutral-700 mb-1 block">Period</label>
+            <select
+              value={statsTimeFilter}
+              onChange={(e) => {
+                const value = e.target.value as 'day' | 'week' | 'month' | 'year' | 'all';
+                setStatsTimeFilter(value);
+                const today = new Date();
+                
+                if (value === 'day') {
+                  const todayStr = today.toISOString().split('T')[0];
+                  setStartDate(todayStr);
+                  setEndDate(todayStr);
+                } else if (value === 'week') {
+                  const dayOfWeek = today.getDay();
+                  const monday = new Date(today);
+                  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+                  const sunday = new Date(monday);
+                  sunday.setDate(monday.getDate() + 6);
+                  setStartDate(monday.toISOString().split('T')[0]);
+                  setEndDate(sunday.toISOString().split('T')[0]);
+                } else if (value === 'month') {
+                  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                  setStartDate(firstDay.toISOString().split('T')[0]);
+                  setEndDate(lastDay.toISOString().split('T')[0]);
+                } else if (value === 'year') {
+                  const firstDay = new Date(today.getFullYear(), 0, 1);
+                  const lastDay = new Date(today.getFullYear(), 11, 31);
+                  setStartDate(firstDay.toISOString().split('T')[0]);
+                  setEndDate(lastDay.toISOString().split('T')[0]);
+                } else if (value === 'all') {
+                  setStartDate('');
+                  setEndDate('');
+                }
+              }}
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-base-body font-bold"
+            >
+              <option value="day">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="year">This Year</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
           <div>
             <label className="text-base-body font-medium text-neutral-700 mb-1 block">Start Date</label>
             <Input
@@ -413,7 +383,7 @@ export default function AdminDashboard() {
             {/* Bookings Created */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#8B5E3C] rounded-lg flex items-center justify-center mb-2">
                   <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Created</p>
@@ -424,7 +394,7 @@ export default function AdminDashboard() {
             {/* Bookings Completed */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-600 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e] rounded-lg flex items-center justify-center mb-2">
                   <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Completed</p>
@@ -435,8 +405,8 @@ export default function AdminDashboard() {
             {/* Bookings Rescheduled */}
             <div className="text-center border-r last:border-r-0 border-border">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-2">
-                  <RefreshCw className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#FAF3E0] rounded-lg flex items-center justify-center mb-2">
+                  <RefreshCw className="w-5 h-5 lg:w-6 lg:h-6 text-[#2C2C2C]" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Rescheduled</p>
                 <p className="text-h3 font-bold text-foreground">{breakdown.rescheduled}</p>
@@ -446,7 +416,7 @@ export default function AdminDashboard() {
             {/* Bookings Cancelled/No Show */}
             <div className="text-center">
               <div className="flex flex-col items-center">
-                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-red-600 rounded-lg flex items-center justify-center mb-2">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#A62F20] rounded-lg flex items-center justify-center mb-2">
                   <XCircle className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                 </div>
                 <p className="text-base-body font-medium text-muted-foreground mb-1">Cancelled/No Show</p>
