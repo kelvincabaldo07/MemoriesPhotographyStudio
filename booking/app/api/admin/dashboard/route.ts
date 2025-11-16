@@ -113,17 +113,55 @@ export async function GET(request: Request) {
     const pastBookings: any[] = [];
     const futureBookings: any[] = [];
     
+    // Bookings breakdown counters
+    let bookingsCreated = 0;
+    let bookingsCompleted = 0;
+    let bookingsRescheduled = 0;
+    let bookingsCancelled = 0;
+    
+    // Customer revenue tracking for top customers
+    const customerRevenue: Record<string, { name: string; email: string; revenue: number; bookings: number }> = {};
+    
     bookings.forEach((page: any) => {
       const props = page.properties;
       const bookingDate = new Date(props.Date?.date?.start || "");
+      const status = props.Status?.select?.name || "Pending";
+      const grandTotal = props["Grand Total"]?.number || 0;
+      const clientName = props["Client Name"]?.title?.[0]?.plain_text || "";
+      const email = props.Email?.email || "";
+      
       const booking = {
         id: page.id,
-        name: props["Client Name"]?.title?.[0]?.plain_text || "",
+        name: clientName,
         service: props.Service?.rich_text?.[0]?.plain_text || "",
         serviceType: props["Service Type"]?.select?.name || "",
         date: props.Date?.date?.start || "",
-        status: props.Status?.select?.name || "Pending",
+        status: status,
       };
+      
+      // Count bookings breakdown
+      bookingsCreated++;
+      
+      if (status === "Session Completed" || status === "RAW Photos Sent" || status === "Final Deliverables Sent" || status === "Access Granted - Completed") {
+        bookingsCompleted++;
+      }
+      
+      if (status === "Rescheduled") {
+        bookingsRescheduled++;
+      }
+      
+      if (status === "Cancelled" || status === "No Show") {
+        bookingsCancelled++;
+      }
+      
+      // Track customer revenue
+      if (email && clientName) {
+        if (!customerRevenue[email]) {
+          customerRevenue[email] = { name: clientName, email, revenue: 0, bookings: 0 };
+        }
+        customerRevenue[email].revenue += grandTotal;
+        customerRevenue[email].bookings++;
+      }
       
       if (bookingDate.getTime() < nowTimestamp) {
         pastBookings.push(booking);
@@ -131,6 +169,18 @@ export async function GET(request: Request) {
         futureBookings.push(booking);
       }
     });
+    
+    // Get top customers sorted by revenue
+    const topCustomers = Object.values(customerRevenue)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5)
+      .map((customer, index) => ({
+        rank: index + 1,
+        name: customer.name,
+        email: customer.email,
+        revenue: customer.revenue,
+        bookings: customer.bookings,
+      }));
     
     // Recent bookings: past bookings, most recent first (already sorted descending)
     const recentBookings = pastBookings.slice(0, 10);
@@ -147,8 +197,15 @@ export async function GET(request: Request) {
         revenueChange,
         bookingsChange,
       },
+      breakdown: {
+        created: bookingsCreated,
+        completed: bookingsCompleted,
+        rescheduled: bookingsRescheduled,
+        cancelled: bookingsCancelled,
+      },
       recentBookings,
       upcomingBookings,
+      topCustomers,
     });
   } catch (error) {
     console.error("Error fetching dashboard data:", error);

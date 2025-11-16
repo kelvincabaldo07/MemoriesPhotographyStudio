@@ -1,9 +1,10 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Calendar, Users, DollarSign, TrendingUp } from "lucide-react";
+import { Calendar, Users, DollarSign, TrendingUp, CheckCircle, XCircle, Clock, RefreshCw, Mail } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { RevenueLineChart } from "@/components/ui/revenue-line-chart";
 
@@ -25,8 +26,21 @@ interface DashboardData {
     revenueChange: number;
     bookingsChange: number;
   };
+  breakdown: {
+    created: number;
+    completed: number;
+    rescheduled: number;
+    cancelled: number;
+  };
   recentBookings: Booking[];
   upcomingBookings: Booking[];
+  topCustomers: Array<{
+    rank: number;
+    name: string;
+    email: string;
+    revenue: number;
+    bookings: number;
+  }>;
 }
 
 interface AnalyticsData {
@@ -67,13 +81,22 @@ export default function AdminDashboard() {
       revenueChange: 0,
       bookingsChange: 0,
     },
+    breakdown: {
+      created: 0,
+      completed: 0,
+      rescheduled: 0,
+      cancelled: 0,
+    },
     recentBookings: [],
     upcomingBookings: [],
+    topCustomers: [],
   });
   const [loading, setLoading] = useState(true);
   // default to today as requested
   const [statsTimeFilter, setStatsTimeFilter] = useState<'day' | 'week' | 'month' | 'year'>('day');
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -113,15 +136,35 @@ export default function AdminDashboard() {
     fetchAnalytics();
   }, [statsTimeFilter]);
 
-  const { stats, recentBookings, upcomingBookings } = data;
+  const { stats, breakdown, recentBookings, upcomingBookings, topCustomers } = data;
 
   // Filter bookings by stats time period
-  const filterBookingsByTime = (bookings: Booking[]) => {
+  const filterBookingsByTime = (bookings: Booking[], isUpcoming: boolean = false) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
     return bookings.filter(booking => {
       const bookingDate = new Date(booking.date);
+      
+      // For upcoming bookings, filter by future time ranges
+      if (isUpcoming) {
+        switch (statsTimeFilter) {
+          case 'day':
+            return bookingDate.toDateString() === today.toDateString();
+          case 'week':
+            const weekAhead = new Date(today);
+            weekAhead.setDate(today.getDate() + 7);
+            return bookingDate >= today && bookingDate <= weekAhead;
+          case 'month':
+            return bookingDate.getMonth() === now.getMonth() && bookingDate.getFullYear() === now.getFullYear() && bookingDate >= today;
+          case 'year':
+            return bookingDate.getFullYear() === now.getFullYear() && bookingDate >= today;
+          default:
+            return true;
+        }
+      }
+      
+      // For past bookings, filter by past time ranges
       switch (statsTimeFilter) {
         case 'day':
           return bookingDate.toDateString() === today.toDateString();
@@ -139,8 +182,8 @@ export default function AdminDashboard() {
     });
   };
 
-  const filteredRecentBookings = filterBookingsByTime(recentBookings);
-  const filteredUpcomingBookings = filterBookingsByTime(upcomingBookings);
+  const filteredRecentBookings = filterBookingsByTime(recentBookings, false);
+  const filteredUpcomingBookings = filterBookingsByTime(upcomingBookings, true);
   const filteredTotalBookings = filteredRecentBookings.length + filteredUpcomingBookings.length;
 
   // Calculate filtered stats
@@ -166,36 +209,91 @@ export default function AdminDashboard() {
         <Button
           variant={statsTimeFilter === 'day' ? "default" : "outline"}
           size="sm"
-          onClick={() => setStatsTimeFilter('day')}
-          className="text-h3"
+          onClick={() => {
+            setStatsTimeFilter('day');
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            setStartDate(todayStr);
+            setEndDate(todayStr);
+          }}
+          className={`text-base ${statsTimeFilter === 'day' ? 'text-white font-bold' : ''}`}
         >
           Today
         </Button>
         <Button
           variant={statsTimeFilter === 'week' ? "default" : "outline"}
           size="sm"
-          onClick={() => setStatsTimeFilter('week')}
-          className="text-h3"
+          onClick={() => {
+            setStatsTimeFilter('week');
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            setStartDate(monday.toISOString().split('T')[0]);
+            setEndDate(sunday.toISOString().split('T')[0]);
+          }}
+          className={`text-base ${statsTimeFilter === 'week' ? 'text-white font-bold' : ''}`}
         >
           This Week
         </Button>
         <Button
           variant={statsTimeFilter === 'month' ? "default" : "outline"}
           size="sm"
-          onClick={() => setStatsTimeFilter('month')}
-          className="text-h3"
+          onClick={() => {
+            setStatsTimeFilter('month');
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            setStartDate(firstDay.toISOString().split('T')[0]);
+            setEndDate(lastDay.toISOString().split('T')[0]);
+          }}
+          className={`text-base ${statsTimeFilter === 'month' ? 'text-white font-bold' : ''}`}
         >
           This Month
         </Button>
         <Button
           variant={statsTimeFilter === 'year' ? "default" : "outline"}
           size="sm"
-          onClick={() => setStatsTimeFilter('year')}
-          className="text-h3"
+          onClick={() => {
+            setStatsTimeFilter('year');
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), 0, 1);
+            const lastDay = new Date(today.getFullYear(), 11, 31);
+            setStartDate(firstDay.toISOString().split('T')[0]);
+            setEndDate(lastDay.toISOString().split('T')[0]);
+          }}
+          className={`text-base ${statsTimeFilter === 'year' ? 'text-white font-bold' : ''}`}
         >
           This Year
         </Button>
       </div>
+
+      {/* Date Range Picker */}
+      <Card className="p-4">
+        <h3 className="text-h3 font-semibold text-primary mb-3">Custom Date Range</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-base-body font-medium text-neutral-700 mb-1 block">Start Date</label>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="text-base-body"
+            />
+          </div>
+          <div>
+            <label className="text-base-body font-medium text-neutral-700 mb-1 block">End Date</label>
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="text-base-body"
+            />
+          </div>
+        </div>
+      </Card>
 
       {/* Summary and Upcoming Bookings (upcoming moved beside summary) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -206,8 +304,8 @@ export default function AdminDashboard() {
               {/* Total Bookings */}
               <div className="text-center border-r last:border-r-0 border-border">
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-2">
-                    <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-blue-600 dark:text-blue-400" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#A62F20] rounded-lg flex items-center justify-center mb-2">
+                    <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Bookings</p>
                   <p className="text-h3 font-bold text-foreground">{filteredTotalBookings}</p>
@@ -217,8 +315,8 @@ export default function AdminDashboard() {
               {/* Revenue */}
               <div className="text-center border-r last:border-r-0 border-border">
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-2">
-                    <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-green-600 dark:text-green-400" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#0b3d2e] rounded-lg flex items-center justify-center mb-2">
+                    <DollarSign className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Revenue</p>
                   <p className="text-h3 font-bold text-foreground">₱{filteredStats.monthlyRevenue.toLocaleString()}</p>
@@ -228,8 +326,8 @@ export default function AdminDashboard() {
               {/* Total Customers */}
               <div className="text-center border-r last:border-r-0 border-border">
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-2">
-                    <Users className="w-5 h-5 lg:w-6 lg:h-6 text-purple-600 dark:text-purple-400" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#8B5E3C] rounded-lg flex items-center justify-center mb-2">
+                    <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Customers</p>
                   <p className="text-h3 font-bold text-foreground">{filteredStats.totalCustomers}</p>
@@ -239,8 +337,8 @@ export default function AdminDashboard() {
               {/* Avg Booking Value */}
               <div className="text-center">
                 <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-2">
-                    <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-yellow-600 dark:text-yellow-400" />
+                  <div className="w-10 h-10 lg:w-12 lg:h-12 bg-[#FAF3E0] rounded-lg flex items-center justify-center mb-2">
+                    <TrendingUp className="w-5 h-5 lg:w-6 lg:h-6 text-[#2C2C2C]" />
                   </div>
                   <p className="text-base-body font-medium text-muted-foreground mb-1">Avg. Value</p>
                   <p className="text-h3 font-bold text-foreground">₱{filteredTotalBookings > 0 ? Math.round((filteredStats.monthlyRevenue / filteredTotalBookings)).toLocaleString() : 0}</p>
@@ -307,6 +405,58 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Bookings Breakdown */}
+      <div>
+        <h2 className="text-h2 font-semibold text-primary mb-3">Bookings Breakdown</h2>
+        <Card className="p-6">
+          <div className="grid grid-cols-4 gap-4 lg:gap-6">
+            {/* Bookings Created */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-2">
+                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                </div>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Created</p>
+                <p className="text-h3 font-bold text-foreground">{breakdown.created}</p>
+              </div>
+            </div>
+
+            {/* Bookings Completed */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-green-600 rounded-lg flex items-center justify-center mb-2">
+                  <CheckCircle className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                </div>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Completed</p>
+                <p className="text-h3 font-bold text-foreground">{breakdown.completed}</p>
+              </div>
+            </div>
+
+            {/* Bookings Rescheduled */}
+            <div className="text-center border-r last:border-r-0 border-border">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-orange-600 rounded-lg flex items-center justify-center mb-2">
+                  <RefreshCw className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                </div>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Rescheduled</p>
+                <p className="text-h3 font-bold text-foreground">{breakdown.rescheduled}</p>
+              </div>
+            </div>
+
+            {/* Bookings Cancelled/No Show */}
+            <div className="text-center">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 bg-red-600 rounded-lg flex items-center justify-center mb-2">
+                  <XCircle className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
+                </div>
+                <p className="text-base-body font-medium text-muted-foreground mb-1">Cancelled/No Show</p>
+                <p className="text-h3 font-bold text-foreground">{breakdown.cancelled}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
       {/* Analytics Charts */}
       {analyticsData && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -354,6 +504,51 @@ export default function AdminDashboard() {
                     </div>
                     <span className="text-base-body text-muted-foreground w-16 text-right">
                       {service.bookings} bookings
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* Top Customers */}
+        <div>
+          <h2 className="text-h2 font-semibold text-primary mb-3">
+            Top Customers
+          </h2>
+          <Card className="p-6">
+            <div className="space-y-4">
+              {topCustomers.map((customer) => (
+                <div key={customer.email}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 bg-[#8B5E3C] text-white rounded-full flex items-center justify-center text-base-body font-bold">
+                        {customer.rank}
+                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-h3 font-medium text-foreground">
+                          {customer.name}
+                        </span>
+                        <span className="text-base-body text-muted-foreground flex items-center gap-1">
+                          <Mail className="w-3 h-3" />
+                          {customer.email}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-h3 font-semibold text-green-600 dark:text-green-400">
+                      ₱{customer.revenue.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 bg-muted rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-[#8B5E3C] to-[#8B5E3C]/80 h-2 rounded-full"
+                        style={{ width: `${Math.min((customer.revenue / topCustomers[0].revenue) * 100, 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-base-body text-muted-foreground w-16 text-right">
+                      {customer.bookings} bookings
                     </span>
                   </div>
                 </div>
