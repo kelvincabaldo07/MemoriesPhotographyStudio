@@ -62,11 +62,16 @@ export default function TermsOfServicePage() {
               You will receive a booking confirmation email once your reservation is processed. Your booking is not confirmed until 
               you receive this email. Please check your spam/junk folder if you do not receive confirmation within 24 hours.
             </p>
+            <p className="text-foreground mt-4">
+              <strong>Important:</strong> You must confirm your attendance at least <strong>2 hours before your scheduled session</strong> via SMS, 
+              email, or Facebook chat. If we do not receive confirmation, your booked appointment will be automatically cancelled. This policy 
+              helps us manage our schedule and serve other customers efficiently.
+            </p>
             
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">4.3 Booking Modifications</h3>
             <p className="text-foreground">
-              You may modify or reschedule your booking up to 48 hours before your scheduled session by contacting us via email 
-              or phone. Modifications are subject to availability.
+              You may modify or reschedule your booking up to <strong>2 hours before your scheduled session</strong> by contacting us via email, 
+              phone, SMS, or Facebook chat. Modifications are subject to availability.
             </p>
             
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">4.4 Booking Authentication</h3>
@@ -86,8 +91,9 @@ export default function TermsOfServicePage() {
             
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">5.2 Payment Methods</h3>
             <p className="text-foreground">
-              We accept payment via bank transfer, GCash, PayMaya, and other payment methods as specified during the booking process. 
-              Payment details will be provided in your booking confirmation email.
+              We accept payment via bank transfer, GCash, PayMaya (Maya), and other payment methods as specified during the booking process. 
+              Payment details and QR codes (GCash QR Code, Maya QR Code, RCBC QR Code, and BPI QR Code) will be provided in your 
+              booking confirmation email for convenient payment.
             </p>
             
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">5.3 Payment Security</h3>
@@ -148,17 +154,23 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-semibold text-foreground mb-4">8. Intellectual Property and Usage Rights</h2>
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">8.1 Photo Ownership</h3>
             <p className="text-foreground">
-              For self-shoot sessions, you retain full ownership and rights to the photos you take.
+              Memories Photography Studio retains the copyright to all photos taken in our studio, whether during self-shoot or 
+              photographer-led sessions. However, you are granted a non-exclusive, royalty-free license to use the delivered photos 
+              for personal, non-commercial purposes, including social media sharing, personal albums, and gifts.
             </p>
             <p className="text-foreground mt-2">
-              For photographer-led sessions, we retain the copyright to all photos. However, you are granted a license to 
-              use the delivered photos for personal, non-commercial purposes.
+              Commercial use, resale, or redistribution of photos is strictly prohibited without our written permission.
             </p>
             
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">8.2 Marketing and Portfolio Use</h3>
             <p className="text-foreground">
-              We may use photos from your session for marketing, portfolio, and promotional purposes unless you explicitly 
-              opt out by notifying us in writing. If you opt out, your privacy will be respected.
+              During the booking process, you will be asked whether you consent to the use of photos from your session for marketing, 
+              portfolio, and promotional purposes. Your choice (opt-in or opt-out) will be recorded and respected. If you opt in, we may 
+              feature your photos on our website, social media, and marketing materials. If you opt out, we will not use your photos for 
+              promotional purposes.
+            </p>
+            <p className="text-foreground mt-2">
+              You may change your marketing consent preference at any time by contacting us at smile@memories-studio.com.
             </p>
             
             <h3 className="text-xl font-semibold text-foreground mt-4 mb-2">8.3 Website Content</h3>
