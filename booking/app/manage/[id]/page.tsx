@@ -34,6 +34,32 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
   const [recaptchaReady, setRecaptchaReady] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [canEdit, setCanEdit] = useState(true);
+  const [editRestrictionReason, setEditRestrictionReason] = useState("");
+
+  // Check if booking can be edited (not in past and at least 2 hours before appointment)
+  useEffect(() => {
+    if (!booking?.schedule?.date || !booking?.schedule?.time) return;
+
+    const checkEditability = () => {
+      const bookingDateTime = new Date(`${booking.schedule.date}T${booking.schedule.time}:00+08:00`);
+      const now = new Date();
+      const twoHoursFromNow = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+
+      if (bookingDateTime < now) {
+        setCanEdit(false);
+        setEditRestrictionReason("This booking is in the past and cannot be modified.");
+      } else if (bookingDateTime < twoHoursFromNow) {
+        setCanEdit(false);
+        setEditRestrictionReason("Bookings cannot be modified within 2 hours of the appointment time. Please contact us directly.");
+      } else {
+        setCanEdit(true);
+        setEditRestrictionReason("");
+      }
+    };
+
+    checkEditability();
+  }, [booking]);
 
   // Load reCAPTCHA on mont
   useEffect(() => {
@@ -504,19 +530,40 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
           </Card>
         )}
 
+        {!canEdit && editRestrictionReason && (
+          <Card className="mb-4 border-2 border-yellow-500 bg-yellow-50">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-yellow-600 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-yellow-900 mb-1">Editing Restricted</h3>
+                  <p className="text-sm text-yellow-800">{editRestrictionReason}</p>
+                  <p className="text-sm text-yellow-700 mt-2">
+                    Need to make changes? Contact us at <a href="tel:+639064694122" className="underline">+63 906 469 4122</a> or{' '}
+                    <a href="mailto:smile@memories-studio.com" className="underline">smile@memories-studio.com</a>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="flex flex-col sm:flex-row gap-3">
           <Button 
             onClick={() => setEditing(true)}
-            disabled={editing}
-            style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+            disabled={editing || !canEdit}
+            style={{ backgroundColor: canEdit ? BRAND.forest : "#9CA3AF", color: BRAND.white }}
             className="flex-1"
+            title={!canEdit ? editRestrictionReason : ""}
           >
             Reschedule Booking
           </Button>
           <Button 
             variant="outline" 
             onClick={handleCancel}
-            className="border-red-600 text-red-600 hover:bg-red-50 flex-1"
+            disabled={!canEdit}
+            className="border-red-600 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+            title={!canEdit ? editRestrictionReason : ""}
           >
             Cancel Booking
           </Button>

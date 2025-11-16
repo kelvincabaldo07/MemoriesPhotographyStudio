@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calendar, Clock, User, Mail, Phone, Search, ArrowLeft, Package, Shield, ShoppingBag, Globe } from "lucide-react";
+import { Calendar, Clock, User, Mail, Phone, Search, ArrowLeft, Package, Shield, ShoppingBag, Globe, Key } from "lucide-react";
 import { executeRecaptcha } from "@/lib/recaptcha";
 import { formatTimeTo12Hour, formatManilaDate } from "@/lib/time-utils";
 
@@ -15,14 +15,13 @@ const BRAND = {
 };
 
 export default function MyBookings() {
-  const [searchMethod, setSearchMethod] = useState<"email" | "name">("email");
+  const [bookingId, setBookingId] = useState("");
   const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const [error, setError] = useState("");
 
   // Load reCAPTCHA on mount
   useEffect(() => {
@@ -39,6 +38,8 @@ export default function MyBookings() {
   async function handleSearch() {
     setLoading(true);
     setSearched(true);
+    setError("");
+    setBooking(null);
 
     try {
       // Get reCAPTCHA token
@@ -51,48 +52,31 @@ export default function MyBookings() {
         }
       }
 
-      let url = "/api/bookings?";
-      if (searchMethod === "email") {
-        url += `email=${encodeURIComponent(email)}`;
-      } else {
-        url += `firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}`;
-      }
-
-      const response = await fetch(url, {
-        headers: {
-          "X-Recaptcha-Token": recaptchaToken,
-        },
-      });
+      // Search by booking ID and email - both must match
+      const response = await fetch(
+        `/api/bookings/${encodeURIComponent(bookingId)}?email=${encodeURIComponent(email)}`,
+        {
+          headers: {
+            "X-Recaptcha-Token": recaptchaToken,
+          },
+        }
+      );
       const data = await response.json();
 
-      if (data.success) {
-        setBookings(data.bookings || []);
+      if (data.success && data.booking) {
+        setBooking(data.booking);
+        setError("");
       } else {
-        setBookings([]);
+        setBooking(null);
+        setError(data.error || "Booking not found. Please check your Booking ID and email.");
       }
     } catch (error) {
-      console.error("Failed to search bookings:", error);
-      setBookings([]);
+      console.error("Failed to search booking:", error);
+      setBooking(null);
+      setError("Failed to search booking. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
-
-  function formatDate(dateStr: string) {
-    const date = new Date(dateStr + "T12:00:00");
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
-
-  function to12Hour(time: string) {
-    const [h, m] = time.split(":").map(Number);
-    const period = h >= 12 ? "PM" : "AM";
-    const hour12 = h % 12 || 12;
-    return `${hour12}:${m.toString().padStart(2, "0")} ${period}`;
   }
 
   return (
@@ -113,81 +97,49 @@ export default function MyBookings() {
         <Card className="mb-6 shadow-lg">
           <CardContent className="p-6">
             <h2 className="text-xl font-semibold mb-4" style={{ color: BRAND.forest }}>
-              Find Your Bookings
+              Find Your Booking
             </h2>
-
-            {/* Search Method Toggle */}
-            <div className="flex gap-2 mb-4">
-              <Button
-                variant={searchMethod === "email" ? "default" : "outline"}
-                onClick={() => setSearchMethod("email")}
-                style={{
-                  backgroundColor: searchMethod === "email" ? BRAND.forest : "transparent",
-                  color: searchMethod === "email" ? BRAND.white : BRAND.charcoal,
-                }}
-                className="flex-1"
-              >
-                <Mail className="w-4 h-4 mr-2" /> Search by Email
-              </Button>
-              <Button
-                variant={searchMethod === "name" ? "default" : "outline"}
-                onClick={() => setSearchMethod("name")}
-                style={{
-                  backgroundColor: searchMethod === "name" ? BRAND.forest : "transparent",
-                  color: searchMethod === "name" ? BRAND.white : BRAND.charcoal,
-                }}
-                className="flex-1"
-              >
-                <User className="w-4 h-4 mr-2" /> Search by Name
-              </Button>
-            </div>
+            <p className="text-sm text-neutral-600 mb-4">
+              Enter your Booking ID and email address to view and manage your booking. Both must match your booking confirmation.
+            </p>
 
             {/* Search Form */}
-            {searchMethod === "email" ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-h3 font-medium mb-1 block">Email Address</label>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  />
-                </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-h3 font-medium mb-1 block flex items-center gap-2">
+                  <Key className="w-4 h-4" style={{ color: BRAND.forest }} />
+                  Booking ID
+                </label>
+                <Input
+                  type="text"
+                  placeholder="MMRS-XXXXXX"
+                  value={bookingId}
+                  onChange={(e) => setBookingId(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => e.key === "Enter" && bookingId && email && handleSearch()}
+                  className="font-mono"
+                />
+                <p className="text-xs text-neutral-500 mt-1">Found in your booking confirmation email</p>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-h3 font-medium mb-1 block">First Name</label>
-                    <Input
-                      placeholder="Enter first name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-h3 font-medium mb-1 block">Last Name</label>
-                    <Input
-                      placeholder="Enter last name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    />
-                  </div>
-                </div>
+
+              <div>
+                <label className="text-h3 font-medium mb-1 block flex items-center gap-2">
+                  <Mail className="w-4 h-4" style={{ color: BRAND.forest }} />
+                  Email Address
+                </label>
+                <Input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && bookingId && email && handleSearch()}
+                />
+                <p className="text-xs text-neutral-500 mt-1">The email you used when booking</p>
               </div>
-            )}
+            </div>
 
             <Button
               onClick={handleSearch}
-              disabled={
-                loading ||
-                !recaptchaReady ||
-                (searchMethod === "email" ? !email : !firstName || !lastName)
-              }
+              disabled={loading || !recaptchaReady || !bookingId || !email}
               style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
               className="w-full mt-4"
             >
@@ -198,7 +150,7 @@ export default function MyBookings() {
                 </>
               ) : (
                 <>
-                  <Search className="w-4 h-4 mr-2" /> Find My Bookings
+                  <Search className="w-4 h-4 mr-2" /> Find My Booking
                 </>
               )}
             </Button>
@@ -214,118 +166,113 @@ export default function MyBookings() {
         {/* Results */}
         {searched && !loading && (
           <div>
-            {bookings.length === 0 ? (
+            {error || !booking ? (
               <Card className="shadow-lg">
                 <CardContent className="p-8 text-center">
                   <Package className="w-16 h-16 mx-auto mb-4 opacity-20" />
                   <h3 className="text-h2 font-semibold mb-2" style={{ color: BRAND.charcoal }}>
-                    No Bookings Found
+                    {error ? "Booking Not Found" : "No Results"}
                   </h3>
                   <p className="text-neutral-600 mb-4">
-                    We couldn't find any bookings matching your search.
+                    {error || "Please enter your Booking ID and email to search."}
                   </p>
                   <p className="text-sm text-neutral-500">
-                    Please check your email or name spelling and try again.
+                    Make sure both your Booking ID and email match your booking confirmation.
                   </p>
                 </CardContent>
               </Card>
             ) : (
               <div>
                 <h2 className="text-h2 font-semibold mb-4" style={{ color: BRAND.forest }}>
-                  Your Bookings ({bookings.length})
+                  Your Booking
                 </h2>
-                <div className="space-y-4">
-                  {bookings.map((booking) => (
-                    <Card
-                      key={booking.id}
-                      className="shadow-lg hover:shadow-xl transition cursor-pointer"
-                      onClick={() => (window.location.href = `/manage/${booking.id}`)}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <h3 className="font-semibold text-lg" style={{ color: BRAND.forest }}>
-                              {booking.selections?.service || "Photography Session"}
-                            </h3>
-                            <p className="text-h3 text-neutral-500">
-                              {booking.selections?.serviceType} • {booking.selections?.serviceCategory}
-                            </p>
-                          </div>
-                          <div
-                            className="px-3 py-1 rounded-full text-xs font-medium"
-                            style={{
-                              backgroundColor:
-                                booking.status === "Confirmed"
-                                  ? "#10b981"
-                                  : booking.status === "Pending"
-                                  ? "#f59e0b"
-                                  : booking.status === "Cancelled"
-                                  ? "#ef4444"
-                                  : "#6b7280",
-                              color: BRAND.white,
-                            }}
-                          >
-                            {booking.status || "Pending"}
-                          </div>
+                <Card
+                  className="shadow-lg hover:shadow-xl transition cursor-pointer"
+                  onClick={() => (window.location.href = `/manage/${booking.id}`)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="font-semibold text-lg" style={{ color: BRAND.forest }}>
+                          {booking.selections?.service || "Photography Session"}
+                        </h3>
+                        <p className="text-h3 text-neutral-500">
+                          {booking.selections?.serviceType} • {booking.selections?.serviceCategory}
+                        </p>
+                      </div>
+                      <div
+                        className="px-3 py-1 rounded-full text-xs font-medium"
+                        style={{
+                          backgroundColor:
+                            booking.status === "Confirmed"
+                              ? "#10b981"
+                              : booking.status === "Pending"
+                              ? "#f59e0b"
+                              : booking.status === "Cancelled"
+                              ? "#ef4444"
+                              : "#6b7280",
+                          color: BRAND.white,
+                        }}
+                      >
+                        {booking.status || "Pending"}
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" style={{ color: BRAND.forest }} />
+                        <div>
+                          <p className="text-base-body text-neutral-500">Date</p>
+                          <p className="text-h3 font-medium">
+                            {booking.schedule?.date
+                              ? formatManilaDate(booking.schedule.date, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+                              : "N/A"}
+                          </p>
                         </div>
+                      </div>
 
-                        <div className="grid md:grid-cols-3 gap-4">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4" style={{ color: BRAND.forest }} />
-                            <div>
-                              <p className="text-base-body text-neutral-500">Date</p>
-                              <p className="text-h3 font-medium">
-                                {booking.schedule?.date
-                                  ? formatDate(booking.schedule.date)
-                                  : "N/A"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4" style={{ color: BRAND.forest }} />
-                            <div>
-                              <p className="text-base-body text-neutral-500">Time</p>
-                              <p className="text-h3 font-medium">
-                                {booking.schedule?.time
-                                  ? to12Hour(booking.schedule.time)
-                                  : "N/A"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4" style={{ color: BRAND.forest }} />
-                            <div>
-                              <p className="text-base-body text-neutral-500">Customer</p>
-                              <p className="text-h3 font-medium">
-                                {booking.customer?.firstName} {booking.customer?.lastName}
-                              </p>
-                            </div>
-                          </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" style={{ color: BRAND.forest }} />
+                        <div>
+                          <p className="text-base-body text-neutral-500">Time</p>
+                          <p className="text-h3 font-medium">
+                            {booking.schedule?.time
+                              ? formatTimeTo12Hour(booking.schedule.time)
+                              : "N/A"}
+                          </p>
                         </div>
+                      </div>
 
-                        <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                          <div>
-                            <p className="text-base-body text-neutral-500">Booking ID</p>
-                            <p className="text-h3 font-mono font-medium">{booking.id}</p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              window.location.href = `/manage/${booking.id}`;
-                            }}
-                            style={{ borderColor: BRAND.forest, color: BRAND.forest }}
-                          >
-                            Manage Booking →
-                          </Button>
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4" style={{ color: BRAND.forest }} />
+                        <div>
+                          <p className="text-base-body text-neutral-500">Customer</p>
+                          <p className="text-h3 font-medium">
+                            {booking.customer?.firstName} {booking.customer?.lastName}
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                      <div>
+                        <p className="text-base-body text-neutral-500">Booking ID</p>
+                        <p className="text-h3 font-mono font-medium">{booking.id}</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/manage/${booking.id}`;
+                        }}
+                        style={{ borderColor: BRAND.forest, color: BRAND.forest }}
+                      >
+                        Manage Booking →
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
