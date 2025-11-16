@@ -197,70 +197,77 @@ export default function AdminDashboard() {
 
       {/* Period Section */}
       <Card className="p-4">
-        <h3 className="text-h3 font-semibold text-primary mb-3">Period</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div>
-            <label className="text-base-body font-medium text-neutral-700 mb-1 block">Period</label>
-            <select
-              value={statsTimeFilter}
-              onChange={(e) => {
-                const value = e.target.value as 'day' | 'week' | 'month' | 'year' | 'all';
-                setStatsTimeFilter(value);
-                const today = new Date();
-                
-                if (value === 'day') {
-                  const todayStr = today.toISOString().split('T')[0];
-                  setStartDate(todayStr);
-                  setEndDate(todayStr);
-                } else if (value === 'week') {
-                  const dayOfWeek = today.getDay();
-                  const monday = new Date(today);
-                  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-                  const sunday = new Date(monday);
-                  sunday.setDate(monday.getDate() + 6);
-                  setStartDate(monday.toISOString().split('T')[0]);
-                  setEndDate(sunday.toISOString().split('T')[0]);
-                } else if (value === 'month') {
-                  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
-                  const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-                  setStartDate(firstDay.toISOString().split('T')[0]);
-                  setEndDate(lastDay.toISOString().split('T')[0]);
-                } else if (value === 'year') {
-                  const firstDay = new Date(today.getFullYear(), 0, 1);
-                  const lastDay = new Date(today.getFullYear(), 11, 31);
-                  setStartDate(firstDay.toISOString().split('T')[0]);
-                  setEndDate(lastDay.toISOString().split('T')[0]);
-                } else if (value === 'all') {
-                  setStartDate('');
-                  setEndDate('');
-                }
-              }}
-              className="w-full h-10 px-3 rounded-md border border-input bg-background text-base-body font-bold"
-            >
-              <option value="day">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="year">This Year</option>
-              <option value="all">All Time</option>
-            </select>
+        <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-base-body font-medium text-neutral-700 dark:text-neutral-300 mb-1 block">Start Date</label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="text-base-body"
+              />
+            </div>
+            <div>
+              <label className="text-base-body font-medium text-neutral-700 dark:text-neutral-300 mb-1 block">End Date</label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="text-base-body"
+              />
+            </div>
           </div>
-          <div>
-            <label className="text-base-body font-medium text-neutral-700 mb-1 block">Start Date</label>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="text-base-body"
-            />
-          </div>
-          <div>
-            <label className="text-base-body font-medium text-neutral-700 mb-1 block">End Date</label>
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="text-base-body"
-            />
+          <div className="flex justify-end">
+            <div className="relative">
+              <select
+                value={statsTimeFilter}
+                onChange={(e) => {
+                  const value = e.target.value as 'day' | 'week' | 'month' | 'year' | 'all';
+                  setStatsTimeFilter(value);
+                  const today = new Date();
+                  
+                  if (value === 'day') {
+                    const todayStr = today.toISOString().split('T')[0];
+                    setStartDate(todayStr);
+                    setEndDate(todayStr);
+                  } else if (value === 'week') {
+                    const dayOfWeek = today.getDay();
+                    const monday = new Date(today);
+                    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+                    const sunday = new Date(monday);
+                    sunday.setDate(monday.getDate() + 6);
+                    setStartDate(monday.toISOString().split('T')[0]);
+                    setEndDate(sunday.toISOString().split('T')[0]);
+                  } else if (value === 'month') {
+                    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    setStartDate(firstDay.toISOString().split('T')[0]);
+                    setEndDate(lastDay.toISOString().split('T')[0]);
+                  } else if (value === 'year') {
+                    const firstDay = new Date(today.getFullYear(), 0, 1);
+                    const lastDay = new Date(today.getFullYear(), 11, 31);
+                    setStartDate(firstDay.toISOString().split('T')[0]);
+                    setEndDate(lastDay.toISOString().split('T')[0]);
+                  } else if (value === 'all') {
+                    setStartDate('');
+                    setEndDate('');
+                  }
+                }}
+                className="appearance-none w-auto min-w-[140px] h-10 pl-3 pr-10 rounded-md border-none bg-[#0b3d2e] text-white text-base-body font-semibold cursor-pointer"
+              >
+                <option value="day">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+                <option value="all">All Time</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
