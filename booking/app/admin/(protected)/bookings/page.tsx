@@ -584,7 +584,7 @@ export default function BookingsPage() {
 
           {/* Status Filters */}
           <div>
-            <label className="text-h3 font-semibold text-neutral-700 mb-2 block">Status Filter</label>
+            <label className="text-base-body font-semibold text-neutral-700 mb-2 block">Status Filter</label>
             <details className="relative border rounded-lg">
               <summary className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between text-base-body">
                 <span>
@@ -625,7 +625,7 @@ export default function BookingsPage() {
           {/* Service Filters */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             <div>
-              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-base-body font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 Start Date
               </label>
@@ -640,7 +640,7 @@ export default function BookingsPage() {
               />
             </div>
             <div>
-              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-base-body font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 End Date
               </label>
@@ -655,14 +655,14 @@ export default function BookingsPage() {
               />
             </div>
             <div>
-              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-base-body font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Package className="w-3 h-3" />
                 Service Type
               </label>
               <select
                 value={serviceTypeFilter}
                 onChange={(e) => setServiceTypeFilter(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-h3"
+                className="w-full px-3 py-2 border rounded-md text-base-body"
               >
                 {uniqueServiceTypes.map((type) => (
                   <option key={type} value={type}>{type}</option>
@@ -670,14 +670,14 @@ export default function BookingsPage() {
               </select>
             </div>
             <div>
-              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-base-body font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Layers className="w-3 h-3" />
                 Category
               </label>
               <select
                 value={serviceCategoryFilter}
                 onChange={(e) => setServiceCategoryFilter(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-h3"
+                className="w-full px-3 py-2 border rounded-md text-base-body"
               >
                 {uniqueServiceCategories.map((cat) => (
                   <option key={cat} value={cat}>{cat}</option>
@@ -685,14 +685,14 @@ export default function BookingsPage() {
               </select>
             </div>
             <div>
-              <label className="text-h3 font-semibold text-neutral-700 mb-1 flex items-center gap-1">
+              <label className="text-base-body font-semibold text-neutral-700 mb-1 flex items-center gap-1">
                 <Tag className="w-3 h-3" />
                 Service
               </label>
               <select
                 value={serviceFilter}
                 onChange={(e) => setServiceFilter(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md text-h3"
+                className="w-full px-3 py-2 border rounded-md text-base-body"
               >
                 {uniqueServices.map((svc) => (
                   <option key={svc} value={svc}>{svc}</option>
