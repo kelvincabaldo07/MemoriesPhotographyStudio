@@ -3,6 +3,8 @@ import { Montserrat, Open_Sans } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Footer from "@/components/Footer";
+import CookieConsent from "@/components/CookieConsent";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -34,9 +36,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${montserrat.variable} ${openSans.variable} antialiased bg-background text-foreground`}
+        className={`${montserrat.variable} ${openSans.variable} antialiased bg-background text-foreground flex flex-col min-h-screen`}
       >
-        {children}
+        <div className="flex-1">
+          {children}
+        </div>
+        <Footer />
+        <CookieConsent />
         <Analytics />
         <SpeedInsights />
       </body>

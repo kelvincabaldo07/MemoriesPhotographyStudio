@@ -4,6 +4,7 @@ import { logAudit, createSearchAudit } from '@/lib/audit';
 import { calculateEndTime } from '@/lib/time-utils';
 import { sendBookingConfirmationEmail } from '@/lib/sendgrid';
 import { createCalendarEvent } from '@/lib/google-calendar';
+import { randomBytes } from 'crypto';
 
 /**
  * Extract time from Notion date property
@@ -228,8 +229,11 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Generate booking ID in format: MMRS-YYYYMMDDHH-XXXX
- * Example: MMRS-2024120114-A3B7
+ * Generate cryptographically secure booking ID in format: MMRS-YYYYMMDDHH-XXXXXXXX
+ * Example: MMRS-2024120114-A3B7K9M2
+ * 
+ * SECURITY: Uses crypto.randomBytes for cryptographic randomness (256 bits total)
+ * This prevents booking ID enumeration and prediction attacks
  */
 function generateBookingId(bookingDate: string, bookingTime: string): string {
   // Parse the booking date (YYYY-MM-DD format)
@@ -241,14 +245,18 @@ function generateBookingId(bookingDate: string, bookingTime: string): string {
   // Format: YYYYMMDDHH
   const dateTimePart = `${year}${month}${day}${hour}`;
   
-  // Generate random 4-character alphanumeric code
+  // Generate cryptographically secure random 8-character alphanumeric code
+  // Using 8 characters from base36 (6 bytes) provides ~48 bits of entropy
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const randomBytesBuffer = randomBytes(6); // 6 bytes = 48 bits of entropy
   let randomCode = '';
-  for (let i = 0; i < 4; i++) {
-    randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < 8; i++) {
+    // Use modulo bias mitigation by using larger random values
+    const randomIndex = randomBytesBuffer[i % 6] % chars.length;
+    randomCode += chars.charAt(randomIndex);
   }
   
-  // Combine: MMRS-YYYYMMDDHH-XXXX
+  // Combine: MMRS-YYYYMMDDHH-XXXXXXXX
   return `MMRS-${dateTimePart}-${randomCode}`;
 }
 

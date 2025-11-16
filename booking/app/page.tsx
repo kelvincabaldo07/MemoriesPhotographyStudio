@@ -2091,7 +2091,38 @@ function StepCustomer(props: {
 
         <Input placeholder="Phone *" value={phone} onChange={(e) => setPhone(e.target.value)} />
         <div className="md:col-span-2">
-          <Input placeholder="Address" value={address} onChange={(e) => setAddr(e.target.value)} />
+          <Input placeholder="Address (optional)" value={address} onChange={(e) => setAddr(e.target.value)} />
+          <p className="text-xs text-neutral-500 mt-1">Full address helps us provide better directions and support</p>
+        </div>
+      </div>
+
+      {/* Legal Consent Section */}
+      <div className="mt-6 p-4 border-2 rounded-xl bg-gray-50">
+        <div className="text-h3 font-semibold mb-3 flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-[#0b3d2e]" />
+          Data Privacy & Consent
+        </div>
+        
+        <div className="space-y-3 text-sm">
+          <p className="text-neutral-700">
+            By providing your information, you agree to our{" "}
+            <a href="/privacy" target="_blank" className="text-[#0b3d2e] underline hover:text-[#0b3d2e]/80">
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a href="/terms" target="_blank" className="text-[#0b3d2e] underline hover:text-[#0b3d2e]/80">
+              Terms of Service
+            </a>.
+          </p>
+          
+          <div className="pt-2 border-t">
+            <p className="text-xs text-neutral-600 mb-2">
+              <strong>Required for booking:</strong> Name and email (for confirmation and reminders)
+            </p>
+            <p className="text-xs text-neutral-600">
+              <strong>Optional:</strong> Phone number (for SMS updates) and address (for directions support)
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -2632,11 +2663,11 @@ function StepVideoAndTerms({
             </>
           )}
         </div>
-        <label className="flex items-start gap-3 text-sm cursor-pointer">
+        <label className="flex items-start gap-3 text-sm cursor-pointer group">
           <Checkbox 
             checked={acceptedPhotoDelivery} 
             onCheckedChange={(v)=>setAcceptedPhotoDelivery(Boolean(v))}
-            className="mt-1"
+            className="mt-1 group-hover:border-[#0b3d2e]"
           />
           <span className="flex-1">
             {language === 'en' ? (
