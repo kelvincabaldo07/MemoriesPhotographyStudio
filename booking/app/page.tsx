@@ -612,9 +612,22 @@ export default function App(){
     const needsBackdrops = serviceType === "Self-Shoot" || (serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot");
     if (!needsBackdrops) return true;
     const total = Object.values(allocations).reduce((a,b)=>a+(Number(b)||0),0);
+    // Require at least 1 backdrop selected, max based on bdLimit
     const countOk = selectedBackdrops.length>0 && selectedBackdrops.length<=bdLimit;
     return countOk && total===duration;
   }, [allocations, selectedBackdrops, bdLimit, duration, serviceType, serviceGroup]);
+
+  // For With Photographer Adult/Family services: at least 1 backdrop, max 3
+  const backdropSelectionValid = useMemo(() => {
+    const needsBackdrops = serviceType === "Self-Shoot" || (serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot");
+    if (!needsBackdrops) return true;
+    // For With Photographer Adult/Family services, only require selection count (no time allocation needed)
+    if (serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot") {
+      return selectedBackdrops.length >= 1 && selectedBackdrops.length <= 3;
+    }
+    // For Self-Shoot, use full allocation validation
+    return allocationValid;
+  }, [serviceType, serviceGroup, selectedBackdrops, allocationValid]);
 
   function toggleAddon(id: string, delta: number){ setAddons(prev=>{ const qty=Math.max(0,(prev[id]||0)+delta); return { ...prev, [id]: qty };}); }
   function moveBackdrop(idx:number,dir:number){ setSelectedBackdrops(prev=>{ const arr=[...prev]; const swap=idx+dir; if(swap<0||swap>=arr.length) return prev; [arr[idx],arr[swap]]=[arr[swap],arr[idx]]; return arr; }); }
@@ -748,13 +761,13 @@ async function submitBooking(){
         }
         return true;
       }
-      case 4: return serviceType !== "Self-Shoot" ? true : allocationValid; // backdrops
+      case 4: return backdropSelectionValid; // backdrops
       case 5: return true; // add-ons optional
       case 6: return acceptedPhotoDelivery && acceptedLocation && acceptedParking && acceptedBookingPolicy; // all terms must be accepted
       case 7: return true; // review
       default: return false;
     }
-  }, [step, service, date, time, firstName, lastName, email, phone, emailVerified, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, allocationValid, acceptedPhotoDelivery, acceptedLocation, acceptedParking, acceptedBookingPolicy, serviceType, serviceGroup]);
+  }, [step, service, date, time, firstName, lastName, email, phone, emailVerified, socialConsent, eventType, celebrantName, birthdayAge, graduationLevel, eventDate, backdropSelectionValid, acceptedPhotoDelivery, acceptedLocation, acceptedParking, acceptedBookingPolicy, serviceType, serviceGroup]);
 
   return (
     <div className="min-h-screen w-full flex items-start justify-center p-4 md:p-8 pb-28 md:pb-32" style={{ backgroundColor: BRAND.cream }}>
@@ -898,6 +911,8 @@ async function submitBooking(){
                   serviceType === "Self-Shoot" || 
                   (serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot")
                 } 
+                serviceType={serviceType}
+                serviceGroup={serviceGroup}
                 duration={duration} 
                 limit={bdLimit} 
                 selected={selectedBackdrops} 
@@ -2432,19 +2447,26 @@ function StepConsent(props:{
   );
 }
 
-function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, allocations, setAlloc }:{ enabled:boolean; duration:number; limit:number; selected:string[]; onToggle:(k:string)=>void; move:(idx:number,dir:number)=>void; allocations:Record<string, number>; setAlloc:(k:string,v:string)=>void; }){
+function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, selected, onToggle, move, allocations, setAlloc }:{ enabled:boolean; serviceType:string; serviceGroup:string; duration:number; limit:number; selected:string[]; onToggle:(k:string)=>void; move:(idx:number,dir:number)=>void; allocations:Record<string, number>; setAlloc:(k:string,v:string)=>void; }){
   if(!enabled){
     return (<div className="text-sm text-neutral-600 flex items-center gap-2"><ImageIcon className="w-4 h-4"/> Backdrop selection applies to <span className="font-medium">Self‑Shoot</span> and <span className="font-medium">Adult/Family With Photographer</span> sessions only.</div>);
   }
   const total = Object.values(allocations).reduce((a,b)=>a+(Number(b)||0),0);
+  const isWithPhotographer = serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot";
+  const maxBackdrops = isWithPhotographer ? 3 : limit; // With Photographer: max 3 backdrops
+  
   return (
     <div>
-      <h2 className="text-xl font-semibold">Choose backdrops & allocate time</h2>
-      <p className="text-neutral-600">For {duration}‑minute sessions, you can select up to <span className="font-medium">{limit}</span> backdrops. Please allocate minutes that sum to <span className="font-medium">{duration}</span>.</p>
+      <h2 className="text-xl font-semibold">Choose backdrops{!isWithPhotographer && ' & allocate time'}</h2>
+      {isWithPhotographer ? (
+        <p className="text-neutral-600">Select <span className="font-medium">1 to 3 backdrops</span> for your photographer-led session. No time allocation needed—we'll use them as needed during your shoot.</p>
+      ) : (
+        <p className="text-neutral-600">For {duration}‑minute sessions, you can select up to <span className="font-medium">{limit}</span> backdrops. Please allocate minutes that sum to <span className="font-medium">{duration}</span>.</p>
+      )}
       <div className="grid md:grid-cols-3 gap-3 mt-3">
         {BACKDROPS.map((bd)=> {
           const isSelected = selected.includes(bd.key);
-          const canAdd = selected.length < limit;
+          const canAdd = selected.length < maxBackdrops;
           const isDisabled = !isSelected && !canAdd;
           
           return (
@@ -2492,7 +2514,7 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
                     {isSelected 
                       ? "✓ Selected" 
                       : isDisabled 
-                        ? `Max ${limit}` 
+                        ? `Max ${maxBackdrops}` 
                         : "Tap to add"
                     }
                   </div>
@@ -2504,58 +2526,86 @@ function StepBackdrops({ enabled, duration, limit, selected, onToggle, move, all
       </div>
       {selected.length>0 && (
         <div className="mt-4">
-          {/* NEW INFO BOX */}
-            <div className="mb-3 p-3 border-2 rounded-xl" style={{ borderColor: BRAND.terracotta, backgroundColor: `${BRAND.terracotta}15` }}>
-              <div className="flex items-center gap-2" style={{ color: BRAND.terracotta }}>
-                <Info className="w-5 h-5" />
-                <span className="font-medium">Arrange backdrops in your preferred shooting order (1st → 2nd → 3rd...)</span>
-              </div>
-              <p className="text-xs mt-1 ml-7" style={{ color: BRAND.clay }}>Use ↑ ↓ buttons to reorder. First backdrop will be shot first, last will be shot last.</p>
-            </div>
-          
-          <h3 className="font-medium mb-2">Order & time allocation</h3>
-          <div className="space-y-2">
-            {selected.map((key,idx)=>{
-              const bd = BACKDROPS.find(b=>b.key===key);
-              const orderLabel = idx === 0 ? "1st" : idx === 1 ? "2nd" : idx === 2 ? "3rd" : `${idx+1}th`;
-              return (
-                <div key={key} className="border rounded-xl p-3 flex items-center gap-3">
-                  {/* NEW ORDER BADGE */}
-                  <div className="w-10 h-10 rounded-lg font-bold flex items-center justify-center text-sm" style={{ backgroundColor: BRAND.clay, color: BRAND.white }}>
-                    {orderLabel}
-                  </div>
-                  
-                  <div className="w-8 h-8 rounded-lg" style={{background: bd?.swatch}}/>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{bd?.name}</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Button variant="outline" size="sm" onClick={()=>move(idx,-1)} disabled={idx===0}>↑</Button>
-                      <Button variant="outline" size="sm" onClick={()=>move(idx,1)} disabled={idx===selected.length-1}>↓</Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={()=>onToggle(key)}
-                        className="text-red-600 hover:text-red-700 hover:border-red-300"
-                      >
-                        Remove
-                      </Button>
-                      {/* REMOVED: First to last = shooting order text */}
-                    </div>
-                  </div>
-                  <div className="w-40">
-                    <Input type="number" min={0} step={5} placeholder="minutes" value={allocations[key]||""} onChange={(e)=>setAlloc(key, e.target.value)}/>
-                  </div>
+          {!isWithPhotographer && (
+            <>
+              {/* NEW INFO BOX */}
+              <div className="mb-3 p-3 border-2 rounded-xl" style={{ borderColor: BRAND.terracotta, backgroundColor: `${BRAND.terracotta}15` }}>
+                <div className="flex items-center gap-2" style={{ color: BRAND.terracotta }}>
+                  <Info className="w-5 h-5" />
+                  <span className="font-medium">Arrange backdrops in your preferred shooting order (1st → 2nd → 3rd...)</span>
                 </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center justify-between mt-2 text-sm">
-            <div className={cn("flex items-center gap-1", total===duration?"text-green-700":"text-red-600") }>
-              {total===duration ? <CheckCircle2 className="w-4 h-4"/> : <XCircle className="w-4 h-4"/>}
-              Allocation total: {total} / {duration} minutes
+                <p className="text-xs mt-1 ml-7" style={{ color: BRAND.clay }}>Use ↑ ↓ buttons to reorder. First backdrop will be shot first, last will be shot last.</p>
+              </div>
+            
+              <h3 className="font-medium mb-2">Order & time allocation</h3>
+              <div className="space-y-2">
+                {selected.map((key,idx)=>{
+                  const bd = BACKDROPS.find(b=>b.key===key);
+                  const orderLabel = idx === 0 ? "1st" : idx === 1 ? "2nd" : idx === 2 ? "3rd" : `${idx+1}th`;
+                  return (
+                    <div key={key} className="border rounded-xl p-3 flex items-center gap-3">
+                      {/* NEW ORDER BADGE */}
+                      <div className="w-10 h-10 rounded-lg font-bold flex items-center justify-center text-sm" style={{ backgroundColor: BRAND.clay, color: BRAND.white }}>
+                        {orderLabel}
+                      </div>
+                      
+                      <div className="w-8 h-8 rounded-lg" style={{background: bd?.swatch}}/>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">{bd?.name}</div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Button variant="outline" size="sm" onClick={()=>move(idx,-1)} disabled={idx===0}>↑</Button>
+                          <Button variant="outline" size="sm" onClick={()=>move(idx,1)} disabled={idx===selected.length-1}>↓</Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={()=>onToggle(key)}
+                            className="text-red-600 hover:text-red-700 hover:border-red-300"
+                          >
+                            Remove
+                          </Button>
+                          {/* REMOVED: First to last = shooting order text */}
+                        </div>
+                      </div>
+                      <div className="w-40">
+                        <Input type="number" min={0} step={5} placeholder="minutes" value={allocations[key]||""} onChange={(e)=>setAlloc(key, e.target.value)}/>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between mt-2 text-sm">
+                <div className={cn("flex items-center gap-1", total===duration?"text-green-700":"text-red-600") }>
+                  {total===duration ? <CheckCircle2 className="w-4 h-4"/> : <XCircle className="w-4 h-4"/>}
+                  Allocation total: {total} / {duration} minutes
+                </div>
+                <div className="text-neutral-500">Max backdrops: {limit}</div>
+              </div>
+            </>
+          )}
+          
+          {isWithPhotographer && (
+            <div className="space-y-2">
+              {selected.map((key,idx)=>{
+                const bd = BACKDROPS.find(b=>b.key===key);
+                return (
+                  <div key={key} className="border rounded-xl p-3 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg" style={{background: bd?.swatch}}/>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium">{bd?.name}</div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={()=>onToggle(key)}
+                      className="text-red-600 hover:text-red-700 hover:border-red-300"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
-            <div className="text-neutral-500">Max backdrops: {limit}</div>
-          </div>
+          )}
         </div>
       )}
     </div>
