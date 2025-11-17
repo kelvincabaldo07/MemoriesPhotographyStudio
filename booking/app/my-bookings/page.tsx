@@ -23,17 +23,36 @@ export default function MyBookings() {
   const [recaptchaReady, setRecaptchaReady] = useState(false);
   const [error, setError] = useState("");
 
-  // Load reCAPTCHA on mount
+  // Load reCAPTCHA on mount with timeout fallback
   useEffect(() => {
+    // Set a 5-second timeout to enable the button even if reCAPTCHA fails
+    const timeout = setTimeout(() => {
+      if (!recaptchaReady) {
+        console.warn("⚠️ reCAPTCHA timeout - proceeding without it");
+        setRecaptchaReady(true);
+      }
+    }, 5000);
+
     if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
       import("@/lib/recaptcha")
         .then(({ loadRecaptchaScript }) => loadRecaptchaScript())
-        .then(() => setRecaptchaReady(true))
-        .catch((err) => console.warn("reCAPTCHA load failed:", err));
+        .then(() => {
+          clearTimeout(timeout);
+          setRecaptchaReady(true);
+          console.log("✅ reCAPTCHA loaded successfully");
+        })
+        .catch((err) => {
+          clearTimeout(timeout);
+          console.warn("⚠️ reCAPTCHA load failed:", err);
+          setRecaptchaReady(true); // Allow proceeding without reCAPTCHA
+        });
     } else {
+      clearTimeout(timeout);
       setRecaptchaReady(true); // Allow without reCAPTCHA in dev
     }
-  }, []);
+
+    return () => clearTimeout(timeout);
+  }, [recaptchaReady]);
 
   async function handleSearch() {
     console.log("🔍 Search initiated", { bookingId, email: email.substring(0, 3) + "***" });
