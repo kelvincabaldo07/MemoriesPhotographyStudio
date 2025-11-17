@@ -36,6 +36,8 @@ export default function MyBookings() {
   }, []);
 
   async function handleSearch() {
+    console.log("🔍 Search initiated", { bookingId, email: email.substring(0, 3) + "***" });
+    
     setLoading(true);
     setSearched(true);
     setError("");
@@ -47,31 +49,39 @@ export default function MyBookings() {
       if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
         try {
           recaptchaToken = await executeRecaptcha("search_bookings");
+          console.log("✅ reCAPTCHA token obtained");
         } catch (error) {
-          console.warn("reCAPTCHA execution failed:", error);
+          console.warn("⚠️ reCAPTCHA execution failed:", error);
         }
+      } else {
+        console.log("ℹ️ reCAPTCHA not configured (development mode)");
       }
 
       // Search by booking ID and email - both must match
-      const response = await fetch(
-        `/api/bookings/${encodeURIComponent(bookingId)}?email=${encodeURIComponent(email)}`,
-        {
-          headers: {
-            "X-Recaptcha-Token": recaptchaToken,
-          },
-        }
-      );
+      const url = `/api/bookings/${encodeURIComponent(bookingId)}?email=${encodeURIComponent(email)}`;
+      console.log("📡 Fetching:", url);
+      
+      const response = await fetch(url, {
+        headers: {
+          "X-Recaptcha-Token": recaptchaToken,
+        },
+      });
+      
+      console.log("📥 Response status:", response.status);
       const data = await response.json();
+      console.log("📦 Response data:", { success: data.success, hasBooking: !!data.booking, error: data.error });
 
       if (data.success && data.booking) {
         setBooking(data.booking);
         setError("");
+        console.log("✅ Booking found successfully");
       } else {
         setBooking(null);
         setError(data.error || "Booking not found. Please check your Booking ID and email.");
+        console.warn("❌ Booking not found:", data.error);
       }
     } catch (error) {
-      console.error("Failed to search booking:", error);
+      console.error("❌ Failed to search booking:", error);
       setBooking(null);
       setError("Failed to search booking. Please try again.");
     } finally {
@@ -139,14 +149,21 @@ export default function MyBookings() {
 
             <Button
               onClick={handleSearch}
-              disabled={loading || !recaptchaReady || !bookingId || !email}
-              style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+              disabled={loading || !recaptchaReady || !bookingId.trim() || !email.trim()}
+              style={{ 
+                backgroundColor: (loading || !recaptchaReady || !bookingId.trim() || !email.trim()) ? "#9CA3AF" : BRAND.forest, 
+                color: BRAND.white 
+              }}
               className="w-full mt-4"
             >
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Searching...
+                </>
+              ) : !recaptchaReady ? (
+                <>
+                  <Shield className="w-4 h-4 mr-2 animate-pulse" /> Loading security check...
                 </>
               ) : (
                 <>
