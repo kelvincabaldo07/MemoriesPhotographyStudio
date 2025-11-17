@@ -61,17 +61,36 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
     checkEditability();
   }, [booking]);
 
-  // Load reCAPTCHA on mont
+  // Load reCAPTCHA on mount with timeout fallback
   useEffect(() => {
+    // Set a 5-second timeout to enable functionality even if reCAPTCHA fails
+    const timeout = setTimeout(() => {
+      if (!recaptchaReady) {
+        console.warn("⚠️ reCAPTCHA timeout - proceeding without it");
+        setRecaptchaReady(true);
+      }
+    }, 5000);
+
     if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
       import("@/lib/recaptcha")
         .then(({ loadRecaptchaScript }) => loadRecaptchaScript())
-        .then(() => setRecaptchaReady(true))
-        .catch((err) => console.warn("reCAPTCHA load failed:", err));
+        .then(() => {
+          clearTimeout(timeout);
+          setRecaptchaReady(true);
+          console.log("✅ reCAPTCHA loaded successfully");
+        })
+        .catch((err) => {
+          clearTimeout(timeout);
+          console.warn("⚠️ reCAPTCHA load failed:", err);
+          setRecaptchaReady(true); // Allow proceeding without reCAPTCHA
+        });
     } else {
+      clearTimeout(timeout);
       setRecaptchaReady(true); // Allow without reCAPTCHA in dev
     }
-  }, []);
+
+    return () => clearTimeout(timeout);
+  }, [recaptchaReady]);
 
   // Countdown timer for OTP expiry
   useEffect(() => {
@@ -314,14 +333,21 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
                 <>
                   <Button
                     onClick={sendOTP}
-                    disabled={!verifyEmail || sendingOtp || !recaptchaReady}
-                    style={{ backgroundColor: BRAND.forest, color: BRAND.white }}
+                    disabled={!verifyEmail.trim() || sendingOtp || !recaptchaReady}
+                    style={{ 
+                      backgroundColor: (!verifyEmail.trim() || sendingOtp || !recaptchaReady) ? "#9CA3AF" : BRAND.forest,
+                      color: BRAND.white 
+                    }}
                     className="w-full"
                   >
                     {sendingOtp ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                         Sending Code...
+                      </>
+                    ) : !recaptchaReady ? (
+                      <>
+                        <Shield className="w-4 h-4 mr-2 animate-pulse" /> Loading security check...
                       </>
                     ) : (
                       <>
