@@ -1890,19 +1890,24 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
               {(() => {
                 const filteredSlots = filterSlotsByService(realAvailableSlots, serviceType, serviceRestrictions);
                 
-                // Split slots into morning (before 12:00) and afternoon/evening (12:00 and after)
+                // Split slots into morning (<12:00), afternoon (12:00-16:59), evening (>=17:00)
                 const morningSlots = filteredSlots.filter(s => {
-                  const hour = parseInt(s.split(':')[0]);
+                  const [hour] = s.split(":").map(Number);
                   return hour < 12;
                 });
-                
+
                 const afternoonSlots = filteredSlots.filter(s => {
-                  const hour = parseInt(s.split(':')[0]);
-                  return hour >= 12;
+                  const [hour] = s.split(":").map(Number);
+                  return hour >= 12 && hour < 17;
+                });
+
+                const eveningSlots = filteredSlots.filter(s => {
+                  const [hour] = s.split(":").map(Number);
+                  return hour >= 17;
                 });
 
                 return (
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     {/* Morning Column */}
                     <div className="space-y-2">
                       {morningSlots.length > 0 && (
@@ -1926,12 +1931,35 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
                       )}
                     </div>
 
-                    {/* Afternoon/Evening Column */}
+                    {/* Afternoon Column */}
                     <div className="space-y-2">
                       {afternoonSlots.length > 0 && (
                         <>
-                          <p className="text-xs font-semibold text-neutral-600 mb-2">Afternoon / Evening</p>
+                          <p className="text-xs font-semibold text-neutral-600 mb-2">Afternoon</p>
                           {afternoonSlots.map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => setTime(s)}
+                              className={cn(
+                                "w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition border",
+                                time === s && "bg-[#0b3d2e] text-white border-[#0b3d2e] shadow-sm",
+                                time !== s && "bg-white text-neutral-900 border-neutral-200 hover:border-[#0b3d2e] hover:bg-neutral-50"
+                              )}
+                            >
+                              <Clock className="w-4 h-4" />
+                              {to12Hour(s)}
+                            </button>
+                          ))}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Evening Column */}
+                    <div className="space-y-2">
+                      {eveningSlots.length > 0 && (
+                        <>
+                          <p className="text-xs font-semibold text-neutral-600 mb-2">Evening</p>
+                          {eveningSlots.map((s) => (
                             <button
                               key={s}
                               onClick={() => setTime(s)}
