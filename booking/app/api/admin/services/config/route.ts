@@ -342,6 +342,12 @@ export async function GET(request: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          filter: {
+            property: "Enabled",
+            checkbox: {
+              equals: true,
+            },
+          },
           sorts: [
             {
               property: "Type",
@@ -350,6 +356,7 @@ export async function GET(request: Request) {
           ],
         }),
         cache: 'no-store',
+        next: { revalidate: 0 },
       }
     );
 
