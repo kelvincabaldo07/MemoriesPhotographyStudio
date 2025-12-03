@@ -70,6 +70,9 @@ function getNotionClient() {
 /**
  * GET: Fetch availability from Notion (source of truth)
  */
+export async function GET(request: NextRequest) {
+  try {
+    const defaultSchedule = {
       Monday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
       Tuesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
       Wednesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
@@ -131,16 +134,11 @@ function getNotionClient() {
         reason: props['Reason']?.rich_text?.[0]?.plain_text || props['Name']?.title?.[0]?.plain_text,
       };
     });
-
-    console.log(`[Availability API] Loaded ${blockedDates.length} blocked dates from Notion`);
-
     return NextResponse.json({
       schedule: defaultSchedule,
       blockedDates,
       timezone: 'Asia/Manila',
     });
-      blockedDates: [],
-      timezone: 'Asia/Manila',
     };
 
     return NextResponse.json(defaultAvailability);
