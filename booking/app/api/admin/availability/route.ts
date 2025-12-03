@@ -57,6 +57,8 @@ function getOAuth2Client() {
     oauth2Client.setCredentials({
       refresh_token: refreshToken,
     });
+  }
+
   return oauth2Client;
 }
 
