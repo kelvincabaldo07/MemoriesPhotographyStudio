@@ -1,4 +1,4 @@
-Ôªø"use client";
+"use client";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Clock, ImageIcon, Info, XCircle, ArrowUp, ArrowDown, Eye, Heart, Plus, ShieldCheck, ShoppingBag, User, Phone, Mail, X as CloseIcon, Globe } from 'lucide-react';
 // import React, { useMemo, useState } from "react";
@@ -24,7 +24,7 @@ import { twMerge as cn } from "tailwind-merge";
 // } from "lucide-react";
 
 /**
- * Memories Photography Studio ‚Äì Booking App (sleek accordions, production build)
+ * Memories Photography Studio ñ Booking App (sleek accordions, production build)
  *
  * - One-step service picker with clear accordions + chevrons
  * - Hides non-selected branches for a sleek view
@@ -32,7 +32,7 @@ import { twMerge as cn } from "tailwind-merge";
  * - Tiny thumbnails for Groups
  * - CSS animation for expand/collapse (no extra deps)
  * - Running total (session + add-ons) in Review + sticky mini-summary
- * - ‚úÖ TestPanel removed for production
+ * - ? TestPanel removed for production
  */
 
 // ---------- Configuration ----------
@@ -126,7 +126,7 @@ const BACKDROPS = [
 ];
 
 const CHRISTMAS_2025 = {
-  title: "2025 Christmas ‚Äì White & Gold",
+  title: "2025 Christmas ñ White & Gold",
   desc: "Elegant, cozy, and timeless.",
 };
 
@@ -173,14 +173,14 @@ const TAXONOMY = {
         "Train Theme",
         "Navy Theme",
       ],
-      "Adult/Family Shoot": ["Adult‚Äôs Pre-Birthday", "Maternity Photoshoot", "Family/Group Portraits"],
+      "Adult/Family Shoot": ["Adultís Pre-Birthday", "Maternity Photoshoot", "Family/Group Portraits (3-5 Persons)", "Family/Group Portraits (6-16 Pax)"],
     },
     // Seasonal
     "Seasonal Sessions": {
       Christmas: [
-        "2025 Christmas ‚Äì White & Gold (Solo/Duo)",
-        "2025 Christmas ‚Äì White & Gold (Small Group)",
-        "2025 Christmas ‚Äì White & Gold (Big Group)",
+        "2025 Christmas ñ White & Gold (Solo/Duo)",
+        "2025 Christmas ñ White & Gold (Small Group)",
+        "2025 Christmas ñ White & Gold (Big Group)",
       ],
     },
   },
@@ -190,83 +190,84 @@ const TAXONOMY = {
 const SERVICE_INFO: Record<string, { details: string; price: number; digitalPrice?: number; classicDetails?: string }> = {
   // Self-shoot - Digital & Classic variants
   "Solo/Duo 15": { 
-    details: "1‚Äì2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)",
+    details: "1ñ2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)",
     price: 250,
-    classicDetails: "1‚Äì2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "1ñ2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Solo/Duo 30": { 
-    details: "1‚Äì2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "1ñ2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 400,
-    classicDetails: "1‚Äì2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "1ñ2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Solo/Duo 60": { 
-    details: "1‚Äì2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "1ñ2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 700,
-    classicDetails: "1‚Äì2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "1ñ2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
   },
 
   "Small Group 15": { 
-    details: "3‚Äì5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "3ñ5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 350,
-    classicDetails: "3‚Äì5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "3ñ5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Small Group 30": { 
-    details: "3‚Äì5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "3ñ5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 600,
-    classicDetails: "3‚Äì5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "3ñ5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Small Group 60": { 
-    details: "3‚Äì5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "3ñ5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 1000,
-    classicDetails: "3‚Äì5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "3ñ5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
   },
 
   "Big Group 30": { 
-    details: "6‚Äì15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "6ñ15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 800,
-    classicDetails: "6‚Äì15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "6ñ15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Big Group 60": { 
-    details: "6‚Äì15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "6ñ15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 1500,
-    classicDetails: "6‚Äì15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "6ñ15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
   },
   // With photographer (45 min)
-  "Adult‚Äôs Pre-Birthday": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Family/Group Portraits": { details: "3‚Äì8 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Adultís Pre-Birthday": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Family/Group Portraits (3-5 Persons)": { details: "3ñ5 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1300 },
+  "Family/Group Portraits (6-16 Pax)": { details: "6ñ16 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1800 },
   "Maternity Photoshoot": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   // Kids themes (45 min, with photographer)
-  "Racing Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Safari Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Outer Space Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Hot Air Balloon Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Cuddly Bear Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Under the Sea Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Train Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Navy Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Dreamy Rainbow Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Bloom & Blush Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Rainbow Boho Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Pastel Daisies Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Butterfly Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Mermaid Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Pink Cloud Wonderland Theme": { details: "Kids 0‚Äì7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Racing Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Safari Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Outer Space Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Hot Air Balloon Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Cuddly Bear Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Under the Sea Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Train Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Navy Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Dreamy Rainbow Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Bloom & Blush Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Rainbow Boho Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Pastel Daisies Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Butterfly Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Mermaid Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Pink Cloud Wonderland Theme": { details: "Kids 0ñ7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
 
   // Seasonal Christmas
-  "2025 Christmas ‚Äì White & Gold (Solo/Duo)": { details: "1‚Äì2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 1000 },
-  "2025 Christmas ‚Äì White & Gold (Small Group)": { details: "3‚Äì5 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2000 },
-  "2025 Christmas ‚Äì White & Gold (Big Group)": { details: "6‚Äì8 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2500 },
+  "2025 Christmas ñ White & Gold (Solo/Duo)": { details: "1ñ2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 1000 },
+  "2025 Christmas ñ White & Gold (Small Group)": { details: "3ñ5 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2000 },
+  "2025 Christmas ñ White & Gold (Big Group)": { details: "6ñ8 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2500 },
 };
 
 // UI thumbnails (emoji-based for now)
 const GROUP_THUMBS: Record<string, string> = {
-  "Solo/Duo": "üë´",
-  "Small Group": "üë®‚Äçüë©‚Äçüëß",
-  "Big Group": "üë®‚Äçüë©‚Äçüëß‚Äçüë¶",
-  "Kids Pre-birthday (Girls)": "üéÄ",
-  "Kids Pre-birthday (Boys)": "üöÇ",
-  "Adult/Family Shoot": "üë™",
-  "Christmas": "üéÑ",
+  "Solo/Duo": "??",
+  "Small Group": "????????",
+  "Big Group": "???????????",
+  "Kids Pre-birthday (Girls)": "??",
+  "Kids Pre-birthday (Boys)": "??",
+  "Adult/Family Shoot": "??",
+  "Christmas": "??",
 };
 
 // Optional add-ons
@@ -388,7 +389,7 @@ function filterSlotsByService(slots: string[], serviceType: string, restrictions
     return slotMinutes >= fromMinutes && slotMinutes < untilMinutes;
   });
 }
-// ‚úÖ FIXED syntax here
+// ? FIXED syntax here
 function isSlotAvailable(slotHHMM: string, duration: number, blocked:[number,number][]): boolean {
   const s=toMinutes(slotHHMM), e=s+duration; 
   return blocked.every(([bs,be])=> e<=bs || s>=be); 
@@ -539,9 +540,11 @@ export default function App(){
             
             // Service descriptions and prices - handle both Classic and Digital services
             if (svc.name) {
-              // Services in Notion have "Digital " or "Classic " prefix
+              // Services in Notion have "Digital " or "Classic " prefix for Self-Shoot services
               // But booking page uses base names like "Solo/Duo 15"
-              const baseServiceName = svc.name.replace(/^(Classic |Digital )/, '');
+              // For other services (With Photographer, Seasonal), use full name
+              const isClassicDigitalVariant = svc.name.startsWith('Classic ') || svc.name.startsWith('Digital ');
+              const baseServiceName = isClassicDigitalVariant ? svc.name.replace(/^(Classic |Digital )/, '') : svc.name;
               
               // Initialize entry if it doesn't exist
               if (!info[baseServiceName]) {
@@ -590,7 +593,7 @@ export default function App(){
   const sessionPrice = useMemo(() => {
     const baseInfo = serviceInfo[service];
     if (!baseInfo) return 0;
-    // Add ‚Ç±50 for Classic category
+    // Add ?50 for Classic category
     return serviceCategory === "Classic" ? baseInfo.price + 50 : baseInfo.price;
   }, [service, serviceCategory, serviceInfo]);
   const addonsTotal = useMemo(() => Object.entries(addons).reduce((sum,[id,qty])=>{
@@ -989,7 +992,7 @@ async function submitBooking(){
                     color: BRAND.white 
                   }}
                 >
-                  {busy?"Submitting‚Ä¶":"Confirm & Book"}
+                  {busy?"SubmittingÖ":"Confirm & Book"}
                 </Button>
               )}
             </div>          
@@ -997,7 +1000,7 @@ async function submitBooking(){
         </Card>
 
         <footer className="text-xs text-center text-neutral-500 mt-4">
-          ¬© {new Date().getFullYear()} Memories Photography Studio ‚Äî "Capture With Purpose. Create Change."
+          © {new Date().getFullYear()} Memories Photography Studio ó "Capture With Purpose. Create Change."
         </footer>
       </div>
     </div>
@@ -1149,7 +1152,7 @@ function Stepper({ step }:{ step:number }){
                     color: isActive || isCompleted ? BRAND.white : '#9ca3af',
                   }}
                 >
-                  {isCompleted ? '‚úì' : i + 1}
+                  {isCompleted ? '?' : i + 1}
                 </div>
                 
                 {/* Step label */}
@@ -1325,12 +1328,12 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
     setServiceGroup(g===serviceGroup?"":g); setOpenGroup(g===openGroup?"":g); setService("");
   }
 
-  // ‚úÖ Group size descriptions
+  // ? Group size descriptions
   function getGroupDescription(groupName: string): string {
     switch(groupName) {
-      case "Solo/Duo": return "1‚Äì2 persons";
-      case "Small Group": return "3‚Äì5 persons";
-      case "Big Group": return "6‚Äì16 persons";
+      case "Solo/Duo": return "1ñ2 persons";
+      case "Small Group": return "3ñ5 persons";
+      case "Big Group": return "6ñ16 persons";
       default: return "Pick a theme / type";
     }
   }
@@ -1366,14 +1369,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
             <div className="flex items-center justify-between p-3 bg-neutral-50">
               <button className="text-left flex-1" onClick={()=>toggleType(String(t))}>
                 <div className="text-h3 font-bold">
-                  {t === "Self-Shoot" ? "üì∏ Self-Shoot" : t === "With Photographer" ? "üë©‚Äçüé® With Photographer" : "üéÑ Seasonal Sessions"}
+                  {t === "Self-Shoot" ? "?? Self-Shoot" : t === "With Photographer" ? "????? With Photographer" : "?? Seasonal Sessions"}
                 </div>
                 <div className="text-base-body text-neutral-500">
                   {t === "Self-Shoot" 
-                    ? "Be your own photographer ‚Äî strike a pose, click the remote, and have fun your way!" 
+                    ? "Be your own photographer ó strike a pose, click the remote, and have fun your way!" 
                     : t === "With Photographer" 
-                    ? "Enjoy your shoot while we guide the angles, lighting, and poses ‚Äî easy and effortless!" 
-                    : "Special themed sets made for holidays and milestones ‚Äî limited-time magic only!"}
+                    ? "Enjoy your shoot while we guide the angles, lighting, and poses ó easy and effortless!" 
+                    : "Special themed sets made for holidays and milestones ó limited-time magic only!"}
                 </div>
               </button>
               <div className="flex items-center gap-2">
@@ -1402,11 +1405,11 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                       >
                         <button className="text-left flex-1" onClick={()=>toggleCategory(String(c))}>
                           <div className="text-h3 font-bold" style={{ color: serviceCategory === c ? BRAND.white : BRAND.charcoal }}>
-                            {c === "Classic" ? "üñº Classic Package" : "üíª Digital Package"}
+                            {c === "Classic" ? "?? Classic Package" : "?? Digital Package"}
                           </div>
                           <div className="text-base-body" style={{ color: serviceCategory === c ? BRAND.white : "#737373" }}>
                             {c === "Classic" 
-                              ? "All enhanced digital copies + printed photos ‚Äî the best of both worlds to keep and display!" 
+                              ? "All enhanced digital copies + printed photos ó the best of both worlds to keep and display!" 
                               : "All enhanced digital copies only, delivered through Lightroom for instant access."}
                           </div>
                         </button>
@@ -1419,7 +1422,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 ) : (
                     // Digital auto-selected for With Photographer and Seasonal Sessions
                     <div className="mb-3 p-3 border rounded-xl bg-neutral-50">
-                      <p className="text-h3 text-neutral-600">üì± Digital-only package (photos delivered via Lightroom)</p>
+                      <p className="text-h3 text-neutral-600">?? Digital-only package (photos delivered via Lightroom)</p>
                     </div>
                   )}
 
@@ -1443,7 +1446,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           onClick={()=>toggleGroup(g)}
                         >
                           <div className="p-3 flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "üì∑"}</div>
+                            <div className="w-10 h-10 rounded-xl bg-neutral-100 flex items-center justify-center text-lg">{GROUP_THUMBS[g] || "??"}</div>
                             <div className="flex-1">
                               <div className="text-h3 font-bold" style={{ color: serviceGroup === g ? BRAND.white : BRAND.charcoal }}>{g}</div>
                               <div className="text-base-body" style={{ color: serviceGroup === g ? BRAND.white : "#737373" }}>{getGroupDescription(g)}</div>
@@ -1453,7 +1456,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                       )})}
                     </div>
                     <div className="mt-2 text-xs text-neutral-500 italic">
-                      üë§ Session size is based on the number of people photographed, not how many appear per shot.
+                      ?? Session size is based on the number of people photographed, not how many appear per shot.
                     </div>
                   </div>
                 )}
@@ -1462,7 +1465,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {serviceGroup && (
                   <div className="mt-4">
                     {t === "Seasonal Sessions" && (
-                      <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} ‚Äî {CHRISTMAS_2025.desc}</div>
+                      <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} ó {CHRISTMAS_2025.desc}</div>
                     )}
                     <div className="text-h3 font-bold mb-2">Services</div>
                     <div className={cn("grid gap-3", service ? "grid-cols-1" : "md:grid-cols-3")}>
@@ -1531,7 +1534,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                                   <ul className="text-base-body text-neutral-600 mt-2 space-y-1">
                                     {displayDetails.split('\n').map((line, idx) => (
                                       <li key={idx} className="flex items-start gap-1">
-                                        <span className="text-green-600 mt-0.5 flex-shrink-0">‚Ä¢</span>
+                                        <span className="text-green-600 mt-0.5 flex-shrink-0">ï</span>
                                         <span className="break-words">{line}</span>
                                       </li>
                                     ))}
@@ -1561,14 +1564,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
       {service && (
         <div className="mt-4 border rounded-2xl p-3 bg-neutral-50">
           <div className="text-sm">Selected:</div>
-          <div className="font-medium">{serviceType} ‚Ä¢ {serviceCategory} ‚Ä¢ {serviceGroup} ‚Ä¢ {service}</div>
+          <div className="font-medium">{serviceType} ï {serviceCategory} ï {serviceGroup} ï {service}</div>
           <div className="text-xs text-neutral-500 mt-1">Press Next to continue.</div>
         </div>
       )}
             {service && (
         <div className="mt-4 border rounded-2xl p-3 bg-neutral-50">
           <div className="text-sm">Selected:</div>
-          <div className="font-medium">{serviceType} ‚Ä¢ {serviceCategory} ‚Ä¢ {serviceGroup} ‚Ä¢ {service}</div>
+          <div className="font-medium">{serviceType} ï {serviceCategory} ï {serviceGroup} ï {service}</div>
           <div className="text-xs text-neutral-500 mt-1">Press Next to continue.</div>
         </div>
       )}
@@ -1841,8 +1844,8 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
 
         <p className="text-xs text-neutral-500 mt-3">
           {usingMockData 
-            ? "‚ö†Ô∏è Showing mock availability"
-            : "‚úÖ Real-time Google Calendar sync"}
+            ? "?? Showing mock availability"
+            : "? Real-time Google Calendar sync"}
         </p>
       </div>
 
@@ -1870,7 +1873,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           <div className="border rounded-xl bg-white overflow-hidden">
             <div className="p-3 bg-neutral-50 border-b">
               <p className="text-xs text-neutral-600">
-                {duration} minute session ‚Ä¢ Manila Time
+                {duration} minute session ï Manila Time
               </p>
             </div>
 
@@ -2120,7 +2123,7 @@ function StepCustomer(props: {
 
         {sentCode && !emailVerified && (
           <div className="md:col-span-2 p-4 border-2 border-blue-600 rounded-xl bg-blue-50">
-            <p className="text-h3 text-blue-900 mb-2">üìß Enter the 6-digit code sent to {email}</p>
+            <p className="text-h3 text-blue-900 mb-2">?? Enter the 6-digit code sent to {email}</p>
             <div className="flex gap-2">
               <Input 
                 placeholder="Enter 6-digit code" 
@@ -2264,7 +2267,7 @@ function StepConsent(props:{
       {/* Christmas: If yes to consent, ask for celebrant name only */}
       {isChristmas && socialConsent === "yes" && (
         <div className="mt-4 p-4 border rounded-xl bg-neutral-50">
-          <p className="text-sm text-neutral-600 mb-3">üéÑ This is a Christmas session. Please provide the name we should use for greetings:</p>
+          <p className="text-sm text-neutral-600 mb-3">?? This is a Christmas session. Please provide the name we should use for greetings:</p>
           <Input 
             placeholder="Name for greetings *" 
             value={celebrantName} 
@@ -2485,7 +2488,7 @@ function StepConsent(props:{
 
 function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, selected, onToggle, move, allocations, setAlloc }:{ enabled:boolean; serviceType:string; serviceGroup:string; duration:number; limit:number; selected:string[]; onToggle:(k:string)=>void; move:(idx:number,dir:number)=>void; allocations:Record<string, number>; setAlloc:(k:string,v:string)=>void; }){
   if(!enabled){
-    return (<div className="text-sm text-neutral-600 flex items-center gap-2"><ImageIcon className="w-4 h-4"/> Backdrop selection applies to <span className="font-medium">Self‚ÄëShoot</span> and <span className="font-medium">Adult/Family With Photographer</span> sessions only.</div>);
+    return (<div className="text-sm text-neutral-600 flex items-center gap-2"><ImageIcon className="w-4 h-4"/> Backdrop selection applies to <span className="font-medium">Self-Shoot</span> and <span className="font-medium">Adult/Family With Photographer</span> sessions only.</div>);
   }
   const total = Object.values(allocations).reduce((a,b)=>a+(Number(b)||0),0);
   const isWithPhotographer = serviceType === "With Photographer" && serviceGroup === "Adult/Family Shoot";
@@ -2495,9 +2498,9 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
     <div>
       <h2 className="text-xl font-semibold">Choose backdrops{!isWithPhotographer && ' & allocate time'}</h2>
       {isWithPhotographer ? (
-        <p className="text-neutral-600">Select <span className="font-medium">1 to 3 backdrops</span> for your photographer-led session. No time allocation needed‚Äîwe'll use them as needed during your shoot.</p>
+        <p className="text-neutral-600">Select <span className="font-medium">1 to 3 backdrops</span> for your photographer-led session. No time allocation neededówe'll use them as needed during your shoot.</p>
       ) : (
-        <p className="text-neutral-600">For {duration}‚Äëminute sessions, you can select up to <span className="font-medium">{limit}</span> backdrops. Please allocate minutes that sum to <span className="font-medium">{duration}</span>.</p>
+        <p className="text-neutral-600">For {duration}-minute sessions, you can select up to <span className="font-medium">{limit}</span> backdrops. Please allocate minutes that sum to <span className="font-medium">{duration}</span>.</p>
       )}
       <div className="grid md:grid-cols-3 gap-3 mt-3">
         {BACKDROPS.map((bd)=> {
@@ -2548,7 +2551,7 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
                   <div className="font-medium text-sm leading-tight">{bd.name}</div>
                   <div className="text-xs text-neutral-500 mt-1">
                     {isSelected 
-                      ? "‚úì Selected" 
+                      ? "? Selected" 
                       : isDisabled 
                         ? `Max ${maxBackdrops}` 
                         : "Tap to add"
@@ -2566,9 +2569,9 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
           <div className="mb-3 p-3 border-2 rounded-xl" style={{ borderColor: BRAND.terracotta, backgroundColor: `${BRAND.terracotta}15` }}>
             <div className="flex items-center gap-2" style={{ color: BRAND.terracotta }}>
               <Info className="w-5 h-5" />
-              <span className="font-medium">Arrange backdrops in your preferred shooting order (1st ‚Üí 2nd ‚Üí 3rd...)</span>
+              <span className="font-medium">Arrange backdrops in your preferred shooting order (1st ? 2nd ? 3rd...)</span>
             </div>
-            <p className="text-xs mt-1 ml-7" style={{ color: BRAND.clay }}>Use ‚Üë ‚Üì buttons to reorder. First backdrop will be shot first, last will be shot last.</p>
+            <p className="text-xs mt-1 ml-7" style={{ color: BRAND.clay }}>Use ? ? buttons to reorder. First backdrop will be shot first, last will be shot last.</p>
           </div>
         
           <h3 className="font-medium mb-2">Order{!isWithPhotographer && ' & time allocation'}</h3>
@@ -2587,8 +2590,8 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
                   <div className="flex-1">
                     <div className="text-sm font-medium">{bd?.name}</div>
                     <div className="flex items-center gap-2 mt-1">
-                      <Button variant="outline" size="sm" onClick={()=>move(idx,-1)} disabled={idx===0}>‚Üë</Button>
-                      <Button variant="outline" size="sm" onClick={()=>move(idx,1)} disabled={idx===selected.length-1}>‚Üì</Button>
+                      <Button variant="outline" size="sm" onClick={()=>move(idx,-1)} disabled={idx===0}>?</Button>
+                      <Button variant="outline" size="sm" onClick={()=>move(idx,1)} disabled={idx===selected.length-1}>?</Button>
                       <Button 
                         variant="outline" 
                         size="sm" 
@@ -2626,7 +2629,7 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
 function StepAddons({ addons, toggle }:{ addons:Record<string, number>; toggle:(id:string,delta:number)=>void; }){
   return (
     <div>
-      <h2 className="text-xl font-semibold">Optional add‚Äëons</h2>
+      <h2 className="text-xl font-semibold">Optional add-ons</h2>
       <p className="text-neutral-600 mb-3">Enhance your session with prints.</p>
       <div className="space-y-3">
         {ADDONS.map(a=>{ const qty=addons[a.id]||0; return (
@@ -2753,7 +2756,7 @@ function StepVideoAndTerms({
               <ul className="list-disc pl-5 space-y-1">
                 <li>Enter the subdivision, go straight to the dead end, then turn right</li>
                 <li>We're the <strong>fourth gate on the left</strong>, with a <strong>Memories Photography Studio tarpaulin</strong> near the gate</li>
-                <li>Our studio is at the back of the property ‚Äî the <strong>dark gray and blue painted house</strong>, not the house at the front</li>
+                <li>Our studio is at the back of the property ó the <strong>dark gray and blue painted house</strong>, not the house at the front</li>
                 <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View on Google Maps</a></li>
               </ul>
               <p className="mt-2"><strong>Respect the Neighborhood:</strong></p>
@@ -2768,7 +2771,7 @@ function StepVideoAndTerms({
               <ul className="list-disc pl-5 space-y-1">
                 <li>Pumasok sa subdivision, diretso hanggang dulo, pagkatapos kumanan</li>
                 <li>Kami ang <strong>ikaapat na gate sa kaliwa</strong>, may <strong>Memories Photography Studio tarpaulin</strong> malapit sa gate</li>
-                <li>Ang aming studio ay nasa likod ng property ‚Äî ang <strong>kulay dark gray at asul na pintadong bahay</strong>, hindi ang bahay sa harap</li>
+                <li>Ang aming studio ay nasa likod ng property ó ang <strong>kulay dark gray at asul na pintadong bahay</strong>, hindi ang bahay sa harap</li>
                 <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tingnan sa Google Maps</a></li>
               </ul>
               <p className="mt-2"><strong>Igalang ang Kapitbahayan:</strong></p>
@@ -2861,23 +2864,23 @@ function StepVideoAndTerms({
               </div>
               
               <div className="pl-4 space-y-2">
-                <p className="font-semibold text-red-600">üïí Sessions 30 Minutes and Below:</p>
+                <p className="font-semibold text-red-600">?? Sessions 30 Minutes and Below:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>5-minute grace period for lateness</li>
                   <li>More than 5 minutes late: Session time reduced by the number of minutes late + Limited to only 1 backdrop</li>
                   <li>10 minutes or more late: <strong>Booking will be cancelled</strong></li>
                 </ul>
                 
-                <p className="font-semibold text-red-600">üïì 1-Hour Sessions:</p>
+                <p className="font-semibold text-red-600">?? 1-Hour Sessions:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>5‚Äì20 minutes late: Time reduced by the number of minutes late + Limited to 2 backdrops of choice</li>
+                  <li>5ñ20 minutes late: Time reduced by the number of minutes late + Limited to 2 backdrops of choice</li>
                   <li>30 minutes late or more: <strong>Booking will be cancelled</strong></li>
                 </ul>
                 
-                <p className="font-semibold text-red-600">üì∑ With Photographer / Occasional Sessions:</p>
+                <p className="font-semibold text-red-600">?? With Photographer / Occasional Sessions:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>10-minute grace period</li>
-                  <li>10‚Äì25 minutes late: Time reduced by the number of minutes late</li>
+                  <li>10ñ25 minutes late: Time reduced by the number of minutes late</li>
                   <li>25 minutes or more late: <strong>Booking will be cancelled</strong></li>
                 </ul>
               </div>
@@ -2907,23 +2910,23 @@ function StepVideoAndTerms({
               </div>
               
               <div className="pl-4 space-y-2">
-                <p className="font-semibold text-red-600">üïí Mga Session na 30 Minuto at Mas Mababa:</p>
+                <p className="font-semibold text-red-600">?? Mga Session na 30 Minuto at Mas Mababa:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>5-minute grace period para sa pagka-late</li>
                   <li>Higit sa 5 minuto ang late: Babawasan ang session time ng bilang ng minutong late + Limitado lamang sa 1 backdrop</li>
                   <li>10 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
                 </ul>
                 
-                <p className="font-semibold text-red-600">üïì 1-Oras na mga Session:</p>
+                <p className="font-semibold text-red-600">?? 1-Oras na mga Session:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>5‚Äì20 minuto ang late: Babawasan ng oras ang bilang ng minutong late + Limitado sa 2 backdrops na pipiliin</li>
+                  <li>5ñ20 minuto ang late: Babawasan ng oras ang bilang ng minutong late + Limitado sa 2 backdrops na pipiliin</li>
                   <li>30 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
                 </ul>
                 
-                <p className="font-semibold text-red-600">üì∑ With Photographer / Occasional Sessions:</p>
+                <p className="font-semibold text-red-600">?? With Photographer / Occasional Sessions:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>10-minute grace period</li>
-                  <li>10‚Äì25 minuto ang late: Babawasan ng oras ang bilang ng minutong late</li>
+                  <li>10ñ25 minuto ang late: Babawasan ng oras ang bilang ng minutong late</li>
                   <li>25 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
                 </ul>
               </div>
@@ -2959,7 +2962,7 @@ function StepVideoAndTerms({
       <div className="border-2 border-neutral-300 rounded-2xl p-4 bg-neutral-50">
         <p className="text-sm text-center">
           {acceptedPhotoDelivery && acceptedLocation && acceptedParking && acceptedBookingPolicy ? (
-            <span className="text-green-600 font-semibold">‚úì All terms accepted. You may proceed to review your booking.</span>
+            <span className="text-green-600 font-semibold">? All terms accepted. You may proceed to review your booking.</span>
           ) : (
             <span className="text-neutral-600">Please agree to all terms above to continue.</span>
           )}
@@ -3068,7 +3071,7 @@ function StepReview({ data }:{ data: {
                 {data.selectedBackdrops.map((key:string,idx:number)=>{ const bd=BACKDROPS.find(b=>b.key===key); return (
                   <div key={key} className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded" style={{background: bd?.swatch}}/>
-                    <div className="text-sm">{idx+1}. {bd?.name} ‚Äî {data.allocations[key]} mins</div>
+                    <div className="text-sm">{idx+1}. {bd?.name} ó {data.allocations[key]} mins</div>
                   </div>
                 );})}
               </div>
@@ -3078,7 +3081,7 @@ function StepReview({ data }:{ data: {
         <div className="border rounded-2xl p-3 md:col-span-2">
           <h3 className="font-medium mb-2">Totals</h3>
           <Line label="Session" value={currency(data.sessionPrice||0)}/>
-          <Line label="Add‚Äëons" value={currency(data.addonsTotal||0)}/>
+          <Line label="Add-ons" value={currency(data.addonsTotal||0)}/>
           <Separator className="my-2"/>
           <Line label="Grand Total" value={currency(data.grandTotal||0)}/>
           <p className="text-xs text-neutral-500 mt-2">Final pricing may vary based on your chosen package.</p>
