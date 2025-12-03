@@ -134,14 +134,12 @@ export async function GET(request: NextRequest) {
         reason: props['Reason']?.rich_text?.[0]?.plain_text || props['Name']?.title?.[0]?.plain_text,
       };
     });
+
     return NextResponse.json({
       schedule: defaultSchedule,
       blockedDates,
       timezone: 'Asia/Manila',
     });
-    };
-
-    return NextResponse.json(defaultAvailability);
   } catch (error) {
     console.error('[Availability API] Error fetching availability:', error);
     return NextResponse.json(
