@@ -129,8 +129,12 @@ export async function POST(request: NextRequest) {
     const existingEventIds = new Set(existingBlockedEvents.map(e => e.id));
 
     // Create/Update blocked dates in Google Calendar
+    console.log(`[Availability API] Processing ${blockedDates.length} blocked dates...`);
+    
     for (const blocked of blockedDates) {
       try {
+        console.log(`[Availability API] Processing blocked date:`, blocked);
+        
         // Check if event already exists (by checking description)
         const existingEvent = existingBlockedEvents.find(e => 
           e.description?.includes(`Block ID: ${blocked.id}`)
@@ -140,7 +144,7 @@ export async function POST(request: NextRequest) {
           summary: `🚫 [Studio Blocked] ${blocked.reason || 'Unavailable'}`,
           description: `Block ID: ${blocked.id}\n${blocked.reason || 'Studio is not available during this time'}`,
           colorId: '11', // Red color for blocked dates
-          transparency: 'transparent', // Show as "Free" so it doesn't block personal events
+          transparency: 'opaque', // Show as "Busy" to block booking slots
           visibility: 'public',
         };
 
