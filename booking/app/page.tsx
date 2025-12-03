@@ -24,7 +24,7 @@ import { twMerge as cn } from "tailwind-merge";
 // } from "lucide-react";
 
 /**
- * Memories Photography Studio – Booking App (sleek accordions, production build)
+ * Memories Photography Studio ï¿½ Booking App (sleek accordions, production build)
  *
  * - One-step service picker with clear accordions + chevrons
  * - Hides non-selected branches for a sleek view
@@ -126,7 +126,7 @@ const BACKDROPS = [
 ];
 
 const CHRISTMAS_2025 = {
-  title: "2025 Christmas – White & Gold",
+  title: "2025 Christmas ï¿½ White & Gold",
   desc: "Elegant, cozy, and timeless.",
 };
 
@@ -173,14 +173,14 @@ const TAXONOMY = {
         "Train Theme",
         "Navy Theme",
       ],
-      "Adult/Family Shoot": ["Adult’s Pre-Birthday", "Maternity Photoshoot", "Family/Group Portraits (3-5 Persons)", "Family/Group Portraits (6-16 Pax)"],
+      "Adult/Family Shoot": ["Adultï¿½s Pre-Birthday", "Maternity Photoshoot", "Family/Group Portraits (3-5 Persons)", "Family/Group Portraits (6-16 Pax)"],
     },
     // Seasonal
     "Seasonal Sessions": {
       Christmas: [
-        "2025 Christmas – White & Gold (Solo/Duo)",
-        "2025 Christmas – White & Gold (Small Group)",
-        "2025 Christmas – White & Gold (Big Group)",
+        "2025 Christmas ï¿½ White & Gold (Solo/Duo)",
+        "2025 Christmas ï¿½ White & Gold (Small Group)",
+        "2025 Christmas ï¿½ White & Gold (Big Group)",
       ],
     },
   },
@@ -190,73 +190,73 @@ const TAXONOMY = {
 const SERVICE_INFO: Record<string, { details: string; price: number; digitalPrice?: number; classicDetails?: string }> = {
   // Self-shoot - Digital & Classic variants
   "Solo/Duo 15": { 
-    details: "1–2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)",
+    details: "1ï¿½2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)",
     price: 250,
-    classicDetails: "1–2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "1ï¿½2 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Solo/Duo 30": { 
-    details: "1–2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "1ï¿½2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 400,
-    classicDetails: "1–2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "1ï¿½2 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Solo/Duo 60": { 
-    details: "1–2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "1ï¿½2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 700,
-    classicDetails: "1–2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "1ï¿½2 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
   },
 
   "Small Group 15": { 
-    details: "3–5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "3ï¿½5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 350,
-    classicDetails: "3–5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "3ï¿½5 pax\nUNLIMITED shots for 15 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Small Group 30": { 
-    details: "3–5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "3ï¿½5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 600,
-    classicDetails: "3–5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "3ï¿½5 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Small Group 60": { 
-    details: "3–5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "3ï¿½5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 1000,
-    classicDetails: "3–5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "3ï¿½5 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
   },
 
   "Big Group 30": { 
-    details: "6–15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "6ï¿½15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 800,
-    classicDetails: "6–15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
+    classicDetails: "6ï¿½15 pax\nUNLIMITED shots for 30 minutes\n2 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 2 photostrips)\n5 mins photo selection (Select up to 7 photos)"
   },
   "Big Group 60": { 
-    details: "6–15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
+    details: "6ï¿½15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)", 
     price: 1500,
-    classicDetails: "6–15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
+    classicDetails: "6ï¿½15 pax\nUNLIMITED shots for 60 minutes\n4 backdrops of choice\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 24 hours)\nPrinted Copies (1 4R (4x6) and 4 Wallet Size (2x3) or 2 photostrips)\n10 mins photo selection (Select up to 7 photos)"
   },
   // With photographer (45 min)
-  "Adult’s Pre-Birthday": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Family/Group Portraits (3-5 Persons)": { details: "3–5 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1300 },
-  "Family/Group Portraits (6-16 Pax)": { details: "6–16 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1800 },
+  "Adultï¿½s Pre-Birthday": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Family/Group Portraits (3-5 Persons)": { details: "3ï¿½5 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1300 },
+  "Family/Group Portraits (6-16 Pax)": { details: "6ï¿½16 pax\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1800 },
   "Maternity Photoshoot": { details: "45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
   // Kids themes (45 min, with photographer)
-  "Racing Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Safari Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Outer Space Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Hot Air Balloon Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Cuddly Bear Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Under the Sea Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Train Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Navy Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Dreamy Rainbow Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Bloom & Blush Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Rainbow Boho Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Pastel Daisies Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Butterfly Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Mermaid Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
-  "Pink Cloud Wonderland Theme": { details: "Kids 0–7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Racing Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Safari Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Outer Space Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Hot Air Balloon Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Cuddly Bear Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Under the Sea Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Train Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Navy Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Dreamy Rainbow Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Bloom & Blush Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Rainbow Boho Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Pastel Daisies Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Butterfly Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Mermaid Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
+  "Pink Cloud Wonderland Theme": { details: "Kids 0ï¿½7\n45 minutes session in our airconditioned studio\nWITH photographer\nFREE family portraits\nFREE use of all the backdrops and props\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 7 days)", price: 1000 },
 
   // Seasonal Christmas
-  "2025 Christmas – White & Gold (Solo/Duo)": { details: "1–2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 1000 },
-  "2025 Christmas – White & Gold (Small Group)": { details: "3–5 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2000 },
-  "2025 Christmas – White & Gold (Big Group)": { details: "6–8 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2500 },
+  "2025 Christmas ï¿½ White & Gold (Solo/Duo)": { details: "1ï¿½2 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 1000 },
+  "2025 Christmas ï¿½ White & Gold (Small Group)": { details: "3ï¿½5 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2000 },
+  "2025 Christmas ï¿½ White & Gold (Big Group)": { details: "6ï¿½8 pax\n45 minutes session in our airconditioned studio\nALL ENHANCED photos (will be shared via Shared Lightroom Album within 10 days)\nCozy white & gold set", price: 2500 },
 };
 
 // UI thumbnails (emoji-based for now)
@@ -992,7 +992,7 @@ async function submitBooking(){
                     color: BRAND.white 
                   }}
                 >
-                  {busy?"Submitting…":"Confirm & Book"}
+                  {busy?"Submittingï¿½":"Confirm & Book"}
                 </Button>
               )}
             </div>          
@@ -1000,7 +1000,7 @@ async function submitBooking(){
         </Card>
 
         <footer className="text-xs text-center text-neutral-500 mt-4">
-          © {new Date().getFullYear()} Memories Photography Studio — "Capture With Purpose. Create Change."
+          ï¿½ {new Date().getFullYear()} Memories Photography Studio ï¿½ "Capture With Purpose. Create Change."
         </footer>
       </div>
     </div>
@@ -1331,9 +1331,9 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
   // ? Group size descriptions
   function getGroupDescription(groupName: string): string {
     switch(groupName) {
-      case "Solo/Duo": return "1–2 persons";
-      case "Small Group": return "3–5 persons";
-      case "Big Group": return "6–16 persons";
+      case "Solo/Duo": return "1ï¿½2 persons";
+      case "Small Group": return "3ï¿½5 persons";
+      case "Big Group": return "6ï¿½16 persons";
       default: return "Pick a theme / type";
     }
   }
@@ -1373,10 +1373,10 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 </div>
                 <div className="text-base-body text-neutral-500">
                   {t === "Self-Shoot" 
-                    ? "Be your own photographer — strike a pose, click the remote, and have fun your way!" 
+                    ? "Be your own photographer ï¿½ strike a pose, click the remote, and have fun your way!" 
                     : t === "With Photographer" 
-                    ? "Enjoy your shoot while we guide the angles, lighting, and poses — easy and effortless!" 
-                    : "Special themed sets made for holidays and milestones — limited-time magic only!"}
+                    ? "Enjoy your shoot while we guide the angles, lighting, and poses ï¿½ easy and effortless!" 
+                    : "Special themed sets made for holidays and milestones ï¿½ limited-time magic only!"}
                 </div>
               </button>
               <div className="flex items-center gap-2">
@@ -1409,7 +1409,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                           </div>
                           <div className="text-base-body" style={{ color: serviceCategory === c ? BRAND.white : "#737373" }}>
                             {c === "Classic" 
-                              ? "All enhanced digital copies + printed photos — the best of both worlds to keep and display!" 
+                              ? "All enhanced digital copies + printed photos ï¿½ the best of both worlds to keep and display!" 
                               : "All enhanced digital copies only, delivered through Lightroom for instant access."}
                           </div>
                         </button>
@@ -1465,7 +1465,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {serviceGroup && (
                   <div className="mt-4">
                     {t === "Seasonal Sessions" && (
-                      <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} — {CHRISTMAS_2025.desc}</div>
+                      <div className="mb-3 text-sm flex items-center gap-2"><Info className="w-4 h-4"/> {CHRISTMAS_2025.title} ï¿½ {CHRISTMAS_2025.desc}</div>
                     )}
                     <div className="text-h3 font-bold mb-2">Services</div>
                     <div className={cn("grid gap-3", service ? "grid-cols-1" : "md:grid-cols-3")}>
@@ -1534,7 +1534,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                                   <ul className="text-base-body text-neutral-600 mt-2 space-y-1">
                                     {displayDetails.split('\n').map((line, idx) => (
                                       <li key={idx} className="flex items-start gap-1">
-                                        <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
+                                        <span className="text-green-600 mt-0.5 flex-shrink-0">ï¿½</span>
                                         <span className="break-words">{line}</span>
                                       </li>
                                     ))}
@@ -1564,14 +1564,14 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
       {service && (
         <div className="mt-4 border rounded-2xl p-3 bg-neutral-50">
           <div className="text-sm">Selected:</div>
-          <div className="font-medium">{serviceType} • {serviceCategory} • {serviceGroup} • {service}</div>
+          <div className="font-medium">{serviceType} ï¿½ {serviceCategory} ï¿½ {serviceGroup} ï¿½ {service}</div>
           <div className="text-xs text-neutral-500 mt-1">Press Next to continue.</div>
         </div>
       )}
             {service && (
         <div className="mt-4 border rounded-2xl p-3 bg-neutral-50">
           <div className="text-sm">Selected:</div>
-          <div className="font-medium">{serviceType} • {serviceCategory} • {serviceGroup} • {service}</div>
+          <div className="font-medium">{serviceType} ï¿½ {serviceCategory} ï¿½ {serviceGroup} ï¿½ {service}</div>
           <div className="text-xs text-neutral-500 mt-1">Press Next to continue.</div>
         </div>
       )}
@@ -1873,7 +1873,7 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           <div className="border rounded-xl bg-white overflow-hidden">
             <div className="p-3 bg-neutral-50 border-b">
               <p className="text-xs text-neutral-600">
-                {duration} minute session • Manila Time
+                {duration} minute session ï¿½ Manila Time
               </p>
             </div>
 
@@ -2498,7 +2498,7 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
     <div>
       <h2 className="text-xl font-semibold">Choose backdrops{!isWithPhotographer && ' & allocate time'}</h2>
       {isWithPhotographer ? (
-        <p className="text-neutral-600">Select <span className="font-medium">1 to 3 backdrops</span> for your photographer-led session. No time allocation needed—we'll use them as needed during your shoot.</p>
+        <p className="text-neutral-600">Select <span className="font-medium">1 to 3 backdrops</span> for your photographer-led session. No time allocation neededï¿½we'll use them as needed during your shoot.</p>
       ) : (
         <p className="text-neutral-600">For {duration}-minute sessions, you can select up to <span className="font-medium">{limit}</span> backdrops. Please allocate minutes that sum to <span className="font-medium">{duration}</span>.</p>
       )}
@@ -2756,7 +2756,7 @@ function StepVideoAndTerms({
               <ul className="list-disc pl-5 space-y-1">
                 <li>Enter the subdivision, go straight to the dead end, then turn right</li>
                 <li>We're the <strong>fourth gate on the left</strong>, with a <strong>Memories Photography Studio tarpaulin</strong> near the gate</li>
-                <li>Our studio is at the back of the property — the <strong>dark gray and blue painted house</strong>, not the house at the front</li>
+                <li>Our studio is at the back of the property ï¿½ the <strong>dark gray and blue painted house</strong>, not the house at the front</li>
                 <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View on Google Maps</a></li>
               </ul>
               <p className="mt-2"><strong>Respect the Neighborhood:</strong></p>
@@ -2771,7 +2771,7 @@ function StepVideoAndTerms({
               <ul className="list-disc pl-5 space-y-1">
                 <li>Pumasok sa subdivision, diretso hanggang dulo, pagkatapos kumanan</li>
                 <li>Kami ang <strong>ikaapat na gate sa kaliwa</strong>, may <strong>Memories Photography Studio tarpaulin</strong> malapit sa gate</li>
-                <li>Ang aming studio ay nasa likod ng property — ang <strong>kulay dark gray at asul na pintadong bahay</strong>, hindi ang bahay sa harap</li>
+                <li>Ang aming studio ay nasa likod ng property ï¿½ ang <strong>kulay dark gray at asul na pintadong bahay</strong>, hindi ang bahay sa harap</li>
                 <li><a href="https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Tingnan sa Google Maps</a></li>
               </ul>
               <p className="mt-2"><strong>Igalang ang Kapitbahayan:</strong></p>
@@ -2873,14 +2873,14 @@ function StepVideoAndTerms({
                 
                 <p className="font-semibold text-red-600">?? 1-Hour Sessions:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>5–20 minutes late: Time reduced by the number of minutes late + Limited to 2 backdrops of choice</li>
+                  <li>5ï¿½20 minutes late: Time reduced by the number of minutes late + Limited to 2 backdrops of choice</li>
                   <li>30 minutes late or more: <strong>Booking will be cancelled</strong></li>
                 </ul>
                 
                 <p className="font-semibold text-red-600">?? With Photographer / Occasional Sessions:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>10-minute grace period</li>
-                  <li>10–25 minutes late: Time reduced by the number of minutes late</li>
+                  <li>10ï¿½25 minutes late: Time reduced by the number of minutes late</li>
                   <li>25 minutes or more late: <strong>Booking will be cancelled</strong></li>
                 </ul>
               </div>
@@ -2919,14 +2919,14 @@ function StepVideoAndTerms({
                 
                 <p className="font-semibold text-red-600">?? 1-Oras na mga Session:</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>5–20 minuto ang late: Babawasan ng oras ang bilang ng minutong late + Limitado sa 2 backdrops na pipiliin</li>
+                  <li>5ï¿½20 minuto ang late: Babawasan ng oras ang bilang ng minutong late + Limitado sa 2 backdrops na pipiliin</li>
                   <li>30 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
                 </ul>
                 
                 <p className="font-semibold text-red-600">?? With Photographer / Occasional Sessions:</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>10-minute grace period</li>
-                  <li>10–25 minuto ang late: Babawasan ng oras ang bilang ng minutong late</li>
+                  <li>10ï¿½25 minuto ang late: Babawasan ng oras ang bilang ng minutong late</li>
                   <li>25 minuto o higit pang late: <strong>Makakansela ang booking</strong></li>
                 </ul>
               </div>
@@ -3071,7 +3071,7 @@ function StepReview({ data }:{ data: {
                 {data.selectedBackdrops.map((key:string,idx:number)=>{ const bd=BACKDROPS.find(b=>b.key===key); return (
                   <div key={key} className="flex items-center gap-3">
                     <div className="w-6 h-6 rounded" style={{background: bd?.swatch}}/>
-                    <div className="text-sm">{idx+1}. {bd?.name} — {data.allocations[key]} mins</div>
+                    <div className="text-sm">{idx+1}. {bd?.name} ï¿½ {data.allocations[key]} mins</div>
                   </div>
                 );})}
               </div>
