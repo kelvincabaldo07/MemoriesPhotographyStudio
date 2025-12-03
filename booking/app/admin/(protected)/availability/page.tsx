@@ -132,11 +132,26 @@ export default function AvailabilityPage() {
       setSyncResult(result);
       setHasChanges(false);
       
-      alert(`✅ Availability synced successfully!\n\n` +
-        `📅 Blocked dates created: ${result.results.blockedDatesCreated}\n` +
-        `📝 Blocked dates updated: ${result.results.blockedDatesUpdated}\n` +
-        `🗑️ Blocked dates removed: ${result.results.blockedDatesDeleted}\n` +
-        `☕ Break events created: ${result.results.breaksCreated}`);
+      const notionStats = result.results.notionCreated || result.results.notionUpdated || result.results.notionDeleted;
+      const alertMessage = notionStats
+        ? `✅ 3-way sync completed successfully!\n\n` +
+          `📊 Notion:\n` +
+          `  • Created: ${result.results.notionCreated || 0}\n` +
+          `  • Updated: ${result.results.notionUpdated || 0}\n` +
+          `  • Archived: ${result.results.notionDeleted || 0}\n\n` +
+          `📅 Google Calendar:\n` +
+          `  • Created: ${result.results.blockedDatesCreated || 0}\n` +
+          `  • Updated: ${result.results.blockedDatesUpdated || 0}\n` +
+          `  • Deleted: ${result.results.blockedDatesDeleted || 0}\n` +
+          `☕ Break events created: ${result.results.breaksCreated || 0}`
+        : `✅ Availability synced to Google Calendar!\n\n` +
+          `📅 Blocked dates created: ${result.results.blockedDatesCreated}\n` +
+          `📝 Blocked dates updated: ${result.results.blockedDatesUpdated}\n` +
+          `🗑️ Blocked dates removed: ${result.results.blockedDatesDeleted}\n` +
+          `☕ Break events created: ${result.results.breaksCreated}\n\n` +
+          `💡 Notion sync not configured. Set NOTION_AVAILABILITY_DATABASE_ID to enable.`;
+      
+      alert(alertMessage);
     } catch (error) {
       console.error('Error saving availability:', error);
       alert(`❌ Failed to save availability: ${error instanceof Error ? error.message : 'Unknown error'}`);

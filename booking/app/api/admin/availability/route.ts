@@ -1,12 +1,14 @@
 /**
- * Availability API
- * Handles syncing working hours, breaks, and blocked dates to Google Calendar and Notion
+ * Availability API with 3-Way Sync
+ * Syncs between: Admin UI ↔ Notion ↔ Google Calendar
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { Client } from '@notionhq/client';
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'primary';
+const NOTION_AVAILABILITY_DB = process.env.NOTION_AVAILABILITY_DATABASE_ID;
 
 interface TimeSlot {
   id: string;
@@ -23,6 +25,8 @@ interface ShopHours {
 
 interface BlockedDate {
   id: string;
+  notionId?: string; // Notion page ID
+  calendarEventId?: string; // Google Calendar event ID
   startDate: string;
   endDate: string;
   allDay: boolean;
@@ -53,28 +57,88 @@ function getOAuth2Client() {
     oauth2Client.setCredentials({
       refresh_token: refreshToken,
     });
-  }
-
   return oauth2Client;
 }
 
+function getNotionClient() {
+  if (!process.env.NOTION_API_KEY) {
+    return null;
+  }
+  return new Client({ auth: process.env.NOTION_API_KEY });
+}
+
 /**
- * GET: Fetch current availability settings
+ * GET: Fetch availability from Notion (source of truth)
  */
-export async function GET(request: NextRequest) {
-  try {
-    // TODO: Fetch from database or config file
-    // For now, return default settings
-    const defaultAvailability: AvailabilityData = {
-      schedule: {
-        Monday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-        Tuesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-        Wednesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-        Thursday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-        Friday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-        Saturday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-        Sunday: { open: "13:00", close: "20:00", breaks: [], enabled: true },
+      Monday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+      Tuesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+      Wednesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+      Thursday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+      Friday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+      Saturday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+      Sunday: { open: "13:00", close: "20:00", breaks: [], enabled: true },
+    };
+
+    // If Notion not configured, return defaults
+    if (!NOTION_AVAILABILITY_DB || !process.env.NOTION_API_KEY) {
+      console.log('[Availability API] Notion not configured, returning defaults');
+      return NextResponse.json({
+        schedule: defaultSchedule,
+        blockedDates: [],
+        timezone: 'Asia/Manila',
+      });
+    }
+
+    // Fetch blocked dates from Notion
+    const notion = getNotionClient();
+    if (!notion) {
+      return NextResponse.json({
+        schedule: defaultSchedule,
+        blockedDates: [],
+        timezone: 'Asia/Manila',
+      });
+    }
+
+    console.log('[Availability API] Fetching from Notion database:', NOTION_AVAILABILITY_DB);
+
+    const response = await notion.databases.query({
+      database_id: NOTION_AVAILABILITY_DB,
+      filter: {
+        property: 'Status',
+        select: {
+          equals: 'Active',
+        },
       },
+      sorts: [
+        {
+          property: 'Start Date',
+          direction: 'ascending',
+        },
+      ],
+    });
+
+    const blockedDates: BlockedDate[] = response.results.map((page: any) => {
+      const props = page.properties;
+      return {
+        id: props['Block ID']?.rich_text?.[0]?.plain_text || page.id,
+        notionId: page.id,
+        calendarEventId: props['Calendar Event ID']?.rich_text?.[0]?.plain_text,
+        startDate: props['Start Date']?.date?.start?.split('T')[0] || '',
+        endDate: props['End Date']?.date?.start?.split('T')[0] || props['Start Date']?.date?.start?.split('T')[0] || '',
+        allDay: props['All Day']?.checkbox !== false,
+        startTime: props['Start Time']?.rich_text?.[0]?.plain_text,
+        endTime: props['End Time']?.rich_text?.[0]?.plain_text,
+        reason: props['Reason']?.rich_text?.[0]?.plain_text || props['Name']?.title?.[0]?.plain_text,
+      };
+    });
+
+    console.log(`[Availability API] Loaded ${blockedDates.length} blocked dates from Notion`);
+
+    return NextResponse.json({
+      schedule: defaultSchedule,
+      blockedDates,
+      timezone: 'Asia/Manila',
+    });
       blockedDates: [],
       timezone: 'Asia/Manila',
     };
@@ -90,17 +154,21 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST: Save availability and sync to Google Calendar
+ * POST: Save to Notion and sync to Google Calendar (3-way sync)
  */
 export async function POST(request: NextRequest) {
   try {
     const data: AvailabilityData = await request.json();
     const { schedule, blockedDates, timezone } = data;
 
-    console.log('[Availability API] Syncing availability to Google Calendar...');
+    console.log('[Availability API] Starting 3-way sync...');
+    console.log('[Availability API] Notion DB ID:', NOTION_AVAILABILITY_DB);
+    console.log('[Availability API] Number of blocked dates to sync:', blockedDates.length);
 
-    // Sync blocked dates to Google Calendar
     const syncResults = {
+      notionCreated: 0,
+      notionUpdated: 0,
+      notionDeleted: 0,
       blockedDatesCreated: 0,
       blockedDatesUpdated: 0,
       blockedDatesDeleted: 0,
@@ -108,56 +176,149 @@ export async function POST(request: NextRequest) {
       errors: [] as string[],
     };
 
-    // Get OAuth client
+    // Initialize clients
     const oauth2Client = getOAuth2Client();
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+    const notion = getNotionClient();
 
-    // Fetch existing events tagged with our markers
+    // Step 1: Get existing data from both systems
     const now = new Date();
     const futureDate = new Date();
-    futureDate.setFullYear(futureDate.getFullYear() + 2); // Look ahead 2 years
+    futureDate.setFullYear(futureDate.getFullYear() + 2);
 
-    const existingEvents = await calendar.events.list({
+    // Fetch existing Google Calendar events
+    const existingCalendarEvents = await calendar.events.list({
       calendarId: CALENDAR_ID,
       timeMin: now.toISOString(),
       timeMax: futureDate.toISOString(),
-      q: '[Studio Blocked]', // Search for our marker
+      q: '[Studio Blocked]',
       singleEvents: true,
     });
 
-    const existingBlockedEvents = existingEvents.data.items || [];
-    const existingEventIds = new Set(existingBlockedEvents.map(e => e.id));
+    const calendarEventsMap = new Map(
+      (existingCalendarEvents.data.items || []).map(e => [e.id, e])
+    );
 
-    // Create/Update blocked dates in Google Calendar
-    console.log(`[Availability API] Processing ${blockedDates.length} blocked dates...`);
-    
+    // Fetch existing Notion records
+    let notionRecordsMap = new Map();
+    if (notion && NOTION_AVAILABILITY_DB) {
+      try {
+        const notionResponse = await notion.databases.query({
+          database_id: NOTION_AVAILABILITY_DB,
+          filter: {
+            property: 'Status',
+            select: {
+              equals: 'Active',
+            },
+          },
+        });
+
+        notionRecordsMap = new Map(
+          notionResponse.results.map((page: any) => {
+            const blockId = page.properties['Block ID']?.rich_text?.[0]?.plain_text || page.id;
+            return [blockId, page];
+          })
+        );
+        console.log(`[Availability API] Found ${notionRecordsMap.size} existing records in Notion`);
+      } catch (error) {
+        console.error('[Availability API] Error fetching from Notion:', error);
+        syncResults.errors.push('Failed to fetch from Notion: ' + (error as Error).message);
+      }
+    }
+
+    // Step 2: Process each blocked date
     for (const blocked of blockedDates) {
       try {
-        console.log(`[Availability API] Processing blocked date:`, blocked);
-        
-        // Check if event already exists (by checking description)
-        const existingEvent = existingBlockedEvents.find(e => 
-          e.description?.includes(`Block ID: ${blocked.id}`)
-        );
+        console.log(`[Availability API] Processing: ${blocked.reason || 'Untitled'} (${blocked.startDate})`);
 
+        // A. Save/Update in Notion
+        let notionPageId = blocked.notionId;
+        let calendarEventId = blocked.calendarEventId;
+
+        if (notion && NOTION_AVAILABILITY_DB) {
+          const notionProperties: any = {
+            'Name': {
+              title: [{ text: { content: blocked.reason || 'Studio Blocked' } }],
+            },
+            'Block ID': {
+              rich_text: [{ text: { content: blocked.id } }],
+            },
+            'Start Date': {
+              date: { start: blocked.startDate },
+            },
+            'End Date': {
+              date: { start: blocked.endDate },
+            },
+            'All Day': {
+              checkbox: blocked.allDay,
+            },
+            'Status': {
+              select: { name: 'Active' },
+            },
+            'Last Synced': {
+              date: { start: new Date().toISOString() },
+            },
+          };
+
+          if (blocked.startTime) {
+            notionProperties['Start Time'] = {
+              rich_text: [{ text: { content: blocked.startTime } }],
+            };
+          }
+
+          if (blocked.endTime) {
+            notionProperties['End Time'] = {
+              rich_text: [{ text: { content: blocked.endTime } }],
+            };
+          }
+
+          if (blocked.reason) {
+            notionProperties['Reason'] = {
+              rich_text: [{ text: { content: blocked.reason } }],
+            };
+          }
+
+          try {
+            if (notionPageId && notionRecordsMap.has(blocked.id)) {
+              // Update existing
+              await notion.pages.update({
+                page_id: notionPageId,
+                properties: notionProperties,
+              });
+              syncResults.notionUpdated++;
+              notionRecordsMap.delete(blocked.id);
+              console.log(`[Availability API] ✅ Updated in Notion: ${blocked.id}`);
+            } else {
+              // Create new
+              const newPage = await notion.pages.create({
+                parent: { database_id: NOTION_AVAILABILITY_DB },
+                properties: notionProperties,
+              });
+              notionPageId = newPage.id;
+              syncResults.notionCreated++;
+              console.log(`[Availability API] ✅ Created in Notion: ${blocked.id}`);
+            }
+          } catch (notionError) {
+            console.error(`[Availability API] Notion error for ${blocked.id}:`, notionError);
+            syncResults.errors.push(`Notion sync failed for ${blocked.reason || blocked.id}`);
+          }
+        }
+
+        // B. Sync to Google Calendar
         const eventData: any = {
           summary: `🚫 [Studio Blocked] ${blocked.reason || 'Unavailable'}`,
           description: `Block ID: ${blocked.id}\n${blocked.reason || 'Studio is not available during this time'}`,
-          colorId: '11', // Red color for blocked dates
-          transparency: 'opaque', // Show as "Busy" to block booking slots
+          colorId: '11',
+          transparency: 'opaque',
           visibility: 'public',
         };
 
         if (blocked.allDay) {
-          // All-day event
-          const startDate = new Date(blocked.startDate);
           const endDate = new Date(blocked.endDate);
-          endDate.setDate(endDate.getDate() + 1); // End date is exclusive for all-day events
-
+          endDate.setDate(endDate.getDate() + 1);
           eventData.start = { date: blocked.startDate };
           eventData.end = { date: endDate.toISOString().split('T')[0] };
         } else {
-          // Timed event
           eventData.start = {
             dateTime: `${blocked.startDate}T${blocked.startTime}:00`,
             timeZone: timezone,
@@ -168,42 +329,87 @@ export async function POST(request: NextRequest) {
           };
         }
 
-        if (existingEvent) {
-          // Update existing event
+        // Find existing calendar event by Block ID
+        const existingCalEvent = Array.from(calendarEventsMap.values()).find(e =>
+          e.description?.includes(`Block ID: ${blocked.id}`)
+        );
+
+        if (existingCalEvent) {
+          // Update existing
           await calendar.events.patch({
             calendarId: CALENDAR_ID,
-            eventId: existingEvent.id!,
+            eventId: existingCalEvent.id!,
             requestBody: eventData,
           });
+          calendarEventId = existingCalEvent.id!;
           syncResults.blockedDatesUpdated++;
-          existingEventIds.delete(existingEvent.id);
-          console.log(`[Availability API] ✅ Updated blocked date: ${blocked.id}`);
+          calendarEventsMap.delete(existingCalEvent.id);
+          console.log(`[Availability API] ✅ Updated in Calendar: ${blocked.id}`);
         } else {
-          // Create new event
-          const response = await calendar.events.insert({
+          // Create new
+          const createdEvent = await calendar.events.insert({
             calendarId: CALENDAR_ID,
             requestBody: eventData,
           });
+          calendarEventId = createdEvent.data.id!;
           syncResults.blockedDatesCreated++;
-          console.log(`[Availability API] ✅ Created blocked date: ${response.data.id}`);
+          console.log(`[Availability API] ✅ Created in Calendar: ${blocked.id}`);
+        }
+
+        // C. Update Notion with Calendar Event ID
+        if (notion && notionPageId && calendarEventId && NOTION_AVAILABILITY_DB) {
+          try {
+            await notion.pages.update({
+              page_id: notionPageId,
+              properties: {
+                'Calendar Event ID': {
+                  rich_text: [{ text: { content: calendarEventId } }],
+                },
+              },
+            });
+            console.log(`[Availability API] ✅ Linked Calendar Event ID in Notion`);
+          } catch (linkError) {
+            console.error(`[Availability API] Error linking Calendar Event ID:`, linkError);
+          }
         }
       } catch (error) {
-        console.error(`[Availability API] Error syncing blocked date ${blocked.id}:`, error);
-        syncResults.errors.push(`Failed to sync blocked date ${blocked.id}`);
+        console.error(`[Availability API] Error processing blocked date ${blocked.id}:`, error);
+        syncResults.errors.push(`Failed to sync ${blocked.reason || blocked.id}: ${(error as Error).message}`);
       }
     }
 
-    // Delete events that no longer exist in our blocked dates
-    for (const eventId of existingEventIds) {
+    // Step 3: Delete removed blocked dates
+    // Delete from Notion
+    if (notion && NOTION_AVAILABILITY_DB) {
+      for (const [blockId, page] of notionRecordsMap) {
+        try {
+          await notion.pages.update({
+            page_id: (page as any).id,
+            properties: {
+              'Status': {
+                select: { name: 'Archived' },
+              },
+            },
+          });
+          syncResults.notionDeleted++;
+          console.log(`[Availability API] ✅ Archived in Notion: ${blockId}`);
+        } catch (error) {
+          console.error(`[Availability API] Error archiving Notion page:`, error);
+        }
+      }
+    }
+
+    // Delete from Google Calendar
+    for (const [eventId, event] of calendarEventsMap) {
       try {
         await calendar.events.delete({
           calendarId: CALENDAR_ID,
-          eventId: eventId as string,
+          eventId: eventId!,
         });
         syncResults.blockedDatesDeleted++;
-        console.log(`[Availability API] ✅ Deleted removed blocked date: ${eventId}`);
+        console.log(`[Availability API] ✅ Deleted from Calendar: ${eventId}`);
       } catch (error) {
-        console.error(`[Availability API] Error deleting event ${eventId}:`, error);
+        console.error(`[Availability API] Error deleting calendar event:`, error);
       }
     }
 
@@ -277,12 +483,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // TODO: Save to database/config file
-    console.log('[Availability API] ✅ Availability synced successfully');
+    console.log('[Availability API] ✅ 3-way sync complete:', syncResults);
 
     return NextResponse.json({
       success: true,
-      message: 'Availability synced to Google Calendar',
+      message: '3-way sync completed successfully',
       results: syncResults,
     });
   } catch (error) {
