@@ -1779,6 +1779,8 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           data.results.forEach(({ date, count }: { date: string; count: number }) => {
             cache[date] = count;
           });
+          console.log('[Calendar] Loaded availability for', Object.keys(cache).length, 'dates');
+          console.log('[Calendar] Blocked dates (count=0):', Object.entries(cache).filter(([_, count]) => count === 0).map(([date]) => date));
           setAvailabilityCache(cache);
           setUsingMockData(data.usingMockData || false);
         }
@@ -1910,11 +1912,13 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
               }
 
               const isDateAllowed = isDateAllowedForService(d, serviceType, serviceRestrictions);
-              // Check cache - if date is in cache, use that value, otherwise check if it's in range
+              // Check cache - if date is in cache, use that value
               const inSchedulingWindow = next90Days.includes(d);
-              const availableCount = availabilityCache[d] !== undefined ? availabilityCache[d] : (inSchedulingWindow ? -1 : 0);
+              const hasAvailabilityData = availabilityCache[d] !== undefined;
+              const availableCount = hasAvailabilityData ? availabilityCache[d] : -1;
               const isPastDate = d < today;
-              const isFullyBooked = (availableCount === 0) || !isDateAllowed || isPastDate || !inSchedulingWindow;
+              // Date is fully booked if: has 0 slots, not allowed by service restrictions, is in the past, or outside scheduling window
+              const isFullyBooked = hasAvailabilityData ? (availableCount === 0 || !isDateAllowed || isPastDate) : (!inSchedulingWindow || isPastDate);
               const isSelected = date === d;
               const isToday = d === today;
 
