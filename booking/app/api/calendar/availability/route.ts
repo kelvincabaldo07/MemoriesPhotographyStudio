@@ -230,6 +230,33 @@ export async function GET(request: NextRequest) {
 
     console.log(`[Availability] Found ${events.length} events for ${date}`);
 
+    // Check for all-day blocked events (studio closed)
+    const hasAllDayBlock = events.some(event => {
+      const isAllDay = !!event.start?.date; // All-day events use 'date' not 'dateTime'
+      const isBlocked = event.summary?.includes('[BLOCKED]') || event.summary?.includes('[Studio Blocked]') || event.summary?.includes('🚫');
+      if (isAllDay && isBlocked) {
+        console.log(`[Availability] All-day block found: ${event.summary}`);
+        return true;
+      }
+      return false;
+    });
+
+    // If entire day is blocked, return no slots
+    if (hasAllDayBlock) {
+      console.log(`[Availability] Date ${date} is completely blocked`);
+      return NextResponse.json({
+        success: true,
+        date,
+        duration,
+        availableSlots: [],
+        totalSlots: 0,
+        realBookableSlots: 0,
+        bookedEvents: events.length,
+        usingMockData: false,
+        blocked: true,
+      });
+    }
+
     // Build blocked ranges
     const blockedRanges: [number, number][] = [];
 

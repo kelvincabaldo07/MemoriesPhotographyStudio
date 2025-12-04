@@ -164,9 +164,23 @@ export async function POST(request: NextRequest) {
 
     const events = response.data.items || [];
 
-    // Group events by date
+    // Group events by date (including all-day events)
     const eventsByDate: Record<string, typeof events> = {};
+    const blockedDates = new Set<string>(); // Track fully blocked dates
+    
     events.forEach(event => {
+      // Check for all-day blocked events
+      if (event.start?.date) {
+        const eventDate = event.start.date;
+        const isBlocked = event.summary?.includes('[BLOCKED]') || event.summary?.includes('[Studio Blocked]') || event.summary?.includes('🚫');
+        if (isBlocked) {
+          blockedDates.add(eventDate);
+          console.log(`[Batch] Date ${eventDate} is blocked: ${event.summary}`);
+        }
+        return;
+      }
+      
+      // Regular timed events
       if (!event.start?.dateTime) return;
       const eventDate = event.start.dateTime.split('T')[0];
       if (!eventsByDate[eventDate]) eventsByDate[eventDate] = [];
@@ -175,6 +189,11 @@ export async function POST(request: NextRequest) {
 
     // Calculate availability for each date
     const results = dates.map(date => {
+      // Check if date is fully blocked
+      if (blockedDates.has(date)) {
+        return { date, count: 0 };
+      }
+      
       const dayEvents = eventsByDate[date] || [];
       const blockedRanges: [number, number][] = [];
 

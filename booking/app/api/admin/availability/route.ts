@@ -304,7 +304,7 @@ export async function POST(request: NextRequest) {
 
         // B. Sync to Google Calendar
         const eventData: any = {
-          summary: `🚫 [Studio Blocked] ${blocked.reason || 'Unavailable'}`,
+          summary: `[BLOCKED] ${blocked.reason || 'Studio Unavailable'}`,
           description: `Block ID: ${blocked.id}\n${blocked.reason || 'Studio is not available during this time'}`,
           colorId: '11',
           transparency: 'opaque',
@@ -446,7 +446,7 @@ export async function POST(request: NextRequest) {
           const rrule = `FREQ=WEEKLY;UNTIL=${breakEndDate.toISOString().split('T')[0].replace(/-/g, '')}`;
           
           const breakEvent = {
-            summary: `☕ [Break] Lunch Break`,
+            summary: `[BREAK] Lunch Break`,
             description: `Break ID: ${day}-${breakSlot.id}\nStudio break time - not available for bookings`,
             start: {
               dateTime: `${currentDate.toISOString().split('T')[0]}T${breakSlot.start}:00`,
