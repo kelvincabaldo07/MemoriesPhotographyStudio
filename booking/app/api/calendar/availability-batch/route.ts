@@ -169,13 +169,25 @@ export async function POST(request: NextRequest) {
     const blockedDates = new Set<string>(); // Track fully blocked dates
     
     events.forEach(event => {
-      // Check for all-day blocked events
+      // Check for all-day blocked events (can span multiple days)
       if (event.start?.date) {
-        const eventDate = event.start.date;
         const isBlocked = event.summary?.includes('[BLOCKED]') || event.summary?.includes('[Studio Blocked]') || event.summary?.includes('🚫');
         if (isBlocked) {
-          blockedDates.add(eventDate);
-          console.log(`[Batch] Date ${eventDate} is blocked: ${event.summary}`);
+          const startDate = new Date(event.start.date);
+          const endDate = event.end?.date ? new Date(event.end.date) : new Date(event.start.date);
+          
+          // For multi-day events, Google Calendar end date is exclusive, so we subtract 1 day
+          const actualEndDate = new Date(endDate);
+          actualEndDate.setDate(actualEndDate.getDate() - 1);
+          
+          // Add all dates in the range
+          const currentDate = new Date(startDate);
+          while (currentDate <= actualEndDate) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            blockedDates.add(dateStr);
+            console.log(`[Batch] Date ${dateStr} is blocked (from ${event.start.date} to ${event.end?.date}): ${event.summary}`);
+            currentDate.setDate(currentDate.getDate() + 1);
+          }
         }
         return;
       }

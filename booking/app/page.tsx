@@ -591,12 +591,14 @@ export default function App(){
                 hierarchy.types.push(serviceType as any);
               }
               
-              // For Self-Shoot, separate groups by category (Classic vs Digital)
-              // For other types, use group as-is
+              // For Self-Shoot with category, separate groups by category (Classic vs Digital)
+              // For services without category or other types, use group as-is
               let groupKey = serviceGroup;
               if (serviceType === "Self-Shoot" && serviceCategory) {
                 groupKey = `${serviceCategory} ${serviceGroup}`;
               }
+              
+              console.log('[Services] Processing:', svc.name, '-> type:', serviceType, 'group:', serviceGroup, 'category:', serviceCategory, 'groupKey:', groupKey);
               
               // Add group to type if not exists
               if (serviceType && groupKey) {
@@ -1421,14 +1423,27 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
   // Filter groups by category for Self-Shoot
   const allGroups = (serviceType ? serviceHierarchy.groups[serviceType as keyof typeof serviceHierarchy.groups] : []) || [];
   const groups = serviceType === "Self-Shoot" && serviceCategory
-    ? allGroups.filter(g => g.startsWith(serviceCategory)).map(g => g.replace(`${serviceCategory} `, ''))
+    ? allGroups.filter(g => g.startsWith(serviceCategory) || !g.includes('Classic') && !g.includes('Digital')).map(g => g.replace(`${serviceCategory} `, ''))
     : allGroups;
   
-  // For Self-Shoot, use category-prefixed group key to get correct services
-  const serviceGroupKey = serviceType === "Self-Shoot" && serviceCategory && serviceGroup
-    ? `${serviceCategory} ${serviceGroup}`
-    : serviceGroup;
-  const services = (serviceType && serviceGroupKey ? (serviceHierarchy.services?.[serviceType as keyof typeof serviceHierarchy.services] as Record<string, readonly string[]>)?.[serviceGroupKey]||[] : []);
+  console.log('[ServicePicker] Type:', serviceType, 'Category:', serviceCategory, 'All groups:', allGroups, 'Filtered groups:', groups);
+  
+  // For Self-Shoot, try category-prefixed group key first, then fall back to non-prefixed
+  let serviceGroupKey = serviceGroup;
+  let services: readonly string[] = [];
+  
+  if (serviceType && serviceGroup) {
+    const servicesMap = serviceHierarchy.services?.[serviceType as keyof typeof serviceHierarchy.services] as Record<string, readonly string[]>;
+    
+    if (serviceType === "Self-Shoot" && serviceCategory) {
+      // Try with category prefix first
+      const prefixedKey = `${serviceCategory} ${serviceGroup}`;
+      services = servicesMap?.[prefixedKey] || servicesMap?.[serviceGroup] || [];
+      console.log('[ServicePicker] Looking for services with key:', prefixedKey, 'or', serviceGroup, '-> found:', services.length);
+    } else {
+      services = servicesMap?.[serviceGroup] || [];
+    }
+  }
 
   return (
     <div>
