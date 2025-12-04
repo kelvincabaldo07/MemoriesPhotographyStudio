@@ -44,10 +44,7 @@ export default function AvailabilityPage() {
     Sunday: { open: "13:00", close: "20:00", breaks: [], enabled: true },
   });
 
-  const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([
-    { id: "1", startDate: "2025-12-25", endDate: "2025-12-25", allDay: true, reason: "Christmas Day" },
-    { id: "2", startDate: "2025-01-01", endDate: "2025-01-01", allDay: true, reason: "New Year" },
-  ]);
+  const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
 
   const [showBlockedDateForm, setShowBlockedDateForm] = useState(false);
   const [newBlockedDate, setNewBlockedDate] = useState<Partial<BlockedDate>>({ allDay: true });
@@ -55,6 +52,32 @@ export default function AvailabilityPage() {
   const [timezone] = useState("Asia/Manila");
   const [syncing, setSyncing] = useState(false);
   const [syncResult, setSyncResult] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load availability data from Notion on mount
+  useEffect(() => {
+    const loadAvailability = async () => {
+      try {
+        const response = await fetch('/api/admin/availability');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.schedule) {
+            setSchedule(data.schedule);
+          }
+          if (data.blockedDates) {
+            setBlockedDates(data.blockedDates);
+          }
+          console.log('Loaded availability from Notion:', data);
+        }
+      } catch (error) {
+        console.error('Failed to load availability:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadAvailability();
+  }, []);
 
   const updateDay = (day: string, field: keyof ShopHours, value: any) => {
     setSchedule({ ...schedule, [day]: { ...schedule[day], [field]: value } });
