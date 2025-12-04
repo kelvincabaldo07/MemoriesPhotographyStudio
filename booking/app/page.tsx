@@ -1803,8 +1803,14 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     // Check if we already fetched this date + duration
     const cachedSlots = sessionStorage.getItem(cacheKey);
     if (cachedSlots) {
-      setRealAvailableSlots(JSON.parse(cachedSlots));
+      const slots = JSON.parse(cachedSlots);
+      setRealAvailableSlots(slots);
       setLoading(false);
+      
+      // Auto-select first available time slot if no time is selected
+      if (!time && slots.length > 0) {
+        setTime(slots[0]);
+      }
       return;
     }
     
@@ -1816,6 +1822,11 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           sessionStorage.setItem(cacheKey, JSON.stringify(data.availableSlots));
           setRealAvailableSlots(data.availableSlots);
           setUsingMockData(data.usingMockData || false);
+          
+          // Auto-select first available time slot if no time is selected
+          if (!time && data.availableSlots.length > 0) {
+            setTime(data.availableSlots[0]);
+          }
         } else {
           if (process.env.NODE_ENV === 'development') {
             console.error('Failed to fetch availability:', data.error);
@@ -1899,9 +1910,11 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
               }
 
               const isDateAllowed = isDateAllowedForService(d, serviceType, serviceRestrictions);
-              const availableCount = availabilityCache[d] || 0;
+              // Check cache - if date is in cache, use that value, otherwise check if it's in range
+              const inSchedulingWindow = next90Days.includes(d);
+              const availableCount = availabilityCache[d] !== undefined ? availabilityCache[d] : (inSchedulingWindow ? -1 : 0);
               const isPastDate = d < today;
-              const isFullyBooked = availableCount === 0 || !isDateAllowed || isPastDate;
+              const isFullyBooked = (availableCount === 0) || !isDateAllowed || isPastDate || !inSchedulingWindow;
               const isSelected = date === d;
               const isToday = d === today;
 
