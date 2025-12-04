@@ -427,6 +427,9 @@ export default function App(){
   
   // Dynamic service info from API (descriptions, prices)
   const [serviceInfo, setServiceInfo] = useState<Record<string, { details: string; price: number; classicDetails?: string; thumbnail?: string }>>(SERVICE_INFO);
+  
+  // Dynamic service hierarchy from API (replaces hardcoded TAXONOMY)
+  const [serviceHierarchy, setServiceHierarchy] = useState<typeof TAXONOMY>(TAXONOMY);
 
   // Booking policies from admin settings
   const [bookingPolicies, setBookingPolicies] = useState({
@@ -517,6 +520,14 @@ export default function App(){
           const restrictions: Record<string, ServiceRestriction> = {};
           const info: Record<string, { details: string; price: number; classicDetails?: string; thumbnail?: string }> = {};
           
+          // Build dynamic hierarchy structure
+          const hierarchy: any = {
+            types: [] as string[],
+            categories: ["Classic", "Digital"] as const,
+            groups: {} as Record<string, string[]>,
+            services: {} as Record<string, Record<string, string[]>>,
+          };
+          
           // Build restrictions and info from services data
           data.services.forEach((svc: any) => {
             // Time-based restrictions (for "With Photographer")
@@ -569,6 +580,36 @@ export default function App(){
                 info[baseServiceName].details = svc.description || "";
                 info[baseServiceName].price = svc.basePrice || 0;
               }
+              
+              // Build hierarchy structure
+              const serviceType = svc.type;
+              const serviceGroup = svc.group;
+              
+              // Add type if not exists
+              if (serviceType && !hierarchy.types.includes(serviceType as any)) {
+                hierarchy.types.push(serviceType as any);
+              }
+              
+              // Add group to type if not exists
+              if (serviceType && serviceGroup) {
+                if (!hierarchy.groups[serviceType]) {
+                  hierarchy.groups[serviceType] = [];
+                }
+                if (!hierarchy.groups[serviceType].includes(serviceGroup)) {
+                  hierarchy.groups[serviceType].push(serviceGroup);
+                }
+                
+                // Add service to group
+                if (!hierarchy.services[serviceType]) {
+                  hierarchy.services[serviceType] = {};
+                }
+                if (!hierarchy.services[serviceType][serviceGroup]) {
+                  hierarchy.services[serviceType][serviceGroup] = [];
+                }
+                if (!hierarchy.services[serviceType][serviceGroup].includes(baseServiceName)) {
+                  hierarchy.services[serviceType][serviceGroup].push(baseServiceName);
+                }
+              }
             }
           });
           
@@ -578,6 +619,10 @@ export default function App(){
           }
           if (Object.keys(info).length > 0) {
             setServiceInfo(prev => ({ ...prev, ...info }));
+          }
+          if (hierarchy.types.length > 0) {
+            console.log('[Services] Updated hierarchy:', hierarchy);
+            setServiceHierarchy(hierarchy);
           }
         }
       })
@@ -874,6 +919,7 @@ async function submitBooking(){
                 service={service}
                 setService={(s:string)=>{ setService(s); }}
                 serviceInfo={serviceInfo}
+                serviceHierarchy={serviceHierarchy}
               />
             )}
 
@@ -1319,12 +1365,13 @@ function Stepper({ step }:{ step:number }){
 }
 
 // Unified one-step service selector with explicit accordions + prices + thumbnails
-function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setServiceCategory, serviceGroup, setServiceGroup, service, setService, serviceInfo }:{
+function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setServiceCategory, serviceGroup, setServiceGroup, service, setService, serviceInfo, serviceHierarchy }:{
   serviceType:string; setServiceType:(v:string)=>void;
   serviceCategory:string; setServiceCategory:(v:string)=>void;
   serviceGroup:string; setServiceGroup:(v:string)=>void;
   service:string; setService:(v:string)=>void;
   serviceInfo: Record<string, { details: string; price: number; classicDetails?: string }>;
+  serviceHierarchy: typeof TAXONOMY;
 }){
   const [openType, setOpenType] = useState<string>(serviceType || "");
   const [openCategory, setOpenCategory] = useState<string>(serviceCategory || "");
@@ -1362,8 +1409,8 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
       setOpenCategory("Digital");
     }
   }, [serviceType, serviceCategory]);
-  const groups = (serviceType ? TAXONOMY.groups[serviceType as keyof typeof TAXONOMY.groups] : []) || [];
-  const services = (serviceType && serviceGroup ? (TAXONOMY.services?.[serviceType as keyof typeof TAXONOMY.services] as Record<string, readonly string[]>)?.[serviceGroup]||[] : []);
+  const groups = (serviceType ? serviceHierarchy.groups[serviceType as keyof typeof serviceHierarchy.groups] : []) || [];
+  const services = (serviceType && serviceGroup ? (serviceHierarchy.services?.[serviceType as keyof typeof serviceHierarchy.services] as Record<string, readonly string[]>)?.[serviceGroup]||[] : []);
 
   return (
     <div>
@@ -1372,7 +1419,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
 
       {/* Types */}
       <div className="space-y-3">
-        {(chosenTypeOnly ? [serviceType] : TAXONOMY.types).filter(Boolean).map((t)=> (
+        {(chosenTypeOnly ? [serviceType] : serviceHierarchy.types).filter(Boolean).map((t)=> (
           <div 
             key={t as string} 
             className={cn(
@@ -1409,7 +1456,7 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
                 {/* Only show category selection for Self-Shoot */}
                 {t === "Self-Shoot" ? (
                   <div className={cn("grid gap-3 mt-3", chosenCategoryOnly?"grid-cols-1":"md:grid-cols-2")}>                  
-                    {(chosenCategoryOnly ? [serviceCategory] : TAXONOMY.categories).filter(Boolean).map((c)=> (
+                    {(chosenCategoryOnly ? [serviceCategory] : serviceHierarchy.categories).filter(Boolean).map((c)=> (
                       <div 
                         key={String(c)} 
                         className={cn(
