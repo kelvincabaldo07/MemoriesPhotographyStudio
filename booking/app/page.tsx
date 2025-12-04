@@ -584,30 +584,38 @@ export default function App(){
               // Build hierarchy structure
               const serviceType = svc.type;
               const serviceGroup = svc.group;
+              const serviceCategory = svc.category; // Classic or Digital
               
               // Add type if not exists
               if (serviceType && !hierarchy.types.includes(serviceType as any)) {
                 hierarchy.types.push(serviceType as any);
               }
               
+              // For Self-Shoot, separate groups by category (Classic vs Digital)
+              // For other types, use group as-is
+              let groupKey = serviceGroup;
+              if (serviceType === "Self-Shoot" && serviceCategory) {
+                groupKey = `${serviceCategory} ${serviceGroup}`;
+              }
+              
               // Add group to type if not exists
-              if (serviceType && serviceGroup) {
+              if (serviceType && groupKey) {
                 if (!hierarchy.groups[serviceType]) {
                   hierarchy.groups[serviceType] = [];
                 }
-                if (!hierarchy.groups[serviceType].includes(serviceGroup)) {
-                  hierarchy.groups[serviceType].push(serviceGroup);
+                if (!hierarchy.groups[serviceType].includes(groupKey)) {
+                  hierarchy.groups[serviceType].push(groupKey);
                 }
                 
                 // Add service to group
                 if (!hierarchy.services[serviceType]) {
                   hierarchy.services[serviceType] = {};
                 }
-                if (!hierarchy.services[serviceType][serviceGroup]) {
-                  hierarchy.services[serviceType][serviceGroup] = [];
+                if (!hierarchy.services[serviceType][groupKey]) {
+                  hierarchy.services[serviceType][groupKey] = [];
                 }
-                if (!hierarchy.services[serviceType][serviceGroup].includes(baseServiceName)) {
-                  hierarchy.services[serviceType][serviceGroup].push(baseServiceName);
+                if (!hierarchy.services[serviceType][groupKey].includes(baseServiceName)) {
+                  hierarchy.services[serviceType][groupKey].push(baseServiceName);
                 }
               }
             }
@@ -1409,8 +1417,18 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
       setOpenCategory("Digital");
     }
   }, [serviceType, serviceCategory]);
-  const groups = (serviceType ? serviceHierarchy.groups[serviceType as keyof typeof serviceHierarchy.groups] : []) || [];
-  const services = (serviceType && serviceGroup ? (serviceHierarchy.services?.[serviceType as keyof typeof serviceHierarchy.services] as Record<string, readonly string[]>)?.[serviceGroup]||[] : []);
+  
+  // Filter groups by category for Self-Shoot
+  const allGroups = (serviceType ? serviceHierarchy.groups[serviceType as keyof typeof serviceHierarchy.groups] : []) || [];
+  const groups = serviceType === "Self-Shoot" && serviceCategory
+    ? allGroups.filter(g => g.startsWith(serviceCategory)).map(g => g.replace(`${serviceCategory} `, ''))
+    : allGroups;
+  
+  // For Self-Shoot, use category-prefixed group key to get correct services
+  const serviceGroupKey = serviceType === "Self-Shoot" && serviceCategory && serviceGroup
+    ? `${serviceCategory} ${serviceGroup}`
+    : serviceGroup;
+  const services = (serviceType && serviceGroupKey ? (serviceHierarchy.services?.[serviceType as keyof typeof serviceHierarchy.services] as Record<string, readonly string[]>)?.[serviceGroupKey]||[] : []);
 
   return (
     <div>
@@ -1670,13 +1688,6 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     return `${year}-${month}-${day}`;
   }, []);
 
-  // Auto-select today if no date is selected
-  useEffect(() => {
-    if (!date) {
-      setDate(today);
-    }
-  }, [date, today, setDate]);
-
   // Generate calendar days based on scheduling window from settings
   const next90Days = useMemo(() => {
     const days: string[] = [];
@@ -1695,6 +1706,26 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
     }
     return days;
   }, [today, bookingPolicies.schedulingWindow, bookingPolicies.schedulingWindowUnit]);
+
+  // Auto-select first available date
+  useEffect(() => {
+    if (!date && Object.keys(availabilityCache).length > 0) {
+      // Find first date with available slots
+      const firstAvailable = next90Days.find(d => {
+        const isDateAllowed = isDateAllowedForService(d, serviceType, serviceRestrictions);
+        const availableCount = availabilityCache[d] || 0;
+        const isPastDate = d < today;
+        return !isPastDate && isDateAllowed && availableCount > 0;
+      });
+      
+      if (firstAvailable) {
+        setDate(firstAvailable);
+      } else {
+        // Fallback to today if no available dates found
+        setDate(today);
+      }
+    }
+  }, [date, today, setDate, availabilityCache, next90Days, serviceType, serviceRestrictions]);
 
   // Current month view state
   const [currentMonth, setCurrentMonth] = useState(new Date(today));
@@ -1888,8 +1919,8 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
                     "aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition relative",
                     isSelected && "bg-[#0b3d2e] text-white shadow-md",
                     !isSelected && !isFullyBooked && "hover:bg-neutral-100 text-neutral-900",
-                    isFullyBooked && "text-neutral-300 cursor-not-allowed",
-                    isToday && !isSelected && "border-2 border-[#0b3d2e]"
+                    isFullyBooked && "bg-neutral-100 text-neutral-400 cursor-not-allowed",
+                    isToday && !isSelected && !isFullyBooked && "border-2 border-[#0b3d2e]"
                   )}
                 >
                   {d.split('-')[2]}
