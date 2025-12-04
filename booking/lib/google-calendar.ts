@@ -17,6 +17,8 @@ interface CalendarEventData {
   };
   service: string;
   serviceType: string;
+  serviceCategory?: string;
+  serviceGroup?: string;
   duration: number;
   date: string;
   time: string;
@@ -136,9 +138,19 @@ export async function createCalendarEvent(eventData: CalendarEventData): Promise
     eventDescription += `Location: Indang, Cavite\n`;
     eventDescription += `Google Maps: https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9`;
 
+    // Create event summary based on service type
+    let eventSummary: string;
+    if (serviceType === 'Self-Shoot') {
+      // Self-Shoot: Service Type, Service Category, Service, First Name Last Name
+      eventSummary = `${serviceType}, ${eventData.serviceCategory || 'Digital'}, ${service} - ${customer.firstName} ${customer.lastName}`;
+    } else {
+      // With Photographer / Seasonal Sessions: Service Type, Service Group, Service, First Name Last Name
+      eventSummary = `${serviceType}, ${eventData.serviceGroup || ''}, ${service} - ${customer.firstName} ${customer.lastName}`;
+    }
+    
     // Create event with proper organizer information
     const event = {
-      summary: `📸 ${service} - ${customer.firstName} ${customer.lastName}`,
+      summary: eventSummary,
       description: eventDescription,
       start: {
         dateTime: startDateTime,

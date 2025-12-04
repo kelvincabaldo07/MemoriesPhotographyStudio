@@ -392,6 +392,8 @@ export async function POST(request: NextRequest) {
         customer: bookingData.customer,
         service: bookingData.selections.service,
         serviceType: bookingData.selections.serviceType,
+        serviceCategory: bookingData.selections.serviceCategory,
+        serviceGroup: bookingData.selections.serviceGroup,
         duration: bookingData.selections.duration,
         date: bookingData.schedule.date,
         time: bookingData.schedule.time,

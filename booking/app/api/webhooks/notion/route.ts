@@ -223,11 +223,16 @@ async function handleBookingCreated(pageId: string, props: any) {
     }
     
     try {
+      const serviceCategory = extractSelect(props['Service Category']);
+      const serviceGroup = extractText(props['Service Group']);
+      
       const eventId = await createCalendarEvent({
         bookingId,
         customer: { firstName, lastName, email, phone },
         service,
         serviceType,
+        serviceCategory,
+        serviceGroup,
         duration,
         date,
         time,

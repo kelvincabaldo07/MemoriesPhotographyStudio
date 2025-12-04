@@ -69,11 +69,16 @@ export async function POST(request: NextRequest) {
         if (!calendarEventId) {
           console.log(`[Sync] Creating calendar event for ${bookingId}`);
           
+          const serviceCategory = props['Service Category']?.select?.name;
+          const serviceGroup = props['Service Group']?.rich_text?.[0]?.plain_text;
+          
           const eventId = await createCalendarEvent({
             bookingId,
             customer: { firstName, lastName, email, phone },
             service,
             serviceType,
+            serviceCategory,
+            serviceGroup,
             duration,
             date,
             time,
