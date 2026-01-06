@@ -370,13 +370,31 @@ export async function GET(request: Request) {
     // Transform Notion data to service config format
     const services = data.results.map((page: any) => {
       const props = page.properties;
+      
+      // Try multiple possible field names for description
+      let description = "";
+      const descriptionFields = ['Description', 'description', 'Details', 'details', 'Info', 'info'];
+      
+      for (const fieldName of descriptionFields) {
+        if (props[fieldName]?.rich_text?.[0]?.plain_text) {
+          description = props[fieldName].rich_text[0].plain_text;
+          break;
+        }
+      }
+      
+      // Debug logging for missing descriptions
+      if (!description && props.Name?.title?.[0]?.plain_text) {
+        console.log(`⚠️  No description found for service: ${props.Name.title[0].plain_text}`);
+        console.log('   Available properties:', Object.keys(props).filter(k => props[k].type === 'rich_text').join(', '));
+      }
+      
       return {
         id: page.id, // Store Notion page ID for updates
         name: props.Name?.title?.[0]?.plain_text || "",
         type: props.Type?.select?.name || "Self-Shoot",
         category: props.Category?.select?.name,
         group: props.Group?.rich_text?.[0]?.plain_text || "",
-        description: props.Description?.rich_text?.[0]?.plain_text || "",
+        description: description,
         basePrice: props.BasePrice?.number || 0,
         duration: props.Duration?.number || 45,
         availableFrom: props.AvailableFrom?.number,

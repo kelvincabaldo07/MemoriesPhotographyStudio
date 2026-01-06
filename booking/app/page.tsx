@@ -47,15 +47,15 @@ type ShopHours = {
 
 // Studio hours by day of week
 const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
-  0: { open: 13, close: 20, lunchBreak: null }, // Sunday: 1 PM - 8 PM (no lunch break)
-  1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Monday: 8 AM - 8 PM (lunch 12-1)
-  2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Tuesday: 8 AM - 8 PM (lunch 12-1)
-  3: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Wednesday: 8 AM - 8 PM (lunch 12-1)
-  4: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Thursday: 8 AM - 8 PM (lunch 12-1)
-  5: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },  // Friday: 8 AM - 8 PM (lunch 12-1)
-  6: { open: 10, close: 20, lunchBreak: { start: 12, end: 13 } }, // Saturday: 10 AM - 8 PM (lunch 12-1)
+  0: { open: 13, close: 18, lunchBreak: null }, // Sunday: 1 PM - 6 PM (no lunch break)
+  1: { open: 10, close: 16, lunchBreak: null },  // Monday: 10 AM - 4 PM (no lunch break)
+  2: { open: 10, close: 16, lunchBreak: null },  // Tuesday: 10 AM - 4 PM (no lunch break)
+  3: { open: 10, close: 16, lunchBreak: null },  // Wednesday: 10 AM - 4 PM (no lunch break)
+  4: { open: 10, close: 16, lunchBreak: null },  // Thursday: 10 AM - 4 PM (no lunch break)
+  5: { open: 10, close: 16, lunchBreak: null },  // Friday: 10 AM - 4 PM (no lunch break)
+  6: { open: 10, close: 18, lunchBreak: null }, // Saturday: 10 AM - 6 PM (no lunch break)
 };
-const SHOP_HOURS = { open: 8, close: 20 }; // Default for general calculations
+const SHOP_HOURS = { open: 10, close: 18 }; // Default for general calculations
 const SLOT_MINUTES = 15; // 15-minute increments for display
 const BUFFER_MINUTES = 30; // 30-min buffer between sessions
 const MIN_SESSION_DURATION = 45; // Minimum booking duration (for slot count calculation)
