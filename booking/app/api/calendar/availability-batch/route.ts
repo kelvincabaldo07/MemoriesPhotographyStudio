@@ -223,6 +223,7 @@ export async function POST(request: NextRequest) {
       
       const dayEvents = eventsByDate[date] || [];
       const blockedRanges: [number, number][] = [];
+      const dayShopHours = getShopHoursForDate(date); // Get correct hours for this specific date
 
       dayEvents.forEach((event) => {
         if (!event.start?.dateTime || !event.end?.dateTime) return;
@@ -230,16 +231,16 @@ export async function POST(request: NextRequest) {
         const eventStart = new Date(event.start.dateTime);
         const eventEnd = new Date(event.end.dateTime);
 
-        const startMins = eventStart.getHours() * 60 + eventStart.getMinutes() - BUFFER_MINUTES;
-        const endMins = eventEnd.getHours() * 60 + eventEnd.getMinutes() + BUFFER_MINUTES;
+        const startMins = eventStart.getHours() * 60 + eventStart.getMinutes();
+        const endMins = eventEnd.getHours() * 60 + eventEnd.getMinutes();
 
-        const clampedStart = Math.max(startMins, SHOP_HOURS.open * 60);
-        const clampedEnd = Math.min(endMins, SHOP_HOURS.close * 60);
+        const clampedStart = Math.max(startMins, dayShopHours.open * 60);
+        const clampedEnd = Math.min(endMins, dayShopHours.close * 60);
 
         blockedRanges.push([clampedStart, clampedEnd]);
       });
 
-      const allSlots = generateDailySlots();
+      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES);
       const availableSlots = allSlots.filter((slot) =>
         isSlotAvailable(slot, duration, blockedRanges)
       );

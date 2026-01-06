@@ -85,7 +85,11 @@ function isSlotAvailable(
   // When a customer books this slot, it will occupy: start -> start + duration + buffer
   const slotEnd = slotStart + duration + BUFFER_MINUTES;
   
+  // Check if this slot overlaps with any blocked range
+  // A slot is only available if it doesn't overlap with ANY booking
   return blockedRanges.every(([blockStart, blockEnd]) => {
+    // No overlap if: slot ends before or exactly when block starts, OR slot starts after block ends
+    // Note: We need buffer, so slot ending exactly when block starts is NOT ok
     return slotEnd <= blockStart || slotStart >= blockEnd;
   });
 }
@@ -278,6 +282,7 @@ export async function GET(request: NextRequest) {
 
     // Build blocked ranges
     const blockedRanges: [number, number][] = [];
+    const dayShopHours = getShopHoursForDate(date); // Get correct hours for this specific date
 
     events.forEach((event) => {
       if (!event.start?.dateTime || !event.end?.dateTime) return;
@@ -303,25 +308,33 @@ export async function GET(request: NextRequest) {
       const [startHour, startMin] = manilaStartStr.split(':').map(Number);
       const [endHour, endMin] = manilaEndStr.split(':').map(Number);
 
-      // Calendar events already include the buffer in their duration, so don't add extra buffer
+      // Calendar events already include the buffer in their duration
       const startMins = startHour * 60 + startMin;
       const endMins = endHour * 60 + endMin;
 
-      const clampedStart = Math.max(startMins, SHOP_HOURS.open * 60);
-      const clampedEnd = Math.min(endMins, SHOP_HOURS.close * 60);
+      // Use the correct shop hours for this date
+      const clampedStart = Math.max(startMins, dayShopHours.open * 60);
+      const clampedEnd = Math.min(endMins, dayShopHours.close * 60);
 
-      console.log(`[Availability] Blocking ${event.summary}: ${toHHMM(clampedStart)} - ${toHHMM(clampedEnd)} (buffer already included in calendar event)`);
+      console.log(`[Availability ${date}] Event: "${event.summary}"`);
+      console.log(`  - Start: ${event.start.dateTime} → Manila: ${manilaStartStr} (${clampedStart} mins)`);
+      console.log(`  - End: ${event.end.dateTime} → Manila: ${manilaEndStr} (${clampedEnd} mins)`);
+      console.log(`  - Blocking range: ${toHHMM(clampedStart)} - ${toHHMM(clampedEnd)}`);
 
       blockedRanges.push([clampedStart, clampedEnd]);
     });
+    
+    console.log(`[Availability ${date}] Total blocked ranges: ${blockedRanges.length}`);
 
     const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, slotSizeMinutes);
+    console.log(`[Availability ${date}] Generated ${allSlots.length} total slots for ${duration}min duration`);
     
     // If admin bypass, return all slots but also mark which ones are booked
     if (adminBypass) {
       const unavailableSlots = allSlots.filter((slot) =>
         !isSlotAvailable(slot, duration, blockedRanges)
       );
+      console.log(`[Availability ${date}] Admin bypass: ${unavailableSlots.length} slots are booked`);
       
       return NextResponse.json({
         success: true,
@@ -338,10 +351,15 @@ export async function GET(request: NextRequest) {
     }
     
     // Regular mode: filter out booked slots
-    const availableSlots = allSlots.filter((slot) =>
-      isSlotAvailable(slot, duration, blockedRanges)
-    );
+    const availableSlots = allSlots.filter((slot) => {
+      const isAvailable = isSlotAvailable(slot, duration, blockedRanges);
+      if (!isAvailable) {
+        console.log(`[Availability ${date}] Slot ${slot} blocked (needs ${duration}+${BUFFER_MINUTES} mins)`);
+      }
+      return isAvailable;
+    });
     const filteredSlots = filterPastSlots(availableSlots, date, leadTimeMinutes);
+    console.log(`[Availability ${date}] ${availableSlots.length} available → ${filteredSlots.length} after filtering past times`);
     
     const realSlots = calculateRealSlots(filteredSlots, duration);
 
