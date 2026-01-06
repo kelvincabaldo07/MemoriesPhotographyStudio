@@ -316,6 +316,28 @@ export async function GET(request: NextRequest) {
     });
 
     const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, slotSizeMinutes);
+    
+    // If admin bypass, return all slots but also mark which ones are booked
+    if (adminBypass) {
+      const unavailableSlots = allSlots.filter((slot) =>
+        !isSlotAvailable(slot, duration, blockedRanges)
+      );
+      
+      return NextResponse.json({
+        success: true,
+        date,
+        duration,
+        availableSlots: allSlots, // All slots in admin mode
+        unavailableSlots, // Which ones are actually booked
+        totalSlots: allSlots.length,
+        realBookableSlots: allSlots.length,
+        bookedEvents: events.length,
+        adminBypass: true,
+        usingMockData: false,
+      });
+    }
+    
+    // Regular mode: filter out booked slots
     const availableSlots = allSlots.filter((slot) =>
       isSlotAvailable(slot, duration, blockedRanges)
     );

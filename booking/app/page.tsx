@@ -846,7 +846,13 @@ async function submitBooking(){
         return true;
       }
       case 4: return backdropSelectionValid; // backdrops
-      case 5: return true; // add-ons optional
+      case 5: {
+        // Skip add-ons for With Photographer and Seasonal Sessions
+        if (serviceType === "With Photographer" || serviceType === "Seasonal Sessions") {
+          return true; // Auto-skip this step
+        }
+        return true; // add-ons optional for Self-Shoot
+      }
       case 6: return acceptedPhotoDelivery && acceptedLocation && acceptedParking && acceptedBookingPolicy; // all terms must be accepted
       case 7: return true; // review
       default: return false;
@@ -1008,7 +1014,13 @@ async function submitBooking(){
               />
             )}
 
-            {step === 5 && (<StepAddons addons={addons} toggle={toggleAddon} />)}
+            {step === 5 && serviceType === "Self-Shoot" && (<StepAddons addons={addons} toggle={toggleAddon} />)}
+            {step === 5 && (serviceType === "With Photographer" || serviceType === "Seasonal Sessions") && (
+              <div className="text-center py-8 text-neutral-600">
+                <p className="text-lg">Add-ons are not available for {serviceType} sessions.</p>
+                <p className="text-sm mt-2">Click Next to continue.</p>
+              </div>
+            )}
             {step === 6 && (
               <StepVideoAndTerms 
                 acceptedPhotoDelivery={acceptedPhotoDelivery}

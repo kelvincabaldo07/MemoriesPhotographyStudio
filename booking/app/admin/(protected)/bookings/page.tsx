@@ -461,6 +461,14 @@ export default function BookingsPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            onClick={() => window.open('/', '_blank')}
+            className="bg-blue-600 hover:bg-blue-700 text-h3"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Create Booking</span>
+            <span className="sm:hidden">New</span>
+          </Button>
           <div className="flex border rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('list')}

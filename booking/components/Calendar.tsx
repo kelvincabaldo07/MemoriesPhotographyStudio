@@ -43,6 +43,7 @@ export function BookingCalendar({
 }: CalendarProps) {
   const [loading, setLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]); // Track booked slots in admin mode
   const [availabilityCache, setAvailabilityCache] = useState<Record<string, number>>({});
   const [loadingDates, setLoadingDates] = useState(false);
 
@@ -158,18 +159,26 @@ export function BookingCalendar({
         console.log('📦 Calendar: API response', data);
         if (data.success) {
           setAvailableSlots(data.availableSlots);
+          // In admin mode, track which slots are already booked
+          if (adminBypass && data.unavailableSlots) {
+            setBookedSlots(data.unavailableSlots);
+          } else {
+            setBookedSlots([]);
+          }
           console.log('✅ Calendar: Set available slots', data.availableSlots.length);
         } else {
           console.warn('⚠️ Calendar: API returned success=false');
           setAvailableSlots([]);
+          setBookedSlots([]);
         }
       })
       .catch(err => {
         console.error('❌ Calendar: Error fetching availability:', err);
         setAvailableSlots([]);
+        setBookedSlots([]);
       })
       .finally(() => setLoading(false));
-  }, [selectedDate, duration]);
+  }, [selectedDate, duration, adminBypass]);
 
   const formatMonthYear = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -314,20 +323,30 @@ export function BookingCalendar({
                 </div>
               )}
 
-              {availableSlots.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => onTimeChange(s)}
-                  className={cn(
-                    "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition border",
-                    selectedTime === s && "bg-[#0b3d2e] text-white border-[#0b3d2e] shadow-sm",
-                    selectedTime !== s && "bg-white text-neutral-900 border-neutral-200 hover:border-[#0b3d2e] hover:bg-neutral-50"
-                  )}
-                >
-                  <Clock className="w-4 h-4" />
-                  {to12Hour(s)}
-                </button>
-              ))}
+              {availableSlots.map((s) => {
+                const isBooked = bookedSlots.includes(s);
+                return (
+                  <button
+                    key={s}
+                    onClick={() => onTimeChange(s)}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition border",
+                      selectedTime === s && "bg-[#0b3d2e] text-white border-[#0b3d2e] shadow-sm",
+                      selectedTime !== s && !isBooked && "bg-white text-neutral-900 border-neutral-200 hover:border-[#0b3d2e] hover:bg-neutral-50",
+                      selectedTime !== s && isBooked && adminBypass && "bg-orange-50 text-orange-900 border-orange-300 hover:border-orange-500",
+                      selectedTime !== s && isBooked && !adminBypass && "hidden" // Hide booked slots for non-admin
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      {to12Hour(s)}
+                    </div>
+                    {adminBypass && isBooked && (
+                      <span className="text-xs bg-orange-200 text-orange-800 px-2 py-0.5 rounded">Already Booked</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
