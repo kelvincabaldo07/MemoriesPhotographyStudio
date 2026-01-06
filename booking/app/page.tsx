@@ -2114,11 +2114,20 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           </div>
         )}
 
-        {date && !loading && realAvailableSlots.length > 0 && 
-          serviceRestrictions[serviceType]?.availableFrom !== undefined && 
-          serviceRestrictions[serviceType]?.availableUntil !== undefined && (
+        {date && !loading && realAvailableSlots.length > 0 && (
           <p className="text-xs text-neutral-500 mt-3">
-            {`${serviceType} sessions: ${serviceRestrictions[serviceType].availableFrom}:00 ${serviceRestrictions[serviceType].availableFrom! >= 12 ? 'PM' : 'AM'} - ${serviceRestrictions[serviceType].availableUntil! > 12 ? serviceRestrictions[serviceType].availableUntil! - 12 : serviceRestrictions[serviceType].availableUntil}:00 ${serviceRestrictions[serviceType].availableUntil! >= 12 ? 'PM' : 'AM'}`}
+            {(() => {
+              // Get shop hours for the selected date
+              const dateObj = new Date(date + 'T12:00:00');
+              const dayOfWeek = dateObj.getDay();
+              const hours = SHOP_HOURS_BY_DAY[dayOfWeek];
+              const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
+              
+              const openTime = hours.open > 12 ? `${hours.open - 12}:00 PM` : `${hours.open}:00 AM`;
+              const closeTime = hours.close > 12 ? `${hours.close - 12}:00 PM` : `${hours.close}:00 PM`;
+              
+              return `Studio hours for ${dayName}: ${openTime} - ${closeTime}`;
+            })()}
           </p>
         )}
       </div>
