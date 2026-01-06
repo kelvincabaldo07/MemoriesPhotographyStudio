@@ -11,15 +11,15 @@ type ShopHours = {
 };
 
 const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
-  0: { open: 13, close: 20, lunchBreak: null },
-  1: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
-  2: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
-  3: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
-  4: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
-  5: { open: 8, close: 20, lunchBreak: { start: 12, end: 13 } },
-  6: { open: 10, close: 20, lunchBreak: { start: 12, end: 13 } },
+  0: { open: 13, close: 18, lunchBreak: null },
+  1: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
+  2: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
+  3: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
+  4: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
+  5: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
+  6: { open: 10, close: 18, lunchBreak: { start: 12, end: 13 } },
 };
-const SHOP_HOURS = { open: 8, close: 20 };
+const SHOP_HOURS = { open: 10, close: 16 };
 const SLOT_MINUTES = 15;
 const BUFFER_MINUTES = 30;
 const MIN_SESSION_DURATION = 45; // Minimum booking duration
