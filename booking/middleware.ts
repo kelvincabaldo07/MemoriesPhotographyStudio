@@ -24,8 +24,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Protect all admin API routes
-  if (path.startsWith('/api/admin')) {
+  // Protect all admin API routes (except public read-only endpoints)
+  const publicAdminEndpoints = [
+    '/api/admin/services/config',
+    '/api/admin/services/taxonomy',
+  ];
+  
+  if (path.startsWith('/api/admin') && !publicAdminEndpoints.some(endpoint => path.startsWith(endpoint))) {
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
