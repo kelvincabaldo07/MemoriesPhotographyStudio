@@ -108,7 +108,7 @@ function calculateRealSlots(availableSlots: string[], duration: number): number 
 
 export async function POST(request: NextRequest) {
   try {
-    const { dates, duration = 45 } = await request.json();
+    const { dates, duration = 45, adminBypass = false } = await request.json();
 
     if (!dates || !Array.isArray(dates)) {
       return NextResponse.json(
@@ -118,6 +118,21 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Batch API received dates:', dates.slice(0, 5), '... total:', dates.length);
+    
+    // If admin bypass is enabled, return maximum slots for all dates
+    if (adminBypass) {
+      const allSlots = generateDailySlots();
+      const results = dates.map(date => ({
+        date,
+        count: allSlots.length
+      }));
+      
+      return NextResponse.json({
+        success: true,
+        results,
+        adminBypass: true,
+      });
+    }
 
     // If no refresh token, return mock data for all dates
     if (!process.env.GOOGLE_REFRESH_TOKEN) {

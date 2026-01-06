@@ -171,11 +171,12 @@ export default function BookingsPage() {
     
     setCheckingAvailability(true);
     try {
-      const response = await fetch(`/api/calendar/availability?date=${date}&duration=${duration}`);
+      // Admin bypass enabled - show all time slots
+      const response = await fetch(`/api/calendar/availability?date=${date}&duration=${duration}&adminBypass=true`);
       const data = await response.json();
       
-      if (response.ok && data.available) {
-        setAvailabilitySlots({ date, slots: data.slots || [] });
+      if (response.ok && data.availableSlots) {
+        setAvailabilitySlots({ date, slots: data.availableSlots || [] });
       } else {
         setAvailabilitySlots({ date, slots: [] });
       }
@@ -1106,6 +1107,11 @@ export default function BookingsPage() {
                   {isEditing ? (
                     <div className="mt-6">
                       <h4 className="text-h3 font-semibold text-neutral-700 mb-4">Select Date & Time</h4>
+                      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          🔓 <strong>Admin Mode:</strong> You can book at any time slot, even if it appears booked or unavailable to regular customers.
+                        </p>
+                      </div>
                       <BookingCalendar
                         selectedDate={editedBooking?.date || ""}
                         selectedTime={editedBooking?.time || ""}
@@ -1120,6 +1126,7 @@ export default function BookingsPage() {
                         duration={editedBooking?.duration || 30}
                         serviceType={editedBooking?.serviceType || ""}
                         bookingPolicies={{ schedulingWindow: 90, schedulingWindowUnit: 'days' }}
+                        adminBypass={true}
                       />
                     </div>
                   ) : (

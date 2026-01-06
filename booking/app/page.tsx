@@ -2114,11 +2114,11 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           </div>
         )}
 
-        {date && !loading && realAvailableSlots.length > 0 && (
+        {date && !loading && realAvailableSlots.length > 0 && 
+          serviceRestrictions[serviceType]?.availableFrom !== undefined && 
+          serviceRestrictions[serviceType]?.availableUntil !== undefined && (
           <p className="text-xs text-neutral-500 mt-3">
-            {serviceRestrictions[serviceType]?.availableFrom !== undefined && 
-              serviceRestrictions[serviceType]?.availableUntil !== undefined && 
-              `${serviceType} sessions: ${serviceRestrictions[serviceType].availableFrom}:00 ${serviceRestrictions[serviceType].availableFrom! >= 12 ? 'PM' : 'AM'} - ${serviceRestrictions[serviceType].availableUntil! > 12 ? serviceRestrictions[serviceType].availableUntil! - 12 : serviceRestrictions[serviceType].availableUntil}:00 ${serviceRestrictions[serviceType].availableUntil! >= 12 ? 'PM' : 'AM'}`}
+            {`${serviceType} sessions: ${serviceRestrictions[serviceType].availableFrom}:00 ${serviceRestrictions[serviceType].availableFrom! >= 12 ? 'PM' : 'AM'} - ${serviceRestrictions[serviceType].availableUntil! > 12 ? serviceRestrictions[serviceType].availableUntil! - 12 : serviceRestrictions[serviceType].availableUntil}:00 ${serviceRestrictions[serviceType].availableUntil! >= 12 ? 'PM' : 'AM'}`}
           </p>
         )}
       </div>

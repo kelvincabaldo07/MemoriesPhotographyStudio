@@ -134,6 +134,10 @@ function filterPastSlots(slots: string[], dateStr: string, leadTimeMinutes: numb
 }
 
 export async function GET(request: NextRequest) {
+  // Check if admin bypass is enabled (allows admins to book beyond available slots)
+  const { searchParams } = new URL(request.url);
+  const adminBypass = searchParams.get('adminBypass') === 'true';
+  
   // Fetch booking policies from settings (declare outside try for catch access)
   let bookingPolicies = {
     leadTime: 2,
@@ -156,7 +160,6 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
     const duration = parseInt(searchParams.get('duration') || '45');
 
@@ -165,6 +168,22 @@ export async function GET(request: NextRequest) {
         { error: 'Date parameter is required' },
         { status: 400 }
       );
+    }
+    
+    // If admin bypass is enabled, return all available time slots without filtering
+    if (adminBypass) {
+      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, 15);
+      return NextResponse.json({
+        success: true,
+        date,
+        duration,
+        availableSlots: allSlots,
+        totalSlots: allSlots.length,
+        realBookableSlots: allSlots.length,
+        bookedEvents: 0,
+        adminBypass: true,
+        message: 'Admin mode: All time slots available',
+      });
     }
 
     // Convert lead time to minutes

@@ -28,6 +28,7 @@ interface CalendarProps {
     schedulingWindow: number;
     schedulingWindowUnit: 'days' | 'months';
   };
+  adminBypass?: boolean; // Allow admins to bypass availability checks
 }
 
 export function BookingCalendar({
@@ -38,6 +39,7 @@ export function BookingCalendar({
   duration,
   serviceType = "",
   bookingPolicies = { schedulingWindow: 90, schedulingWindowUnit: 'days' },
+  adminBypass = false,
 }: CalendarProps) {
   const [loading, setLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
@@ -122,7 +124,7 @@ export function BookingCalendar({
     fetch('/api/calendar/availability-batch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dates: futureQDays, duration })
+      body: JSON.stringify({ dates: futureQDays, duration, adminBypass })
     })
       .then(res => res.json())
       .then(data => {
@@ -146,10 +148,11 @@ export function BookingCalendar({
     }
 
     console.log('🔍 Calendar: Fetching slots for', { selectedDate, duration });
-    console.log('🔍 Calendar: Full props:', { selectedDate, selectedTime, duration, serviceType });
+    console.log('🔍 Calendar: Full props:', { selectedDate, selectedTime, duration, serviceType, adminBypass });
     setLoading(true);
 
-    fetch(`/api/calendar/availability?date=${selectedDate}&duration=${duration}`)
+    const adminParam = adminBypass ? '&adminBypass=true' : '';
+    fetch(`/api/calendar/availability?date=${selectedDate}&duration=${duration}${adminParam}`)
       .then(res => res.json())
       .then(data => {
         console.log('📦 Calendar: API response', data);
