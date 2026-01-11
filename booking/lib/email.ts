@@ -77,14 +77,12 @@ export async function sendOTPEmail(email: string, otpCode: string): Promise<bool
                   <!-- Body -->
                   <tr>
                     <td style="padding: 40px;">
-                      <h2 style="margin: 0 0 20px 0; color: #2C2C2C; font-size: 24px;">Email Verification</h2>
-                      <p style="margin: 0 0 20px 0; color: #2C2C2C; font-size: 16px; line-height: 1.5;">
-                        Thank you for choosing Memories Photography Studio! Please use the verification code below to complete your action:
+                      <p style="margin: 0 0 20px 0; color: #2C2C2C; font-size: 18px; line-height: 1.5; text-align: center;">
+                        Your verification code is:
                       </p>
                       
                       <!-- OTP Code Box -->
-                      <div style="background-color: #FAF3E0; border: 2px dashed #0b3d2e; border-radius: 8px; padding: 30px; text-align: center; margin: 30px 0;">
-                        <p style="margin: 0 0 10px 0; color: #666; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Your Verification Code</p>
+                      <div style="background-color: #FAF3E0; border: 2px dashed #0b3d2e; border-radius: 8px; padding: 30px; text-align: center; margin: 20px 0;">
                         <p style="margin: 0; color: #0b3d2e; font-size: 42px; font-weight: bold; letter-spacing: 8px; font-family: 'Courier New', monospace;">${otpCode}</p>
                       </div>
                       
