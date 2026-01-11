@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendEmailVerificationCode } from '@/lib/sendgrid';
+import { sendEmailVerificationCode } from '@/lib/email';
 
 function generateVerificationCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();

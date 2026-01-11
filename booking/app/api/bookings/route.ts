@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyRecaptchaToken } from '@/lib/recaptcha';
 import { logAudit, createSearchAudit } from '@/lib/audit';
 import { calculateEndTime } from '@/lib/time-utils';
-import { sendBookingConfirmationEmail } from '@/lib/sendgrid';
+import { sendBookingConfirmationEmail } from '@/lib/email';
 import { createCalendarEvent } from '@/lib/google-calendar';
 import { randomBytes } from 'crypto';
 

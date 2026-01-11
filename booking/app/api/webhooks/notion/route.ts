@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
-import { sendBookingConfirmationEmail } from '@/lib/sendgrid';
+import { sendBookingConfirmationEmail } from '@/lib/email';
 
 // Webhook secret for security
 const WEBHOOK_SECRET = process.env.NOTION_WEBHOOK_SECRET;

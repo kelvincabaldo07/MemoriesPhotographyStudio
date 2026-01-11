@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createOTP, otpExists, getOTPConfig } from '@/lib/otp';
 import { verifyRecaptchaToken } from '@/lib/recaptcha';
 import { logAudit, createOTPRequestAudit } from '@/lib/audit';
-import { sendOTPEmail } from '@/lib/sendgrid';
+import { sendOTPEmail } from '@/lib/email';
 
 /**
  * POST /api/otp/send - Generate and send OTP via email
