@@ -394,11 +394,12 @@ export async function POST(request: NextRequest) {
     try {
       await logAudit({
         timestamp: new Date().toISOString(),
-        action: 'admin_booking_create',
+        action: 'create',
         adminUser: session.user?.email || 'unknown',
         bookingId: bookingId,
         customerEmail: bookingData.customer.email,
         details: {
+          adminBooking: true,
           service: bookingData.selections.service,
           date: bookingData.schedule.date,
           time: bookingData.schedule.time,
