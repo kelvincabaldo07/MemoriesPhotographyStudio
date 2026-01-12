@@ -395,18 +395,19 @@ export async function POST(request: NextRequest) {
       await logAudit({
         timestamp: new Date().toISOString(),
         action: 'create',
-        adminUser: session.user?.email || 'unknown',
         bookingId: bookingId,
-        customerEmail: bookingData.customer.email,
-        details: {
+        email: bookingData.customer.email,
+        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
+        userAgent: request.headers.get('user-agent') || 'unknown',
+        status: 'success',
+        metadata: {
           adminBooking: true,
+          adminUser: session.user?.email || 'unknown',
           service: bookingData.selections.service,
           date: bookingData.schedule.date,
           time: bookingData.schedule.time,
           offHoursOverride: bookingData.allowOffHours || false,
         },
-        ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown',
       });
     } catch (auditError) {
       console.warn('⚠️ Audit logging failed:', auditError);
