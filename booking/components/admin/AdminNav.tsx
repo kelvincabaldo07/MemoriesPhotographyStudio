@@ -11,7 +11,8 @@ import {
   BarChart3,
   PackageOpen,
   Clock,
-  LogOut
+  LogOut,
+  UserPlus
 } from "lucide-react";
 
 export default function AdminNav({ session }: { session: any }) {
@@ -21,6 +22,7 @@ export default function AdminNav({ session }: { session: any }) {
   const navItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Bookings", path: "/admin/bookings", icon: Calendar },
+    { name: "Book Customer", path: "/admin/book-customer", icon: UserPlus },
     { name: "Customers", path: "/admin/customers", icon: Users },
     { name: "Services", path: "/admin/services", icon: PackageOpen },
     { name: "Availability", path: "/admin/availability", icon: Clock },
