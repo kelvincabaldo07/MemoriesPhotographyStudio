@@ -271,10 +271,10 @@ export default function AdminBookCustomerPage() {
     }
   };
 
-  if (success) {session={session} 
+  if (success) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <AdminNav />
+        <AdminNav session={session} />
         <main className="container mx-auto px-4 py-8">
           <Card className="max-w-md mx-auto">
             <CardContent className="p-8 text-center">
