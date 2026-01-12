@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Calendar, ChevronLeft, ChevronRight, Clock, User, Phone, Mail, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,9 @@ function toProperCase(name: string): string {
 }
 
 export default function AdminBookCustomerPage() {
+  // Get session for AdminNav
+  const { data: session } = useSession();
+  
   // Load services
   const [services, setServices] = useState<Service[]>([]);
   
@@ -267,7 +271,7 @@ export default function AdminBookCustomerPage() {
     }
   };
 
-  if (success) {
+  if (success) {session={session} 
     return (
       <div className="min-h-screen bg-gray-50">
         <AdminNav />
@@ -287,7 +291,7 @@ export default function AdminBookCustomerPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminNav />
+      <AdminNav session={session} />
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <h1 className="text-3xl font-bold mb-6">Book for Customer</h1>
         
