@@ -227,7 +227,7 @@ export default function AdminBookCustomerPage() {
           serviceGroup: selectedGroup,
           service: selectedService,
           duration: serviceConfig?.duration || 30,
-          description: serviceConfig?.details || "",
+          description: serviceConfig?.description || "",
         },
         schedule: {
           date: selectedDate,
