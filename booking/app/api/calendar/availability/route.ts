@@ -75,6 +75,19 @@ function generateDailySlots(dateStr?: string, duration: number = MIN_SESSION_DUR
   return slots;
 }
 
+// Generate 24-hour slots for admin bypass mode (00:00 to 23:45)
+function generateFullDaySlots(slotSize: number = SLOT_MINUTES): string[] {
+  const slots: string[] = [];
+  // Generate slots from 00:00 to 23:45 (or whatever fits in 24 hours)
+  const totalMinutesInDay = 24 * 60;
+  
+  for (let mins = 0; mins < totalMinutesInDay; mins += slotSize) {
+    slots.push(toHHMM(mins));
+  }
+  
+  return slots;
+}
+
 function isSlotAvailable(
   slotHHMM: string,
   duration: number,
@@ -174,9 +187,9 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // If admin bypass is enabled, return all available time slots without filtering
+    // If admin bypass is enabled, return all 24-hour time slots without filtering
     if (adminBypass) {
-      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, 15);
+      const allSlots = generateFullDaySlots(15); // Generate 00:00 to 23:45 in 15-min increments
       return NextResponse.json({
         success: true,
         date,
@@ -186,7 +199,7 @@ export async function GET(request: NextRequest) {
         realBookableSlots: allSlots.length,
         bookedEvents: 0,
         adminBypass: true,
-        message: 'Admin mode: All time slots available',
+        message: 'Admin mode: All 24-hour time slots available (00:00-23:45)',
       });
     }
 
