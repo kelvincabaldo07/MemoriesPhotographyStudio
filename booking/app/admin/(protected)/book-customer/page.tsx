@@ -403,9 +403,12 @@ export default function AdminBookCustomerPage() {
                   onCheckedChange={(checked) => setAllowOffHours(checked as boolean)}
                   id="offhours"
                 />
-                <label htmlFor="offhours" className="text-sm font-medium">
-                  Allow booking during off-hours (Admin Override)
+                <label htmlFor="offhours" className="text-sm font-medium cursor-pointer">
+                  Allow booking during off-hours (00:00-23:45)
                 </label>
+              </div>
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+                <strong>Note:</strong> Double-booking is always prevented. The off-hours toggle only allows booking outside normal business hours.
               </div>
               
               {/* Calendar */}

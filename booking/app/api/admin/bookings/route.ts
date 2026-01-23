@@ -188,73 +188,71 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for double-booking (unless admin override is enabled)
-    if (!bookingData.allowOffHours) {
-      // Check if time slot is already booked
-      const existingBookingsResponse = await fetch(
-        `https://api.notion.com/v1/databases/${databaseId}/query`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${notionApiKey}`,
-            'Content-Type': 'application/json',
-            'Notion-Version': '2022-06-28',
-          },
-          body: JSON.stringify({
-            filter: {
-              and: [
-                {
-                  property: 'Date',
-                  date: {
-                    equals: bookingData.schedule.date
-                  }
-                },
-                {
-                  property: 'Status',
-                  select: {
-                    does_not_equal: 'Cancelled'
-                  }
+    // Always check for double-booking to prevent conflicts
+    // Check if time slot is already booked
+    const existingBookingsResponse = await fetch(
+      `https://api.notion.com/v1/databases/${databaseId}/query`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionApiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          filter: {
+            and: [
+              {
+                property: 'Date',
+                date: {
+                  equals: bookingData.schedule.date
                 }
-              ]
-            }
-          })
-        }
-      );
+              },
+              {
+                property: 'Status',
+                select: {
+                  does_not_equal: 'Cancelled'
+                }
+              }
+            ]
+          }
+        })
+      }
+    );
 
-      if (existingBookingsResponse.ok) {
-        const existingData = await existingBookingsResponse.json();
-        const requestedTime = bookingData.schedule.time;
-        const requestedDuration = bookingData.selections.duration || 30;
+    if (existingBookingsResponse.ok) {
+      const existingData = await existingBookingsResponse.json();
+      const requestedTime = bookingData.schedule.time;
+      const requestedDuration = bookingData.selections.duration || 30;
+      
+      // Check for time conflicts
+      const hasConflict = existingData.results.some((page: any) => {
+        const existingTimeData = page.properties.Time?.date;
+        if (!existingTimeData?.start) return false;
         
-        // Check for time conflicts
-        const hasConflict = existingData.results.some((page: any) => {
-          const existingTimeData = page.properties.Time?.date;
-          if (!existingTimeData?.start) return false;
-          
-          const existingTime = existingTimeData.start.match(/T(\d{2}:\d{2})/)?.[1];
-          if (!existingTime) return false;
-          
-          const existingDuration = page.properties.Duration?.number || 30;
-          
-          // Convert times to minutes for comparison
-          const [reqH, reqM] = requestedTime.split(':').map(Number);
-          const reqStart = reqH * 60 + reqM;
-          const reqEnd = reqStart + requestedDuration + 30; // Include buffer
-          
-          const [exH, exM] = existingTime.split(':').map(Number);
-          const exStart = exH * 60 + exM;
-          const exEnd = exStart + existingDuration + 30; // Include buffer
-          
-          // Check for overlap
-          return (reqStart < exEnd && reqEnd > exStart);
-        });
+        const existingTime = existingTimeData.start.match(/T(\d{2}:\d{2})/)?.[1];
+        if (!existingTime) return false;
         
-        if (hasConflict) {
-          return NextResponse.json(
-            { success: false, error: 'Time slot is already booked. Enable off-hours override to force booking.' },
-            { status: 409 }
-          );
-        }
+        const existingDuration = page.properties.Duration?.number || 30;
+        
+        // Convert times to minutes for comparison
+        const [reqH, reqM] = requestedTime.split(':').map(Number);
+        const reqStart = reqH * 60 + reqM;
+        const reqEnd = reqStart + requestedDuration + 30; // Include buffer
+        
+        const [exH, exM] = existingTime.split(':').map(Number);
+        const exStart = exH * 60 + exM;
+        const exEnd = exStart + existingDuration + 30; // Include buffer
+        
+        // Check for overlap
+        return (reqStart < exEnd && reqEnd > exStart);
+      });
+      
+      if (hasConflict) {
+        return NextResponse.json(
+          { success: false, error: 'Time slot is already booked. Please choose a different time.' },
+          { status: 409 }
+        );
       }
     }
 
