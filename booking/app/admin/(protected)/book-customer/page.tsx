@@ -1,15 +1,12 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { Calendar, ChevronLeft, ChevronRight, Clock, User, Phone, Mail, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-import AdminNav from "@/components/admin/AdminNav";
 
 // Define service structure type
 type Service = {
@@ -43,9 +40,6 @@ function toProperCase(name: string): string {
 }
 
 export default function AdminBookCustomerPage() {
-  // Get session for AdminNav
-  const { data: session } = useSession();
-  
   // Load services
   const [services, setServices] = useState<Service[]>([]);
   
@@ -273,27 +267,20 @@ export default function AdminBookCustomerPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <AdminNav session={session} />
-        <main className="container mx-auto px-4 py-8">
-          <Card className="max-w-md mx-auto">
-            <CardContent className="p-8 text-center">
-              <div className="text-green-600 text-6xl mb-4">✓</div>
-              <h2 className="text-2xl font-bold mb-2">Booking Created!</h2>
-              <p className="text-gray-600">The booking has been successfully created.</p>
-              <p className="text-sm text-gray-500 mt-4">Redirecting...</p>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
+      <Card className="max-w-md mx-auto mt-8">
+        <CardContent className="p-8 text-center">
+          <div className="text-green-600 text-6xl mb-4">✓</div>
+          <h2 className="text-2xl font-bold mb-2">Booking Created!</h2>
+          <p className="text-gray-600">The booking has been successfully created.</p>
+          <p className="text-sm text-gray-500 mt-4">Redirecting...</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <AdminNav session={session} />
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-6">Book for Customer</h1>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Book for Customer</h1>
         
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 flex items-center gap-2">
@@ -571,7 +558,6 @@ export default function AdminBookCustomerPage() {
             </CardContent>
           </Card>
         )}
-      </main>
     </div>
   );
 }
