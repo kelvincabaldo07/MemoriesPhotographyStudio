@@ -50,10 +50,10 @@ export default function AdminBookCustomerPage() {
   const [services, setServices] = useState<Service[]>([]);
   
   useEffect(() => {
-    // Load services from API or JSON
-    fetch('/data/services-config.json')
+    // Load services from API
+    fetch('/api/admin/services/config')
       .then(res => res.json())
-      .then(data => setServices(data))
+      .then(data => setServices(data.services || []))
       .catch(err => console.error('Failed to load services:', err));
   }, []);
   // Form state

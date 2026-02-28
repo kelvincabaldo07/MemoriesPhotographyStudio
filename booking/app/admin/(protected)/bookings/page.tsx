@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,7 @@ interface Booking {
 }
 
 export default function BookingsPage() {
+  const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('calendar');
@@ -462,7 +464,7 @@ export default function BookingsPage() {
         </div>
         <div className="flex gap-2">
           <Button 
-            onClick={() => window.open('/', '_blank')}
+            onClick={() => router.push('/admin/book-customer')}
             className="bg-blue-600 hover:bg-blue-700 text-h3"
           >
             <Users className="w-4 h-4 mr-2" />
