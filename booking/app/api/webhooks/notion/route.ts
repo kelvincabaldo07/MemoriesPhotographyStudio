@@ -454,7 +454,8 @@ async function handleBookingUpdated(pageId: string, props: any) {
 
 /**
  * Handle one-shot email trigger checkboxes set via Notion buttons.
- * Sends the appropriate email, resets the checkbox to false, and increments the sent-count.
+ * IMPORTANT: Checkboxes are reset to false FIRST (separate PATCH) before any
+ * email is sent, so if the email or count update fails the loop cannot continue.
  */
 async function handleEmailTriggers(
   pageId: string,
@@ -462,16 +463,16 @@ async function handleEmailTriggers(
   resendConfirmation: boolean,
   sendReminder: boolean,
 ) {
-  const bookingId  = extractText(props['Booking ID']);
-  const firstName  = extractText(props['First Name']);
-  const lastName   = extractText(props['Last Name']);
-  const email      = extractEmail(props['Email']);
-  const phone      = extractPhone(props['Phone']);
-  const service    = extractText(props['Service']) || extractSelect(props['Service']);
+  const bookingId   = extractText(props['Booking ID']);
+  const firstName   = extractText(props['First Name']);
+  const lastName    = extractText(props['Last Name']);
+  const email       = extractEmail(props['Email']);
+  const phone       = extractPhone(props['Phone']);
+  const service     = extractText(props['Service']) || extractSelect(props['Service']);
   const serviceType = extractSelect(props['Service Type']);
-  const duration   = extractNumber(props['Duration']) || 45;
-  const date       = extractDate(props['Date']);
-  const time       = extractTime(props['Time']);
+  const duration    = extractNumber(props['Duration']) || 45;
+  const date        = extractDate(props['Date']);
+  const time        = extractTime(props['Time']);
 
   const fullName = `${firstName} ${lastName}`.trim()
     || extractText(props['Client Name'])
@@ -480,18 +481,27 @@ async function handleEmailTriggers(
   const resolvedFirst = firstName || fn || fullName;
   const resolvedLast  = lastName  || rest.join(' ') || '';
 
-  if (!email) {
-    console.warn(`[Notion Webhook] ⚠️  Email trigger fired for ${bookingId} but no email on record — skipping.`);
-    // Still reset the checkboxes so they don't stay checked
-    const resetProps: Record<string, any> = {};
-    if (resendConfirmation) resetProps['Resend Confirmation'] = { checkbox: false };
-    if (sendReminder)       resetProps['Send Reminder']       = { checkbox: false };
-    await updateNotionPage(pageId, resetProps);
-    return;
+  // ── STEP 1: Reset checkboxes immediately (MUST happen before anything else) ─
+  // This breaks any potential loop even if subsequent steps fail.
+  const checkboxReset: Record<string, any> = {};
+  if (resendConfirmation) checkboxReset['Resend Confirmation'] = { checkbox: false };
+  if (sendReminder)       checkboxReset['Send Reminder']       = { checkbox: false };
+
+  try {
+    await updateNotionPage(pageId, checkboxReset);
+    console.log('[Notion Webhook] ✅ Checkboxes reset:', Object.keys(checkboxReset).join(', '));
+  } catch (err) {
+    // Log but continue — email should still send; we'll try the reset again below
+    console.error('[Notion Webhook] ❌ Checkbox reset PATCH failed:', err);
   }
 
+  // ── STEP 2: Guard — need email + date + time to send ──────────────────────
+  if (!email) {
+    console.warn(`[Notion Webhook] ⚠️  Email trigger: no email on record for ${bookingId} — stopped after reset`);
+    return;
+  }
   if (!date || !time) {
-    console.warn(`[Notion Webhook] ⚠️  Email trigger fired for ${bookingId} but no date/time — skipping.`);
+    console.warn(`[Notion Webhook] ⚠️  Email trigger: no date/time for ${bookingId} — stopped after reset`);
     return;
   }
 
@@ -505,40 +515,38 @@ async function handleEmailTriggers(
     time,
   };
 
-  const notionUpdates: Record<string, any> = {};
+  // ── STEP 3: Send emails ────────────────────────────────────────────────────
+  const countUpdates: Record<string, any> = {};
 
-  // ── 1. Resend Confirmation ────────────────────────────────────────────────
   if (resendConfirmation) {
     const prevCount = extractNumber(props['Confirmation Sent Count']) || 0;
     const sent = await sendBookingResendConfirmationEmail(emailData);
     if (sent) {
       console.log(`[Notion Webhook] ✅ Resend confirmation email sent for ${bookingId} (total: ${prevCount + 1})`);
-      notionUpdates['Confirmation Sent Count'] = { number: prevCount + 1 };
+      countUpdates['Confirmation Sent Count'] = { number: prevCount + 1 };
+    } else {
+      console.error(`[Notion Webhook] ❌ Resend confirmation email FAILED for ${bookingId}`);
     }
-    notionUpdates['Resend Confirmation'] = { checkbox: false };
   }
 
-  // ── 2. Send Reminder ──────────────────────────────────────────────────────
   if (sendReminder) {
     const prevCount = extractNumber(props['Reminder Sent Count']) || 0;
     const sent = await sendBookingReminderEmail(emailData);
     if (sent) {
       console.log(`[Notion Webhook] ✅ Reminder email sent for ${bookingId} (total: ${prevCount + 1})`);
-      notionUpdates['Reminder Sent Count'] = { number: prevCount + 1 };
+      countUpdates['Reminder Sent Count'] = { number: prevCount + 1 };
+    } else {
+      console.error(`[Notion Webhook] ❌ Reminder email FAILED for ${bookingId}`);
     }
-    notionUpdates['Send Reminder'] = { checkbox: false };
   }
 
-  // Write back counter updates + checkbox resets in one PATCH
-  if (Object.keys(notionUpdates).length > 0) {
-    console.log('[Notion Webhook] Writing back to Notion:', JSON.stringify(notionUpdates));
+  // ── STEP 4: Update sent counts (separate PATCH — checkboxes already reset) ─
+  if (Object.keys(countUpdates).length > 0) {
     try {
-      await updateNotionPage(pageId, notionUpdates);
-      console.log('[Notion Webhook] ✅ Checkbox reset + counts updated for', bookingId);
+      await updateNotionPage(pageId, countUpdates);
+      console.log('[Notion Webhook] ✅ Sent counts updated:', JSON.stringify(countUpdates));
     } catch (err) {
-      // Email already sent — don't let the write-back failure crash the whole handler.
-      // The error details are already logged inside updateNotionPage.
-      console.error('[Notion Webhook] ❌ Failed to write back to Notion after email trigger:', err);
+      console.error('[Notion Webhook] ❌ Count update PATCH failed (emails were still sent):', err);
     }
   }
 }
