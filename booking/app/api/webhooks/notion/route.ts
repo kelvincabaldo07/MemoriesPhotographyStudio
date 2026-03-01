@@ -512,7 +512,14 @@ async function handleEmailTriggers(
 
   // Write back counter updates + checkbox resets in one PATCH
   if (Object.keys(notionUpdates).length > 0) {
-    await updateNotionPage(pageId, notionUpdates);
+    try {
+      await updateNotionPage(pageId, notionUpdates);
+      console.log('[Notion Webhook] ✅ Checkbox reset + counts updated for', bookingId);
+    } catch (err) {
+      // Email already sent — don't let the write-back failure crash the whole handler.
+      // The error details are already logged inside updateNotionPage.
+      console.error('[Notion Webhook] ❌ Failed to write back to Notion after email trigger:', err);
+    }
   }
 }
 
@@ -559,7 +566,13 @@ async function updateNotionPage(pageId: string, properties: any) {
     });
 
     if (!response.ok) {
-      throw new Error(`Notion API error: ${response.statusText}`);
+      // Log the full Notion error body so we can see exactly what was rejected
+      let errorBody: any = {};
+      try { errorBody = await response.json(); } catch {}
+      console.error('[Notion Webhook] updateNotionPage failed:', response.status, response.statusText);
+      console.error('[Notion Webhook] Notion error body:', JSON.stringify(errorBody, null, 2));
+      console.error('[Notion Webhook] Properties attempted:', JSON.stringify(properties, null, 2));
+      throw new Error(`Notion API error ${response.status}: ${errorBody?.message || response.statusText}`);
     }
 
     return await response.json();
