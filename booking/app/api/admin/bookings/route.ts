@@ -269,37 +269,44 @@ export async function POST(request: NextRequest) {
     const startDateTime = `${bookingData.schedule.date}T${bookingData.schedule.time}:00.000+08:00`;
     const endDateTime = `${bookingData.schedule.date}T${endTime}:00.000+08:00`;
     
+    // Build properties - only include fields with actual values to avoid Notion rejections
+    const notionProperties: Record<string, any> = {
+      "Name": { title: [{ text: { content: fullName } }] },
+      "Booking ID": { rich_text: [{ text: { content: bookingId } }] },
+      "First Name": { rich_text: [{ text: { content: bookingData.customer.firstName || "" } }] },
+      "Last Name": { rich_text: [{ text: { content: bookingData.customer.lastName || "" } }] },
+      "Service Group": { rich_text: [{ text: { content: bookingData.selections.serviceGroup || "" } }] },
+      "Service": { rich_text: [{ text: { content: bookingData.selections.service || "" } }] },
+      "Date": { date: { start: bookingData.schedule.date } },
+      "Time": { date: { start: startDateTime, end: endDateTime } },
+      "Duration": { number: bookingData.selections.duration || 0 },
+      "Backdrops": { multi_select: (bookingData.selfShoot?.backdrops || []).map((bd: string) => ({ name: bd })) },
+      "Backdrop Allocations": { rich_text: [{ text: { content: JSON.stringify(bookingData.selfShoot?.allocations || {}) } }] },
+      "Backdrop Order": { rich_text: [{ text: { content: (bookingData.selfShoot?.backdrops || []).join(', ') } }] },
+      "Add-ons": { multi_select: Object.keys(bookingData.addons || {}).filter(key => bookingData.addons[key] > 0).map(addon => ({ name: addon })) },
+      "Session Price": { number: bookingData.totals?.sessionPrice || 0 },
+      "Add-ons Total": { number: bookingData.totals?.addonsTotal || 0 },
+      "Grand Total": { number: bookingData.totals?.grandTotal || 0 },
+      "Status": { select: { name: "Booking Confirmed" } },
+    };
+
+    // Only add optional fields when they have values
+    if (bookingData.customer.email) {
+      notionProperties["Email"] = { email: bookingData.customer.email };
+    }
+    if (bookingData.customer.phone) {
+      notionProperties["Phone"] = { phone_number: bookingData.customer.phone };
+    }
+    if (bookingData.selections.serviceType) {
+      notionProperties["Service Type"] = { select: { name: bookingData.selections.serviceType } };
+    }
+    if (bookingData.selections.serviceCategory) {
+      notionProperties["Service Category"] = { select: { name: bookingData.selections.serviceCategory } };
+    }
+
     const notionPayload = {
       parent: { database_id: databaseId },
-      properties: {
-        "Client Name": { title: [{ text: { content: fullName } }] },
-        "Booking ID": { rich_text: [{ text: { content: bookingId } }] },
-        "First Name": { rich_text: [{ text: { content: bookingData.customer.firstName || "" } }] },
-        "Last Name": { rich_text: [{ text: { content: bookingData.customer.lastName || "" } }] },
-        "Email": { email: bookingData.customer.email || null },
-        "Phone": { phone_number: bookingData.customer.phone || null },
-        "Service Type": { select: bookingData.selections.serviceType ? { name: bookingData.selections.serviceType } : null },
-        "Service Category": { select: bookingData.selections.serviceCategory ? { name: bookingData.selections.serviceCategory } : null },
-        "Service Group": { rich_text: [{ text: { content: bookingData.selections.serviceGroup || "" } }] },
-        "Service": { rich_text: [{ text: { content: bookingData.selections.service || "" } }] },
-        "Date": { date: bookingData.schedule.date ? { start: bookingData.schedule.date } : null },
-        "Time": { 
-          date: {
-            start: startDateTime,
-            end: endDateTime
-          }
-        },
-        "Duration": { number: bookingData.selections.duration || 0 },
-        "Backdrops": { multi_select: (bookingData.selfShoot?.backdrops || []).map((bd: string) => ({ name: bd })) },
-        "Backdrop Allocations": { rich_text: [{ text: { content: JSON.stringify(bookingData.selfShoot?.allocations || {}) } }] },
-        "Backdrop Order": { rich_text: [{ text: { content: (bookingData.selfShoot?.backdrops || []).join(', ') } }] },
-        "Add-ons": { multi_select: Object.keys(bookingData.addons || {}).filter(key => bookingData.addons[key] > 0).map(addon => ({ name: addon })) },
-        "Session Price": { number: bookingData.totals?.sessionPrice || 0 },
-        "Add-ons Total": { number: bookingData.totals?.addonsTotal || 0 },
-        "Grand Total": { number: bookingData.totals?.grandTotal || 0 },
-        "Status": { select: { name: "Booking Confirmed" } },
-        "Booked By": { rich_text: [{ text: { content: `Admin: ${session.user?.email || 'Unknown'}` } }] },
-      }
+      properties: notionProperties,
     };
 
     console.log('🚀 Saving to Notion database...');
@@ -318,8 +325,13 @@ export async function POST(request: NextRequest) {
     if (!notionResponse.ok) {
       const errorText = await notionResponse.text();
       console.error('❌ Notion API error:', errorText);
+      let notionMessage = 'Failed to save booking to Notion';
+      try {
+        const notionErr = JSON.parse(errorText);
+        if (notionErr.message) notionMessage = notionErr.message;
+      } catch {}
       return NextResponse.json(
-        { success: false, error: 'Failed to save booking to Notion', details: errorText },
+        { success: false, error: notionMessage, details: errorText },
         { status: 500 }
       );
     }
