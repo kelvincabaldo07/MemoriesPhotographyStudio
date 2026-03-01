@@ -394,7 +394,18 @@ async function handleBookingUpdated(pageId: string, props: any) {
     return;
   }
 
-  // ── 1. Re-stamp end time in Notion ────────────────────────────────────
+  // ── Past booking guard ─────────────────────────────────────────────────
+  // Compare booking date to today in Manila time (Asia/Manila = UTC+8)
+  const todayManila = new Date(
+    new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' })
+  );
+  todayManila.setHours(0, 0, 0, 0);
+  const bookingDate = new Date(`${date}T00:00:00+08:00`);
+  if (bookingDate < todayManila) {
+    console.log(`[Notion Webhook] Skipping auto-update for past booking ${bookingId} (${date})`);
+    return;
+  }
+  // ──────────────────────────────────────────────────────────────────────
   const endTime       = calculateEndTime(time, duration + BUFFER_MINUTES);
   const startDateTime = `${date}T${time}:00.000+08:00`;
   const endDateTime   = `${date}T${endTime}:00.000+08:00`;
