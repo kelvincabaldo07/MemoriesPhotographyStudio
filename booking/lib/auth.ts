@@ -13,7 +13,8 @@ export const authOptions: NextAuthOptions = {
       // Only allow specific email(s)
       const allowedEmails = [
         "smile@memories-studio.com",
-        "kelvin.cabaldo@gmail.com", // Add your admin emails
+        "kelvin.cabaldo@gmail.com",
+        "mojica.johannamay@gmail.com",
       ];
       return allowedEmails.includes(user.email || "");
     },
