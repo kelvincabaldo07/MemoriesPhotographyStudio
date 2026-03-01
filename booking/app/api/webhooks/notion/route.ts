@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
+import { createCalendarEvent, createBlockedCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
 import { sendBookingConfirmationEmail } from '@/lib/email';
 
 // Webhook secret for security
@@ -94,7 +94,21 @@ export async function POST(request: NextRequest) {
     // Extract booking data from Notion properties
     const bookingId = extractText(props['Booking ID']);
     const status = extractSelect(props['Status']);
-    
+
+    // ── Blocked time handling ─────────────────────────────────────────────
+    // If Status is "Blocked" treat this page as a studio block, not a booking
+    if (status === 'Blocked' || status === 'Studio Block' || status === 'Blocked Time') {
+      console.log(`[Notion Webhook] Detected blocked-time page (status: ${status})`);
+      const existingEventId = extractText(props['Calendar Event ID']);
+      if (!existingEventId) {
+        await handleBlockedTime(pageId, props, eventType);
+      } else if (eventType === 'page.deleted') {
+        await deleteCalendarEvent(existingEventId);
+      }
+      return NextResponse.json({ success: true, message: `Processed block: ${status}` });
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     if (!bookingId) {
       console.error('[Notion Webhook] No booking ID found - not a booking page');
       return NextResponse.json({ success: true, message: 'Ignored non-booking page' });
@@ -347,5 +361,51 @@ async function updateNotionPage(pageId: string, properties: any) {
   } catch (error) {
     console.error('[Notion Webhook] Error updating Notion page:', error);
     throw error;
+  }
+}
+
+/**
+ * Handle a Notion page with Status = "Blocked" as a studio blocked time.
+ * Creates a Google Calendar block event and writes the event ID back to Notion.
+ */
+async function handleBlockedTime(pageId: string, props: any, eventType: string) {
+  const reason =
+    extractText(props['Client Name']) ||
+    extractText(props['Name']) ||
+    extractText(props['Reason']) ||
+    'Studio Block';
+
+  const date = extractDate(props['Date']);
+  if (!date) {
+    console.warn('[Notion Webhook] Blocked time has no date, skipping.');
+    return;
+  }
+
+  // Try to get specific time from the Time property
+  const rawTime = props['Time'];
+  let startTime: string | undefined;
+  let endTime: string | undefined;
+
+  if (rawTime?.date?.start && rawTime.date.start.includes('T')) {
+    startTime = rawTime.date.start.match(/T(\d{2}:\d{2})/)?.[1];
+    endTime = rawTime.date.end?.match(/T(\d{2}:\d{2})/)?.[1];
+    if (startTime && !endTime) {
+      // Default 1-hour block if no end
+      const [h, m] = startTime.split(':').map(Number);
+      const endMins = h * 60 + m + 60;
+      endTime = `${String(Math.floor(endMins / 60)).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
+    }
+  }
+
+  try {
+    const eventId = await createBlockedCalendarEvent({ reason, date, startTime, endTime, notionPageId: pageId });
+    if (eventId) {
+      await updateNotionPage(pageId, {
+        'Calendar Event ID': { rich_text: [{ text: { content: eventId } }] },
+      });
+      console.log(`[Notion Webhook] ✅ Blocked time synced to calendar: ${eventId}`);
+    }
+  } catch (err) {
+    console.error('[Notion Webhook] Failed to sync blocked time to calendar:', err);
   }
 }

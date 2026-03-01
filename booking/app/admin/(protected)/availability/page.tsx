@@ -204,7 +204,7 @@ export default function AvailabilityPage() {
             <Button 
               onClick={saveChanges} 
               disabled={syncing}
-              className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 shrink-0 w-full sm:w-auto text-h3"
+              className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 shrink-0 w-full sm:w-auto text-white text-h3"
             >
               {syncing ? (
                 <>
@@ -341,7 +341,7 @@ export default function AvailabilityPage() {
             <Button 
               onClick={() => setShowBlockedDateForm(!showBlockedDateForm)} 
               size="sm" 
-              className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 shrink-0 w-full sm:w-auto"
+              className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 shrink-0 w-full sm:w-auto text-white"
             >
               <Plus className="w-4 h-4 mr-1" />
               Add override
@@ -391,7 +391,7 @@ export default function AvailabilityPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button onClick={addBlockedDate} disabled={!newBlockedDate.startDate} className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 w-full sm:w-auto">Save Override</Button>
+                <Button onClick={addBlockedDate} disabled={!newBlockedDate.startDate} className="bg-[#0b3d2e] hover:bg-[#0b3d2e]/90 text-white w-full sm:w-auto">Save Override</Button>
                 <Button variant="outline" onClick={() => { setShowBlockedDateForm(false); setNewBlockedDate({ allDay: true }); }} className="w-full sm:w-auto">Cancel</Button>
               </div>
             </div>

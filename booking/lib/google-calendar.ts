@@ -51,6 +51,55 @@ function getOAuth2Client() {
  * Create a Google Calendar event for a booking
  * Returns the event ID if successful, null if failed
  */
+/**
+ * Create a Google Calendar blocked time event (studio closed / unavailable)
+ * Returns the event ID if successful, null if failed
+ */
+export async function createBlockedCalendarEvent(params: {
+  reason: string;
+  date: string;
+  startTime?: string; // HH:MM, omit for all-day
+  endTime?: string;   // HH:MM, omit for all-day
+  notionPageId?: string;
+}): Promise<string | null> {
+  try {
+    const oauth2Client = getOAuth2Client();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    const { reason, date, startTime, endTime } = params;
+    const title = `🚫 [Studio Blocked] ${reason}`;
+
+    let eventBody: any;
+    if (startTime && endTime) {
+      eventBody = {
+        summary: title,
+        description: `Studio blocked: ${reason}\nSource: Notion`,
+        start: { dateTime: `${date}T${startTime}:00+08:00`, timeZone: 'Asia/Manila' },
+        end: { dateTime: `${date}T${endTime}:00+08:00`, timeZone: 'Asia/Manila' },
+      };
+    } else {
+      // All-day event
+      eventBody = {
+        summary: title,
+        description: `Studio blocked: ${reason}\nSource: Notion`,
+        start: { date },
+        end: { date },
+      };
+    }
+
+    const event = await calendar.events.insert({
+      calendarId: CALENDAR_ID,
+      requestBody: eventBody,
+    });
+
+    console.log(`[Calendar] Created blocked event: ${event.data.id}`);
+    return event.data.id || null;
+  } catch (error) {
+    console.error('[Calendar] Failed to create blocked event:', error);
+    return null;
+  }
+}
+
 export async function createCalendarEvent(eventData: CalendarEventData): Promise<string | null> {
   // DIAGNOSTIC LOGGING - Track all calendar event creation attempts
   const callStack = new Error().stack;

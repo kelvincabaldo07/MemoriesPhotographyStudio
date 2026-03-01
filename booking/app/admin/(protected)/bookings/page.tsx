@@ -314,41 +314,45 @@ export default function BookingsPage() {
 
   // Set date range based on time filter selection
   const applyTimeRangeFilter = (range: string) => {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    
+    // Use Manila timezone for all date calculations
+    const nowManila = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+    const today = new Date(nowManila.getFullYear(), nowManila.getMonth(), nowManila.getDate());
+    const toDateStr = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
     setTimeRangeFilter(range);
-    
+
     switch (range) {
       case "today":
-        const todayStr = today.toISOString().split('T')[0];
-        setStartDateFilter(todayStr);
-        setEndDateFilter(todayStr);
+        setStartDateFilter(toDateStr(today));
+        setEndDateFilter(toDateStr(today));
         break;
-      case "week":
-        // Get Monday of this week
+      case "week": {
+        // Week starts on Monday
         const weekStart = new Date(today);
-        const dayOfWeek = weekStart.getDay();
-        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday, go back 6 days, else go to Monday
+        const dow = weekStart.getDay(); // 0=Sun, 1=Mon …
+        const diff = dow === 0 ? -6 : 1 - dow;
         weekStart.setDate(weekStart.getDate() + diff);
-        // Get Sunday of this week
         const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-        setStartDateFilter(weekStart.toISOString().split('T')[0]);
-        setEndDateFilter(weekEnd.toISOString().split('T')[0]);
+        weekEnd.setDate(weekEnd.getDate() + 6); // Mon + 6 = Sunday
+        setStartDateFilter(toDateStr(weekStart));
+        setEndDateFilter(toDateStr(weekEnd));
         break;
-      case "month":
+      }
+      case "month": {
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
         const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        setStartDateFilter(monthStart.toISOString().split('T')[0]);
-        setEndDateFilter(monthEnd.toISOString().split('T')[0]);
+        setStartDateFilter(toDateStr(monthStart));
+        setEndDateFilter(toDateStr(monthEnd));
         break;
-      case "year":
+      }
+      case "year": {
         const yearStart = new Date(today.getFullYear(), 0, 1);
         const yearEnd = new Date(today.getFullYear(), 11, 31);
-        setStartDateFilter(yearStart.toISOString().split('T')[0]);
-        setEndDateFilter(yearEnd.toISOString().split('T')[0]);
+        setStartDateFilter(toDateStr(yearStart));
+        setEndDateFilter(toDateStr(yearEnd));
         break;
+      }
       default: // "all"
         setStartDateFilter("");
         setEndDateFilter("");
@@ -465,7 +469,7 @@ export default function BookingsPage() {
         <div className="flex gap-2">
           <Button 
             onClick={() => router.push('/admin/book-customer')}
-            className="bg-blue-600 hover:bg-blue-700 text-h3"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-h3"
           >
             <Users className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Create Booking</span>
@@ -493,7 +497,7 @@ export default function BookingsPage() {
               <CalendarDays className="w-4 h-4" />
             </button>
           </div>
-          <Button className="bg-[#0b3d2e] hover:bg-[#0a3426] text-h3">
+          <Button className="bg-[#0b3d2e] hover:bg-[#0a3426] text-white text-h3">
             <Download className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Export CSV</span>
           </Button>
@@ -516,8 +520,8 @@ export default function BookingsPage() {
             onClick={() => applyTimeRangeFilter(range.value)}
             className={`whitespace-nowrap text-h3 ${
               timeRangeFilter === range.value
-                ? "bg-[#0b3d2e] hover:bg-[#0a3426]"
-                : ""
+                ? "bg-[#0b3d2e] hover:bg-[#0a3426] text-white"
+                : "text-neutral-700"
             }`}
           >
             {range.label}
