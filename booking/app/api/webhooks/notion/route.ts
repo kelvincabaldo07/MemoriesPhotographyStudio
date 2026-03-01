@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { createCalendarEvent, createBlockedCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
-import { sendBookingConfirmationEmail, sendBookingUpdateEmail } from '@/lib/email';
+import { sendBookingConfirmationEmail, sendBookingUpdateEmail, sendBookingResendConfirmationEmail, sendBookingReminderEmail } from '@/lib/email';
 import { calculateEndTime } from '@/lib/time-utils';
 
 // Webhook secret for security
@@ -17,7 +17,15 @@ const WEBHOOK_SECRET = process.env.NOTION_WEBHOOK_SECRET;
 const BUFFER_MINUTES = 30;
 
 /** Fields written back by the webhook itself — skip re-processing when only these changed */
-const WEBHOOK_WRITTEN_FIELDS = new Set(['Calendar Event ID', 'Booking ID', 'Time']);
+const WEBHOOK_WRITTEN_FIELDS = new Set([
+  'Calendar Event ID', 'Booking ID', 'Time',
+  // Email trigger reset + counters (we write these back after handling)
+  'Resend Confirmation', 'Send Reminder',
+  'Confirmation Sent Count', 'Reminder Sent Count',
+]);
+
+/** Notion property names that act as one-shot email trigger buttons */
+const EMAIL_TRIGGER_FIELDS = ['Resend Confirmation', 'Send Reminder'] as const;
 
 /** Generate a Booking ID in the same format as the app: MMRS-YYYYMMDDHH-XXXXXXXX */
 function generateBookingId(date: string, time: string): string {
@@ -139,9 +147,28 @@ export async function POST(request: NextRequest) {
         await handleBookingCreated(pageId, props);
         break;
       
-      case 'page.properties_updated':
-        // Widen loop-prevention: skip if ONLY fields we wrote back changed
-        const updatedProperties = payload.data?.updated_properties || [];
+      case 'page.properties_updated': {
+        const updatedProperties: string[] = payload.data?.updated_properties || [];
+
+        // ── Email trigger check (runs BEFORE loop-prevention) ────────────────
+        // Notion buttons set the checkbox to true; we only act when it's true.
+        const resendConfirmationTriggered =
+          updatedProperties.includes('Resend Confirmation') &&
+          props['Resend Confirmation']?.checkbox === true;
+        const sendReminderTriggered =
+          updatedProperties.includes('Send Reminder') &&
+          props['Send Reminder']?.checkbox === true;
+
+        if (resendConfirmationTriggered || sendReminderTriggered) {
+          await handleEmailTriggers(pageId, props, resendConfirmationTriggered, sendReminderTriggered);
+          // If only trigger fields changed (no real booking edits) stop here
+          const onlyTriggers = updatedProperties.every(p => EMAIL_TRIGGER_FIELDS.includes(p as any));
+          if (onlyTriggers) {
+            return NextResponse.json({ success: true, message: 'Email trigger handled' });
+          }
+        }
+
+        // ── Loop-prevention: skip if only webhook-written fields changed ─────
         const allWrittenByUs = updatedProperties.length > 0 &&
           updatedProperties.every((p: string) => WEBHOOK_WRITTEN_FIELDS.has(p));
 
@@ -149,9 +176,10 @@ export async function POST(request: NextRequest) {
           console.log('[Notion Webhook] Skipping - only webhook-written fields updated (preventing loop):', updatedProperties);
           return NextResponse.json({ success: true, message: 'Skipped - webhook-written fields only' });
         }
-        
+
         await handleBookingUpdated(pageId, props);
         break;
+      }
       
       case 'page.deleted':
         await handleBookingDeleted(pageId, props);
@@ -399,6 +427,89 @@ async function handleBookingUpdated(pageId: string, props: any) {
     console.log(`[Notion Webhook] ✅ Update email sent for ${bookingId}`);
   } else {
     console.log(`[Notion Webhook] ℹ️  No email — skipping update notification for ${bookingId}`);
+  }
+}
+
+/**
+ * Handle one-shot email trigger checkboxes set via Notion buttons.
+ * Sends the appropriate email, resets the checkbox to false, and increments the sent-count.
+ */
+async function handleEmailTriggers(
+  pageId: string,
+  props: any,
+  resendConfirmation: boolean,
+  sendReminder: boolean,
+) {
+  const bookingId  = extractText(props['Booking ID']);
+  const firstName  = extractText(props['First Name']);
+  const lastName   = extractText(props['Last Name']);
+  const email      = extractEmail(props['Email']);
+  const phone      = extractPhone(props['Phone']);
+  const service    = extractText(props['Service']) || extractSelect(props['Service']);
+  const serviceType = extractSelect(props['Service Type']);
+  const duration   = extractNumber(props['Duration']) || 45;
+  const date       = extractDate(props['Date']);
+  const time       = extractTime(props['Time']);
+
+  const fullName = `${firstName} ${lastName}`.trim()
+    || extractText(props['Client Name'])
+    || 'Customer';
+  const [fn, ...rest] = fullName.split(' ');
+  const resolvedFirst = firstName || fn || fullName;
+  const resolvedLast  = lastName  || rest.join(' ') || '';
+
+  if (!email) {
+    console.warn(`[Notion Webhook] ⚠️  Email trigger fired for ${bookingId} but no email on record — skipping.`);
+    // Still reset the checkboxes so they don't stay checked
+    const resetProps: Record<string, any> = {};
+    if (resendConfirmation) resetProps['Resend Confirmation'] = { checkbox: false };
+    if (sendReminder)       resetProps['Send Reminder']       = { checkbox: false };
+    await updateNotionPage(pageId, resetProps);
+    return;
+  }
+
+  if (!date || !time) {
+    console.warn(`[Notion Webhook] ⚠️  Email trigger fired for ${bookingId} but no date/time — skipping.`);
+    return;
+  }
+
+  const emailData = {
+    bookingId,
+    customer: { firstName: resolvedFirst, lastName: resolvedLast, email, phone: phone || '' },
+    service:     service     || undefined,
+    serviceType: serviceType || undefined,
+    duration,
+    date,
+    time,
+  };
+
+  const notionUpdates: Record<string, any> = {};
+
+  // ── 1. Resend Confirmation ────────────────────────────────────────────────
+  if (resendConfirmation) {
+    const prevCount = extractNumber(props['Confirmation Sent Count']) || 0;
+    const sent = await sendBookingResendConfirmationEmail(emailData);
+    if (sent) {
+      console.log(`[Notion Webhook] ✅ Resend confirmation email sent for ${bookingId} (total: ${prevCount + 1})`);
+      notionUpdates['Confirmation Sent Count'] = { number: prevCount + 1 };
+    }
+    notionUpdates['Resend Confirmation'] = { checkbox: false };
+  }
+
+  // ── 2. Send Reminder ──────────────────────────────────────────────────────
+  if (sendReminder) {
+    const prevCount = extractNumber(props['Reminder Sent Count']) || 0;
+    const sent = await sendBookingReminderEmail(emailData);
+    if (sent) {
+      console.log(`[Notion Webhook] ✅ Reminder email sent for ${bookingId} (total: ${prevCount + 1})`);
+      notionUpdates['Reminder Sent Count'] = { number: prevCount + 1 };
+    }
+    notionUpdates['Send Reminder'] = { checkbox: false };
+  }
+
+  // Write back counter updates + checkbox resets in one PATCH
+  if (Object.keys(notionUpdates).length > 0) {
+    await updateNotionPage(pageId, notionUpdates);
   }
 }
 
