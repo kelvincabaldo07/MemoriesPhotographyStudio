@@ -179,16 +179,20 @@ export async function POST(request: NextRequest) {
       case 'page.properties_updated': {
         const updatedProperties: string[] = payload.data?.updated_properties || [];
 
-        // ── Loop-prevention: skip if only webhook-written fields changed ─────
+        // ── Loop-prevention ───────────────────────────────────────────────────
+        // Skip if:
+        //   a) Notion gave us an empty list (we wrote back and it didn't include field names)
+        //   b) Every changed field is one we wrote ourselves
+        const nothingChanged = updatedProperties.length === 0;
         const allWrittenByUs = updatedProperties.length > 0 &&
           updatedProperties.every((p: string) => WEBHOOK_WRITTEN_FIELDS.has(p));
 
-        if (allWrittenByUs) {
-          console.log('[Notion Webhook] Skipping - only webhook-written fields updated (preventing loop):', updatedProperties);
-          return NextResponse.json({ success: true, message: 'Skipped - webhook-written fields only' });
+        if (nothingChanged || allWrittenByUs) {
+          console.log('[Notion Webhook] Skipping - no user-driven changes detected. updatedProperties:', updatedProperties);
+          return NextResponse.json({ success: true, message: 'Skipped - no user-driven changes' });
         }
 
-        await handleBookingUpdated(pageId, props);
+        await handleBookingUpdated(pageId, props, updatedProperties);
         break;
       }
       
@@ -357,7 +361,10 @@ async function handleBookingCreated(pageId: string, props: any) {
   }
 }
 
-async function handleBookingUpdated(pageId: string, props: any) {
+/** Fields whose change is meaningful enough to notify the customer */
+const CUSTOMER_VISIBLE_FIELDS = new Set(['Date', 'Time', 'Service', 'Service Type', 'Duration', 'First Name', 'Last Name', 'Client Name']);
+
+async function handleBookingUpdated(pageId: string, props: any, updatedProperties: string[] = []) {
   const bookingId      = extractText(props['Booking ID']);
   const calendarEventId = extractText(props['Calendar Event ID']);
   const status         = extractSelect(props['Status']);
@@ -435,8 +442,11 @@ async function handleBookingUpdated(pageId: string, props: any) {
     time,
   });
 
-  // ── 3. Send update email to customer ──────────────────────────────────
-  if (email) {
+  // ── 3. Send update email — only when customer-visible fields changed ────
+  const hasCustomerVisibleChange = updatedProperties.length > 0 &&
+    updatedProperties.some(p => CUSTOMER_VISIBLE_FIELDS.has(p));
+
+  if (hasCustomerVisibleChange && email) {
     await sendBookingUpdateEmail({
       bookingId,
       customer: { firstName: resolvedFirst, lastName: resolvedLast, email, phone: phone || '' },
@@ -446,9 +456,11 @@ async function handleBookingUpdated(pageId: string, props: any) {
       date,
       time,
     });
-    console.log(`[Notion Webhook] ✅ Update email sent for ${bookingId}`);
+    console.log(`[Notion Webhook] ✅ Update email sent for ${bookingId} (changed: ${updatedProperties.join(', ')})`);
+  } else if (!hasCustomerVisibleChange) {
+    console.log(`[Notion Webhook] ℹ️  Skipping update email — no customer-visible fields changed (changed: ${updatedProperties.join(', ')})`);
   } else {
-    console.log(`[Notion Webhook] ℹ️  No email — skipping update notification for ${bookingId}`);
+    console.log(`[Notion Webhook] ℹ️  No email on record — skipping update notification for ${bookingId}`);
   }
 }
 
