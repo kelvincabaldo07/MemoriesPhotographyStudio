@@ -512,6 +512,7 @@ async function handleEmailTriggers(
 
   // Write back counter updates + checkbox resets in one PATCH
   if (Object.keys(notionUpdates).length > 0) {
+    console.log('[Notion Webhook] Writing back to Notion:', JSON.stringify(notionUpdates));
     try {
       await updateNotionPage(pageId, notionUpdates);
       console.log('[Notion Webhook] ✅ Checkbox reset + counts updated for', bookingId);
