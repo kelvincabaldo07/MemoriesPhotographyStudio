@@ -135,6 +135,27 @@ export async function POST(request: NextRequest) {
     }
     // ─────────────────────────────────────────────────────────────────────
 
+    // ── Email trigger check (runs BEFORE bookingId guard so it always works) ─
+    if (eventType === 'page.properties_updated') {
+      const updatedProperties: string[] = payload.data?.updated_properties || [];
+      const resendConfirmationTriggered =
+        updatedProperties.includes('Resend Confirmation') &&
+        props['Resend Confirmation']?.checkbox === true;
+      const sendReminderTriggered =
+        updatedProperties.includes('Send Reminder') &&
+        props['Send Reminder']?.checkbox === true;
+
+      if (resendConfirmationTriggered || sendReminderTriggered) {
+        await handleEmailTriggers(pageId, props, resendConfirmationTriggered, sendReminderTriggered);
+        // If the only changes were the trigger checkboxes, stop here
+        const onlyTriggers = updatedProperties.every(p => EMAIL_TRIGGER_FIELDS.includes(p as any));
+        if (onlyTriggers) {
+          return NextResponse.json({ success: true, message: 'Email trigger handled' });
+        }
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
     if (!bookingId) {
       console.error('[Notion Webhook] No booking ID found - not a booking page');
       return NextResponse.json({ success: true, message: 'Ignored non-booking page' });
@@ -149,24 +170,6 @@ export async function POST(request: NextRequest) {
       
       case 'page.properties_updated': {
         const updatedProperties: string[] = payload.data?.updated_properties || [];
-
-        // ── Email trigger check (runs BEFORE loop-prevention) ────────────────
-        // Notion buttons set the checkbox to true; we only act when it's true.
-        const resendConfirmationTriggered =
-          updatedProperties.includes('Resend Confirmation') &&
-          props['Resend Confirmation']?.checkbox === true;
-        const sendReminderTriggered =
-          updatedProperties.includes('Send Reminder') &&
-          props['Send Reminder']?.checkbox === true;
-
-        if (resendConfirmationTriggered || sendReminderTriggered) {
-          await handleEmailTriggers(pageId, props, resendConfirmationTriggered, sendReminderTriggered);
-          // If only trigger fields changed (no real booking edits) stop here
-          const onlyTriggers = updatedProperties.every(p => EMAIL_TRIGGER_FIELDS.includes(p as any));
-          if (onlyTriggers) {
-            return NextResponse.json({ success: true, message: 'Email trigger handled' });
-          }
-        }
 
         // ── Loop-prevention: skip if only webhook-written fields changed ─────
         const allWrittenByUs = updatedProperties.length > 0 &&
