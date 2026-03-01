@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { createCalendarEvent, createBlockedCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
-import { sendBookingConfirmationEmail } from '@/lib/email';
+import { sendBookingConfirmationEmail, sendBookingUpdateEmail } from '@/lib/email';
 import { calculateEndTime } from '@/lib/time-utils';
 
 // Webhook secret for security
@@ -319,40 +319,86 @@ async function handleBookingCreated(pageId: string, props: any) {
 }
 
 async function handleBookingUpdated(pageId: string, props: any) {
-  const bookingId = extractText(props['Booking ID']);
+  const bookingId      = extractText(props['Booking ID']);
   const calendarEventId = extractText(props['Calendar Event ID']);
-  const status = extractSelect(props['Status']);
-  
-  // If status changed to cancelled, delete calendar event
-  if (status === 'Cancelled' && calendarEventId) {
-    console.log(`[Notion Webhook] Deleting calendar event for cancelled booking ${bookingId}`);
+  const status         = extractSelect(props['Status']);
+  const firstName      = extractText(props['First Name']);
+  const lastName       = extractText(props['Last Name']);
+  const email          = extractEmail(props['Email']);
+  const phone          = extractPhone(props['Phone']);
+  const service        = extractText(props['Service']) || extractSelect(props['Service']);
+  const serviceType    = extractSelect(props['Service Type']);
+  const serviceCategory = extractSelect(props['Service Category']);
+  const serviceGroup   = extractText(props['Service Group']);
+  const duration       = extractNumber(props['Duration']) || 45;
+  const date           = extractDate(props['Date']);
+  const time           = extractTime(props['Time']);
+
+  // Derive a display name even if First/Last are empty
+  const fullName = `${firstName} ${lastName}`.trim()
+    || extractText(props['Client Name'])
+    || 'Customer';
+  const [fn, ...rest] = fullName.split(' ');
+  const resolvedFirst = firstName || fn || fullName;
+  const resolvedLast  = lastName  || rest.join(' ') || '';
+
+  // Cancelled or No Show → remove calendar event
+  if ((status === 'Cancelled' || status === 'No Show') && calendarEventId) {
+    console.log(`[Notion Webhook] Deleting calendar event for ${status} booking ${bookingId}`);
     await deleteCalendarEvent(calendarEventId);
     return;
   }
 
-  // If status changed to confirmed and no calendar event exists, create one
-  if (status === 'Booking Confirmed' && !calendarEventId) {
-    console.log(`[Notion Webhook] Status changed to Booking Confirmed - creating calendar event`);
-    await handleBookingCreated(pageId, props);
+  // No calendar event yet on a confirmed booking → delegate to create handler
+  if (!calendarEventId) {
+    if (status === 'Booking Confirmed' && date && time) {
+      console.log(`[Notion Webhook] No calendar event — creating one for ${bookingId}`);
+      await handleBookingCreated(pageId, props);
+    }
     return;
   }
 
-  // If date/time changed, update calendar event
-  if (calendarEventId) {
-    const date = extractDate(props['Date']);
-    const time = extractTime(props['Time']);
-    const duration = extractNumber(props['Duration']) || 45;
-    
-    if (date && time) {
-      console.log(`[Notion Webhook] Updating calendar event ${calendarEventId}`);
-      await updateCalendarEvent(calendarEventId, { date, time, duration } as any);
-      
-      // Send update notification email
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[Notion Webhook] TODO: Send update email`);
-      }
-      // TODO: Create sendBookingUpdateEmail function
-    }
+  if (!date || !time) {
+    console.log(`[Notion Webhook] Skipping update — no date/time for ${bookingId}`);
+    return;
+  }
+
+  // ── 1. Re-stamp end time in Notion ────────────────────────────────────
+  const endTime       = calculateEndTime(time, duration + BUFFER_MINUTES);
+  const startDateTime = `${date}T${time}:00.000+08:00`;
+  const endDateTime   = `${date}T${endTime}:00.000+08:00`;
+  await updateNotionPage(pageId, {
+    'Time': { date: { start: startDateTime, end: endDateTime } },
+  });
+
+  // ── 2. Update Google Calendar event (rebuilds description + invite) ─────
+  console.log(`[Notion Webhook] Updating calendar event ${calendarEventId} for ${bookingId}`);
+  await updateCalendarEvent(calendarEventId, {
+    bookingId,
+    customer: { firstName: resolvedFirst, lastName: resolvedLast, email: email || '', phone: phone || '' },
+    service:         service || 'Studio Session',
+    serviceType:     serviceType || '',
+    serviceCategory: serviceCategory || '',
+    serviceGroup:    serviceGroup || '',
+    duration,
+    date,
+    time,
+  });
+
+  // ── 3. Send update email to customer ──────────────────────────────────
+  if (email) {
+    await sendBookingUpdateEmail({
+      bookingId,
+      customer: { firstName: resolvedFirst, lastName: resolvedLast, email, phone: phone || '' },
+      service:     service || undefined,
+      serviceType: serviceType || undefined,
+      duration,
+      date,
+      time,
+    });
+    console.log(`[Notion Webhook] ✅ Update email sent for ${bookingId}`);
+  } else {
+    console.log(`[Notion Webhook] ℹ️  No email — skipping update notification for ${bookingId}`);
   }
 }
 

@@ -278,10 +278,12 @@ export async function updateCalendarEvent(
     // Build update payload (only update provided fields)
     const updatePayload: any = {};
 
-    if (eventData.date && eventData.time && eventData.duration) {
+    // ── Date / time ────────────────────────────────────────────────────────
+    if (eventData.date && eventData.time) {
+      const dur = eventData.duration ?? 45;
       const [hours, minutes] = eventData.time.split(':').map(Number);
       const startMinutes = hours * 60 + minutes;
-      const endMinutes = startMinutes + eventData.duration + 30;
+      const endMinutes = startMinutes + dur + 30;
       const endHours = Math.floor(endMinutes / 60);
       const endMins = endMinutes % 60;
       const endTime = `${String(endHours).padStart(2, '0')}:${String(endMins).padStart(2, '0')}`;
@@ -296,20 +298,58 @@ export async function updateCalendarEvent(
       };
     }
 
-    if (eventData.customer || eventData.service) {
-      const currentSummary = existingEvent.data.summary || '';
-      if (eventData.service && eventData.customer) {
-        updatePayload.summary = `📸 ${eventData.service} - ${eventData.customer.firstName} ${eventData.customer.lastName}`;
-      } else if (eventData.service) {
-        updatePayload.summary = currentSummary.replace(/📸 .*? -/, `📸 ${eventData.service} -`);
+    // ── Summary ────────────────────────────────────────────────────────────
+    if (eventData.customer && eventData.service) {
+      const { serviceType, serviceCategory, serviceGroup, customer, service } = eventData;
+      if (serviceType === 'Self-Shoot') {
+        updatePayload.summary = `${serviceType}, ${serviceCategory || 'Digital'}, ${service} - ${customer.firstName} ${customer.lastName}`;
+      } else {
+        updatePayload.summary = `${serviceType || ''}, ${serviceGroup || ''}, ${service} - ${customer.firstName} ${customer.lastName}`;
       }
+    } else if (eventData.service) {
+      const cur = existingEvent.data.summary || '';
+      updatePayload.summary = cur.replace(/,\s*[^-]+-\s*(.+)$/, `, ${eventData.service} - $1`);
+    }
+
+    // ── Description (rebuild when we have enough data) ─────────────────────
+    if (eventData.bookingId && eventData.customer) {
+      const { bookingId, customer, service, serviceType, duration } = eventData;
+      let desc = `Booking ID: ${bookingId}\n\n`;
+      desc += `Customer: ${customer.firstName} ${customer.lastName}\n`;
+      if (customer.email) desc += `Email: ${customer.email}\n`;
+      if (customer.phone) desc += `Phone: ${customer.phone}\n`;
+      desc += `\nService: ${service || 'Studio Session'}\n`;
+      if (serviceType) desc += `Type: ${serviceType}\n`;
+      if (duration)    desc += `Duration: ${duration} minutes (+ 30 min buffer)\n`;
+      desc += `\nStudio: Memories Photography Studio\n`;
+      desc += `Location: Indang, Cavite\n`;
+      desc += `Google Maps: https://maps.app.goo.gl/kcjjzkZnvvpxJmQL9`;
+      updatePayload.description = desc;
+    }
+
+    // ── Attendees (update if email provided) ──────────────────────────────
+    if (eventData.customer?.email) {
+      const { customer } = eventData;
+      const existingAttendees: any[] = existingEvent.data.attendees || [];
+      // Replace or add the customer attendee, keep any other attendees (e.g. organizer)
+      const others = existingAttendees.filter(
+        (a: any) => a.organizer || a.self
+      );
+      updatePayload.attendees = [
+        ...others,
+        {
+          email: customer.email,
+          displayName: `${customer.firstName} ${customer.lastName}`,
+          responseStatus: 'needsAction',
+        },
+      ];
     }
 
     await calendar.events.patch({
       calendarId: CALENDAR_ID,
       eventId: eventId,
       requestBody: updatePayload,
-      sendUpdates: 'all',
+      sendUpdates: 'all', // Sends updated invite to attendees
     });
 
     console.log('✅ Calendar event updated:', eventId);

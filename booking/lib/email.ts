@@ -447,6 +447,150 @@ export async function sendBookingConfirmationEmail(bookingData: BookingData): Pr
   }
 }
 
+export interface BookingUpdateData {
+  bookingId: string;
+  customer: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
+  service?: string;
+  serviceType?: string;
+  duration?: number;
+  date: string;
+  time: string;
+  changedFields?: string[];
+}
+
+/**
+ * Send booking update notification email
+ * Called when a booking is edited in Notion so the customer gets the latest details
+ */
+export async function sendBookingUpdateEmail(data: BookingUpdateData): Promise<boolean> {
+  if (!data.customer.email) return false;
+
+  try {
+    const { bookingId, customer, service, serviceType, duration, date, time } = data;
+    const formattedDateTime = formatManilaDateTime(date, time);
+    const formattedTime    = formatTimeTo12Hour(time);
+
+    const bccEmails = await getBccEmails();
+
+    const { data: result, error } = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: [customer.email],
+      bcc: bccEmails,
+      subject: `Booking Updated - ${bookingId} | Memories Photography Studio`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Booking Updated</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #FAF3E0;">
+          <table role="presentation" style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" style="width: 600px; max-width: 100%; border-collapse: collapse; background-color: #FFFFFF; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                  <!-- Header -->
+                  <tr>
+                    <td style="padding: 40px 40px 20px 40px; text-align: center; background-color: #0b3d2e; border-radius: 8px 8px 0 0;">
+                      <h1 style="margin: 0; color: #FFFFFF; font-size: 28px; font-weight: bold;">Booking Updated</h1>
+                      <p style="margin: 10px 0 0 0; color: #FAF3E0; font-size: 14px;">Memories Photography Studio</p>
+                    </td>
+                  </tr>
+
+                  <!-- Notice -->
+                  <tr>
+                    <td style="padding: 24px 40px 0 40px; text-align: center;">
+                      <p style="margin: 0; color: #555; font-size: 15px; line-height: 1.6;">
+                        Hi <strong>${customer.firstName}</strong>, your booking has been updated. Here are your latest details:
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Booking ID -->
+                  <tr>
+                    <td style="padding: 20px 40px; text-align: center; background-color: #f0f8f5;">
+                      <p style="margin: 0 0 4px 0; color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Booking ID</p>
+                      <p style="margin: 0; color: #0b3d2e; font-size: 22px; font-weight: bold; font-family: 'Courier New', monospace;">${bookingId}</p>
+                    </td>
+                  </tr>
+
+                  <!-- Details -->
+                  <tr>
+                    <td style="padding: 28px 40px 20px 40px;">
+                      <h2 style="margin: 0 0 16px 0; color: #0b3d2e; font-size: 18px; border-bottom: 2px solid #0b3d2e; padding-bottom: 8px;">Updated Booking Details</h2>
+                      <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                          <td style="padding: 8px 0; color: #666; font-size: 14px; width: 40%;">Customer:</td>
+                          <td style="padding: 8px 0; color: #2C2C2C; font-size: 14px; font-weight: 600;">${customer.firstName} ${customer.lastName}</td>
+                        </tr>
+                        ${service ? `<tr>
+                          <td style="padding: 8px 0; color: #666; font-size: 14px;">Service:</td>
+                          <td style="padding: 8px 0; color: #2C2C2C; font-size: 14px;">${service}${serviceType ? ` (${serviceType})` : ''}</td>
+                        </tr>` : ''}
+                        <tr>
+                          <td style="padding: 8px 0; color: #666; font-size: 14px;">Date &amp; Time:</td>
+                          <td style="padding: 8px 0; color: #2C2C2C; font-size: 14px; font-weight: 600;">${formattedDateTime} at ${formattedTime}</td>
+                        </tr>
+                        ${duration ? `<tr>
+                          <td style="padding: 8px 0; color: #666; font-size: 14px;">Duration:</td>
+                          <td style="padding: 8px 0; color: #2C2C2C; font-size: 14px;">${duration} minutes</td>
+                        </tr>` : ''}
+                        ${customer.phone ? `<tr>
+                          <td style="padding: 8px 0; color: #666; font-size: 14px;">Phone:</td>
+                          <td style="padding: 8px 0; color: #2C2C2C; font-size: 14px;">${customer.phone}</td>
+                        </tr>` : ''}
+                      </table>
+                    </td>
+                  </tr>
+
+                  <!-- Note -->
+                  <tr>
+                    <td style="padding: 0 40px 28px 40px;">
+                      <p style="margin: 0; color: #555; font-size: 13px; line-height: 1.6; background: #fffbeb; border-left: 4px solid #d4a017; padding: 12px 16px; border-radius: 4px;">
+                        Your Google Calendar invite has also been updated automatically. Please check your calendar for the latest details.
+                      </p>
+                    </td>
+                  </tr>
+
+                  <!-- Footer -->
+                  <tr>
+                    <td style="padding: 24px 40px; background-color: #f5f5f5; border-radius: 0 0 8px 8px; text-align: center;">
+                      <p style="margin: 0 0 8px 0; color: #666; font-size: 12px;">
+                        Memories Photography Studio &nbsp;·&nbsp; Indang, Cavite<br>
+                        📧 <a href="mailto:smile@memories-studio.com" style="color: #0b3d2e; text-decoration: none;">smile@memories-studio.com</a>
+                        &nbsp;·&nbsp; 📱 0906 469 4122
+                      </p>
+                      <p style="margin: 0; color: #999; font-size: 11px;">© ${new Date().getFullYear()} Memories Photography Studio. All rights reserved.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('❌ Booking update email error:', error);
+      return false;
+    }
+
+    console.log('✅ Booking update email sent to:', customer.email, '| ID:', result?.id);
+    return true;
+  } catch (error) {
+    console.error('❌ Booking update email error:', error);
+    return false;
+  }
+}
+
 /**
  * Send email verification code (for booking management)
  */
