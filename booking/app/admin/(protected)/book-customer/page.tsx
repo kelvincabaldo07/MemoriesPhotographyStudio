@@ -115,16 +115,18 @@ export default function AdminBookCustomerPage() {
     };
   }, [serviceConfig, selectedAddons]);
 
-  // Fetch booked slots when date changes
+  // Fetch booked slots when date or service changes
   useEffect(() => {
     if (!selectedDate) return;
     
     const fetchBookedSlots = async () => {
       try {
-        const response = await fetch(`/api/calendar/blocked-times?date=${selectedDate}`);
+        const duration = serviceConfig?.duration || 45;
+        const response = await fetch(`/api/calendar/availability?date=${selectedDate}&duration=${duration}&adminBypass=true`);
         if (response.ok) {
           const data = await response.json();
-          setBookedSlots(data.blockedTimes || []);
+          // unavailableSlots = slots that are already booked; all other slots are free
+          setBookedSlots(data.unavailableSlots || []);
         }
       } catch (err) {
         console.error("Error fetching booked slots:", err);
@@ -132,7 +134,7 @@ export default function AdminBookCustomerPage() {
     };
     
     fetchBookedSlots();
-  }, [selectedDate]);
+  }, [selectedDate, serviceConfig?.duration]);
 
   // Generate time slots (with admin override)
   const timeSlots = useMemo(() => {

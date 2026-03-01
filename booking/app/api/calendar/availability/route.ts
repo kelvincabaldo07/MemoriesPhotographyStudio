@@ -187,22 +187,6 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // If admin bypass is enabled, return all 24-hour time slots without filtering
-    if (adminBypass) {
-      const allSlots = generateFullDaySlots(15); // Generate 00:00 to 23:45 in 15-min increments
-      return NextResponse.json({
-        success: true,
-        date,
-        duration,
-        availableSlots: allSlots,
-        totalSlots: allSlots.length,
-        realBookableSlots: allSlots.length,
-        bookedEvents: 0,
-        adminBypass: true,
-        message: 'Admin mode: All 24-hour time slots available (00:00-23:45)',
-      });
-    }
-
     // Convert lead time to minutes
     let leadTimeMinutes = bookingPolicies.leadTime;
     if (bookingPolicies.leadTimeUnit === 'hours') {
@@ -220,6 +204,21 @@ export async function GET(request: NextRequest) {
     // Check if refresh token exists
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.warn('Google Calendar not configured. Using mock data.');
+      if (adminBypass) {
+        const fullDaySlots = generateFullDaySlots(15);
+        return NextResponse.json({
+          success: true,
+          date,
+          duration,
+          availableSlots: fullDaySlots,
+          unavailableSlots: [],
+          totalSlots: fullDaySlots.length,
+          realBookableSlots: fullDaySlots.length,
+          bookedEvents: 0,
+          adminBypass: true,
+          usingMockData: true,
+        });
+      }
       const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, slotSizeMinutes);
       const filteredSlots = filterPastSlots(allSlots, date, leadTimeMinutes);
       const realSlots = calculateRealSlots(filteredSlots, duration);
@@ -342,21 +341,22 @@ export async function GET(request: NextRequest) {
     const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES, slotSizeMinutes);
     console.log(`[Availability ${date}] Generated ${allSlots.length} total slots for ${duration}min duration`);
     
-    // If admin bypass, return all slots but also mark which ones are booked
+    // If admin bypass, return ALL 24-hour slots but mark which ones are actually booked
     if (adminBypass) {
-      const unavailableSlots = allSlots.filter((slot) =>
+      const fullDaySlots = generateFullDaySlots(15);
+      const unavailableSlots = fullDaySlots.filter((slot) =>
         !isSlotAvailable(slot, duration, blockedRanges)
       );
-      console.log(`[Availability ${date}] Admin bypass: ${unavailableSlots.length} slots are booked`);
+      console.log(`[Availability ${date}] Admin bypass: ${unavailableSlots.length}/${fullDaySlots.length} slots are booked`);
       
       return NextResponse.json({
         success: true,
         date,
         duration,
-        availableSlots: allSlots, // All slots in admin mode
-        unavailableSlots, // Which ones are actually booked
-        totalSlots: allSlots.length,
-        realBookableSlots: allSlots.length,
+        availableSlots: fullDaySlots,
+        unavailableSlots,
+        totalSlots: fullDaySlots.length,
+        realBookableSlots: fullDaySlots.length - unavailableSlots.length,
         bookedEvents: events.length,
         adminBypass: true,
         usingMockData: false,

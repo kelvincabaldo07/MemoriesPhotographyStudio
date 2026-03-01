@@ -188,74 +188,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Always check for double-booking to prevent conflicts
-    // Check if time slot is already booked
-    const existingBookingsResponse = await fetch(
-      `https://api.notion.com/v1/databases/${databaseId}/query`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${notionApiKey}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28',
-        },
-        body: JSON.stringify({
-          filter: {
-            and: [
-              {
-                property: 'Date',
-                date: {
-                  equals: bookingData.schedule.date
-                }
-              },
-              {
-                property: 'Status',
-                select: {
-                  does_not_equal: 'Cancelled'
-                }
-              }
-            ]
-          }
-        })
-      }
-    );
-
-    if (existingBookingsResponse.ok) {
-      const existingData = await existingBookingsResponse.json();
-      const requestedTime = bookingData.schedule.time;
-      const requestedDuration = bookingData.selections.duration || 30;
-      
-      // Check for time conflicts
-      const hasConflict = existingData.results.some((page: any) => {
-        const existingTimeData = page.properties.Time?.date;
-        if (!existingTimeData?.start) return false;
-        
-        const existingTime = existingTimeData.start.match(/T(\d{2}:\d{2})/)?.[1];
-        if (!existingTime) return false;
-        
-        const existingDuration = page.properties.Duration?.number || 30;
-        
-        // Convert times to minutes for comparison
-        const [reqH, reqM] = requestedTime.split(':').map(Number);
-        const reqStart = reqH * 60 + reqM;
-        const reqEnd = reqStart + requestedDuration + 30; // Include buffer
-        
-        const [exH, exM] = existingTime.split(':').map(Number);
-        const exStart = exH * 60 + exM;
-        const exEnd = exStart + existingDuration + 30; // Include buffer
-        
-        // Check for overlap
-        return (reqStart < exEnd && reqEnd > exStart);
-      });
-      
-      if (hasConflict) {
-        return NextResponse.json(
-          { success: false, error: 'Time slot is already booked. Please choose a different time.' },
-          { status: 409 }
-        );
-      }
-    }
-
     // Prepare Notion page properties
     const fullName = `${bookingData.customer.firstName} ${bookingData.customer.lastName}`.trim() || "Unknown Customer";
     
@@ -271,7 +203,7 @@ export async function POST(request: NextRequest) {
     
     // Build properties - only include fields with actual values to avoid Notion rejections
     const notionProperties: Record<string, any> = {
-      "Name": { title: [{ text: { content: fullName } }] },
+      "Client Name": { title: [{ text: { content: fullName } }] },
       "Booking ID": { rich_text: [{ text: { content: bookingId } }] },
       "First Name": { rich_text: [{ text: { content: bookingData.customer.firstName || "" } }] },
       "Last Name": { rich_text: [{ text: { content: bookingData.customer.lastName || "" } }] },
