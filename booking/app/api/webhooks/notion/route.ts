@@ -7,11 +7,29 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { randomBytes } from 'crypto';
 import { createCalendarEvent, createBlockedCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '@/lib/google-calendar';
 import { sendBookingConfirmationEmail } from '@/lib/email';
+import { calculateEndTime } from '@/lib/time-utils';
 
 // Webhook secret for security
 const WEBHOOK_SECRET = process.env.NOTION_WEBHOOK_SECRET;
+const BUFFER_MINUTES = 30;
+
+/** Fields written back by the webhook itself — skip re-processing when only these changed */
+const WEBHOOK_WRITTEN_FIELDS = new Set(['Calendar Event ID', 'Booking ID', 'Time']);
+
+/** Generate a Booking ID in the same format as the app: MMRS-YYYYMMDDHH-XXXXXXXX */
+function generateBookingId(date: string, time: string): string {
+  const [year, month, day] = date.split('-');
+  const hour = time.split(':')[0];
+  const dateTimePart = `${year}${month}${day}${hour}`;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const buf = randomBytes(6);
+  let code = '';
+  for (let i = 0; i < 8; i++) code += chars[buf[i % 6] % chars.length];
+  return `MMRS-${dateTimePart}-${code}`;
+}
 
 interface NotionWebhookPayload {
   type: 'page.created' | 'page.properties_updated' | 'page.deleted' | 'url_verification';
@@ -122,17 +140,14 @@ export async function POST(request: NextRequest) {
         break;
       
       case 'page.properties_updated':
-        // Check if only Calendar Event ID was updated - skip to prevent loop
+        // Widen loop-prevention: skip if ONLY fields we wrote back changed
         const updatedProperties = payload.data?.updated_properties || [];
-        const onlyCalendarEventIdUpdated = updatedProperties.length === 1 && 
-                                            updatedProperties[0] === 'Calendar Event ID';
-        
-        if (onlyCalendarEventIdUpdated) {
-          console.log('[Notion Webhook] Skipping - only Calendar Event ID was updated (preventing loop)');
-          return NextResponse.json({ 
-            success: true, 
-            message: 'Skipped - Calendar Event ID update only' 
-          });
+        const allWrittenByUs = updatedProperties.length > 0 &&
+          updatedProperties.every((p: string) => WEBHOOK_WRITTEN_FIELDS.has(p));
+
+        if (allWrittenByUs) {
+          console.log('[Notion Webhook] Skipping - only webhook-written fields updated (preventing loop):', updatedProperties);
+          return NextResponse.json({ success: true, message: 'Skipped - webhook-written fields only' });
         }
         
         await handleBookingUpdated(pageId, props);
@@ -208,68 +223,98 @@ async function fetchNotionPage(pageId: string) {
 }
 
 async function handleBookingCreated(pageId: string, props: any) {
-  // Extract all booking details
-  const bookingId = extractText(props['Booking ID']);
+  let bookingId = extractText(props['Booking ID']);
   const firstName = extractText(props['First Name']);
   const lastName = extractText(props['Last Name']);
   const email = extractEmail(props['Email']);
   const phone = extractPhone(props['Phone']);
-  const service = extractSelect(props['Service']);
+  const service = extractText(props['Service']) || extractSelect(props['Service']);
   const serviceType = extractSelect(props['Service Type']);
+  const serviceCategory = extractSelect(props['Service Category']);
+  const serviceGroup = extractText(props['Service Group']);
   const duration = extractNumber(props['Duration']) || 45;
   const date = extractDate(props['Date']);
   const time = extractTime(props['Time']);
   const calendarEventId = extractText(props['Calendar Event ID']);
   const status = extractSelect(props['Status']);
 
-  // IMPORTANT: Skip if calendar event already exists (prevent duplicates)
-  // The google-calendar.ts will also check for existing events by booking ID
-  if (calendarEventId) {
-    console.log(`[Notion Webhook] Skipping - booking already has calendar event ID: ${calendarEventId}`);
+  // Must have at least date + start time
+  if (!date || !time) {
+    console.log(`[Notion Webhook] Skipping page ${pageId} — no date/time`);
     return;
   }
 
-  // Only create calendar event if booking is confirmed and has required data
-  if (status === 'Booking Confirmed' && email && date && time) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Notion Webhook] Creating Google Calendar event for ${bookingId}`);
-      console.log(`[Notion Webhook] Details: ${firstName} ${lastName}, [REDACTED], ${date} ${time}, ${service} (${duration}min)`);
-    }
-    
-    try {
-      const serviceCategory = extractSelect(props['Service Category']);
-      const serviceGroup = extractText(props['Service Group']);
-      
-      const eventId = await createCalendarEvent({
-        bookingId,
-        customer: { firstName, lastName, email, phone },
-        service,
-        serviceType,
-        serviceCategory,
-        serviceGroup,
-        duration,
-        date,
-        time,
-      });
+  // Skip non-booking statuses
+  const skipStatuses = ['', 'Blocked', 'Studio Block', 'Blocked Time', 'Cancelled', 'No Show'];
+  if (skipStatuses.includes(status)) {
+    console.log(`[Notion Webhook] Skipping status: ${status}`);
+    return;
+  }
 
-      if (eventId) {
-        // Update Notion with calendar event ID
-        await updateNotionPage(pageId, {
-          'Calendar Event ID': {
-            rich_text: [{ text: { content: eventId } }]
-          }
-        });
-        
-        console.log(`[Notion Webhook] ✅ Calendar event created: ${eventId}`);
-      }
-    } catch (error) {
-      console.error('[Notion Webhook] Error creating calendar event:', error);
-      throw error;
+  // Fields to write back in one Notion PATCH
+  const notionUpdates: Record<string, any> = {};
+
+  // 1️⃣ Generate Booking ID if missing
+  if (!bookingId) {
+    bookingId = generateBookingId(date, time);
+    notionUpdates['Booking ID'] = { rich_text: [{ text: { content: bookingId } }] };
+    console.log(`[Notion Webhook] Generated Booking ID: ${bookingId}`);
+  }
+
+  // 2️⃣ Stamp end time on the Time property if it only has a start
+  const hasEndTime = !!props['Time']?.date?.end;
+  if (!hasEndTime) {
+    const endTime = calculateEndTime(time, duration + BUFFER_MINUTES);
+    const startDateTime = `${date}T${time}:00.000+08:00`;
+    const endDateTime   = `${date}T${endTime}:00.000+08:00`;
+    notionUpdates['Time'] = { date: { start: startDateTime, end: endDateTime } };
+    console.log(`[Notion Webhook] Stamped end time: ${time} → ${endTime} (${duration}min + ${BUFFER_MINUTES}min buffer)`);
+  }
+
+  // Write Booking ID + Time back to Notion first
+  if (Object.keys(notionUpdates).length > 0) {
+    await updateNotionPage(pageId, notionUpdates);
+  }
+
+  // 3️⃣ Create Google Calendar event (skip if already exists)
+  if (calendarEventId) {
+    console.log(`[Notion Webhook] Calendar event already exists: ${calendarEventId}`);
+    return;
+  }
+
+  try {
+    // Derive a display name even if First/Last Name fields are empty
+    const fullName = `${firstName} ${lastName}`.trim()
+      || extractText(props['Client Name'])
+      || 'Customer';
+    const [fn, ...rest] = fullName.split(' ');
+
+    const eventId = await createCalendarEvent({
+      bookingId,
+      customer: {
+        firstName: firstName || fn || fullName,
+        lastName:  lastName  || rest.join(' ') || '',
+        email:     email  || '',
+        phone:     phone  || '',
+      },
+      service:         service || 'Studio Session',
+      serviceType:     serviceType || '',
+      serviceCategory: serviceCategory || '',
+      serviceGroup:    serviceGroup || '',
+      duration,
+      date,
+      time,
+    });
+
+    if (eventId) {
+      await updateNotionPage(pageId, {
+        'Calendar Event ID': { rich_text: [{ text: { content: eventId } }] },
+      });
+      console.log(`[Notion Webhook] ✅ Calendar event created: ${eventId}`);
     }
-  } else {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Notion Webhook] Skipping calendar creation: status=${status}, hasEmail=${!!email}, hasDate=${!!date}, hasTime=${!!time}`);
-    }
+  } catch (error) {
+    console.error('[Notion Webhook] Error creating calendar event:', error);
+    throw error;
   }
 }
 
