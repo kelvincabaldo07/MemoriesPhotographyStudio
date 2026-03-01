@@ -138,12 +138,20 @@ export async function POST(request: NextRequest) {
     // ── Email trigger check (runs BEFORE bookingId guard so it always works) ─
     if (eventType === 'page.properties_updated') {
       const updatedProperties: string[] = payload.data?.updated_properties || [];
+
+      // Diagnostic: log exactly what Notion sent so we can verify property names
+      console.log('[Notion Webhook] updated_properties:', JSON.stringify(updatedProperties));
+      console.log('[Notion Webhook] Resend Confirmation prop:', JSON.stringify(props['Resend Confirmation']));
+      console.log('[Notion Webhook] Send Reminder prop:', JSON.stringify(props['Send Reminder']));
+
       const resendConfirmationTriggered =
         updatedProperties.includes('Resend Confirmation') &&
         props['Resend Confirmation']?.checkbox === true;
       const sendReminderTriggered =
         updatedProperties.includes('Send Reminder') &&
         props['Send Reminder']?.checkbox === true;
+
+      console.log('[Notion Webhook] resendConfirmationTriggered:', resendConfirmationTriggered, '| sendReminderTriggered:', sendReminderTriggered);
 
       if (resendConfirmationTriggered || sendReminderTriggered) {
         await handleEmailTriggers(pageId, props, resendConfirmationTriggered, sendReminderTriggered);
