@@ -672,8 +672,8 @@ function DayView({
         return { open: 13, close: 20, lunch: null };
       case 6: // Saturday
         return { open: 10, close: 20, lunch: { start: 12, end: 13 } };
-      default: // Monday-Friday
-        return { open: 8, close: 20, lunch: { start: 12, end: 13 } };
+      default: // Monday-Friday — lunch break is 11:30–13:30; shade hours 11–14 on hourly grid
+        return { open: 10, close: 20, lunch: { start: 11, end: 14 } };
     }
   };
 

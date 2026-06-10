@@ -1,35 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import { loadSchedule, getDayHours, hhmmToMinutes, DEFAULT_SCHEDULE, type WeekSchedule } from '@/lib/schedule-store';
 
 const STUDIO_TZ = 'Asia/Manila';
-const SHOP_HOURS = { open: 10, close: 16 }; // Default shop hours
-
-// Add this type definition:
-type ShopHours = {
-  open: number;
-  close: number;
-  lunchBreak?: { start: number; end: number } | null;
-};
-
-const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
-  0: { open: 13, close: 18, lunchBreak: null },
-  1: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  2: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  3: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  4: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  5: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  6: { open: 10, close: 18, lunchBreak: { start: 12, end: 13 } },
-};
 const SLOT_MINUTES = 15;
 const BUFFER_MINUTES = 30;
 
 function pad(n: number) {
   return n.toString().padStart(2, '0');
-}
-
-function toMinutes(hhmm: string) {
-  const [h, m] = hhmm.split(':').map(Number);
-  return h * 60 + m;
 }
 
 function toHHMM(mins: number) {
@@ -38,40 +16,41 @@ function toHHMM(mins: number) {
   return `${pad(h)}:${pad(m)}`;
 }
 
-function getShopHoursForDate(dateStr: string): ShopHours {
-  const date = new Date(dateStr + 'T12:00:00');
-  const dayOfWeek = date.getDay();
-  return SHOP_HOURS_BY_DAY[dayOfWeek];
-}
+// Alias kept for internal use
+const toMinutes = hhmmToMinutes;
 
-function generateDailySlots(dateStr?: string, duration: number = 45, buffer: number = BUFFER_MINUTES) {
-  const hours: ShopHours = dateStr ? getShopHoursForDate(dateStr) : { ...SHOP_HOURS, lunchBreak: null };
-  const start = hours.open * 60;
-  const end = hours.close * 60;
-  
-  // Calculate the latest possible start time
+/**
+ * Generate available time slots for a given date using the admin-configured schedule.
+ * Respects the day's open/close hours and all configured break periods.
+ */
+function generateDailySlots(
+  dateStr: string,
+  schedule: WeekSchedule,
+  duration: number = 45,
+  buffer: number = BUFFER_MINUTES
+): string[] {
+  const dayHours = getDayHours(dateStr, schedule);
+  if (!dayHours) return []; // Day is disabled
+
+  const start = hhmmToMinutes(dayHours.open);
+  const end = hhmmToMinutes(dayHours.close);
   const latestStartTime = end - duration - buffer;
-  
+
   const slots: string[] = [];
-  
   for (let mins = start; mins <= latestStartTime; mins += SLOT_MINUTES) {
     slots.push(toHHMM(mins));
   }
-  
-  // Filter out lunch break if applicable
-  if (hours.lunchBreak) {
-    const lunchStart = hours.lunchBreak.start * 60;
-    const lunchEnd = hours.lunchBreak.end * 60;
-    
-    return slots.filter(slot => {
-      const slotMinutes = toMinutes(slot);
-      const slotEnd = slotMinutes + duration + buffer;
-      
-      return slotEnd <= lunchStart || slotMinutes >= lunchEnd;
+
+  // Filter out any break periods
+  return slots.filter(slot => {
+    const slotMinutes = hhmmToMinutes(slot);
+    const slotEnd = slotMinutes + duration + buffer;
+    return dayHours.breaks.every(b => {
+      const breakStart = hhmmToMinutes(b.start);
+      const breakEnd = hhmmToMinutes(b.end);
+      return slotEnd <= breakStart || slotMinutes >= breakEnd;
     });
-  }
-  
-  return slots;
+  });
 }
 
 function isSlotAvailable(
@@ -107,6 +86,14 @@ function calculateRealSlots(availableSlots: string[], duration: number): number 
 }
 
 export async function POST(request: NextRequest) {
+  // Load the admin-configured schedule once for the entire batch
+  let schedule: WeekSchedule = DEFAULT_SCHEDULE;
+  try {
+    schedule = await loadSchedule();
+  } catch (err) {
+    console.warn('Failed to load schedule for batch, using defaults');
+  }
+
   try {
     const { dates, duration = 45, adminBypass = false } = await request.json();
 
@@ -121,10 +108,9 @@ export async function POST(request: NextRequest) {
     
     // If admin bypass is enabled, return maximum slots for all dates
     if (adminBypass) {
-      const allSlots = generateDailySlots();
-      const results = dates.map(date => ({
+      const results = dates.map((date: string) => ({
         date,
-        count: allSlots.length
+        count: generateDailySlots(date, schedule, duration, BUFFER_MINUTES).length,
       }));
       
       return NextResponse.json({
@@ -137,12 +123,10 @@ export async function POST(request: NextRequest) {
     // If no refresh token, return mock data for all dates
     if (!process.env.GOOGLE_REFRESH_TOKEN) {
       console.warn('Google Calendar not configured. Using mock data for batch request.');
-      const allSlots = generateDailySlots();
-      const realSlots = calculateRealSlots(allSlots, duration);
-      const results = dates.map(date => ({
-        date,
-        count: realSlots
-      }));
+      const results = dates.map((date: string) => {
+        const allSlots = generateDailySlots(date, schedule, duration, BUFFER_MINUTES);
+        return { date, count: calculateRealSlots(allSlots, duration) };
+      });
       
       return NextResponse.json({
         success: true,
@@ -215,7 +199,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Calculate availability for each date
-    const results = dates.map(date => {
+    const results = dates.map((date: string) => {
       // Check if date is fully blocked
       if (blockedDates.has(date)) {
         return { date, count: 0 };
@@ -223,7 +207,9 @@ export async function POST(request: NextRequest) {
       
       const dayEvents = eventsByDate[date] || [];
       const blockedRanges: [number, number][] = [];
-      const dayShopHours = getShopHoursForDate(date); // Get correct hours for this specific date
+      const dayHours = getDayHours(date, schedule); // Get correct hours for this specific date
+      const dayOpen = dayHours ? hhmmToMinutes(dayHours.open) : 0;
+      const dayClose = dayHours ? hhmmToMinutes(dayHours.close) : 24 * 60;
 
       dayEvents.forEach((event) => {
         if (!event.start?.dateTime || !event.end?.dateTime) return;
@@ -234,13 +220,13 @@ export async function POST(request: NextRequest) {
         const startMins = eventStart.getHours() * 60 + eventStart.getMinutes();
         const endMins = eventEnd.getHours() * 60 + eventEnd.getMinutes();
 
-        const clampedStart = Math.max(startMins, dayShopHours.open * 60);
-        const clampedEnd = Math.min(endMins, dayShopHours.close * 60);
+        const clampedStart = Math.max(startMins, dayOpen);
+        const clampedEnd = Math.min(endMins, dayClose);
 
         blockedRanges.push([clampedStart, clampedEnd]);
       });
 
-      const allSlots = generateDailySlots(date, duration, BUFFER_MINUTES);
+      const allSlots = generateDailySlots(date, schedule, duration, BUFFER_MINUTES);
       const availableSlots = allSlots.filter((slot) =>
         isSlotAvailable(slot, duration, blockedRanges)
       );
@@ -266,9 +252,10 @@ export async function POST(request: NextRequest) {
     try {
       const body = await request.json();
       const { dates, duration = 45 } = body;
-      const allSlots = generateDailySlots();
-      const realSlots = calculateRealSlots(allSlots, duration);
-      const results = dates.map((date: string) => ({ date, count: realSlots }));
+      const results = dates.map((date: string) => {
+        const allSlots = generateDailySlots(date, schedule, duration, BUFFER_MINUTES);
+        return { date, count: calculateRealSlots(allSlots, duration) };
+      });
       
       return NextResponse.json({
         success: true,
