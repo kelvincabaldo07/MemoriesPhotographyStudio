@@ -38,6 +38,27 @@ export function hhmmToMinutes(hhmm: string): number {
   return h * 60 + m;
 }
 
+function normalizeLegacyLunchBreaks(schedule: WeekSchedule): WeekSchedule {
+  const normalized: WeekSchedule = { ...schedule };
+  const targetDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+  for (const day of targetDays) {
+    const dayHours = normalized[day];
+    if (!dayHours?.breaks?.length) continue;
+
+    normalized[day] = {
+      ...dayHours,
+      breaks: dayHours.breaks.map((breakSlot) =>
+        breakSlot.start === '12:00' && breakSlot.end === '13:00'
+          ? { ...breakSlot, start: '11:30', end: '13:30' }
+          : breakSlot
+      ),
+    };
+  }
+
+  return normalized;
+}
+
 /** Return the DayHours for a given YYYY-MM-DD date string using the provided schedule */
 export function getDayHours(dateStr: string, schedule: WeekSchedule): DayHours | null {
   const date = new Date(dateStr + 'T12:00:00');
@@ -111,7 +132,7 @@ export async function loadSchedule(): Promise<WeekSchedule> {
     if (!textContent) return DEFAULT_SCHEDULE;
 
     const parsed: WeekSchedule = JSON.parse(textContent);
-    return { ...DEFAULT_SCHEDULE, ...parsed };
+    return normalizeLegacyLunchBreaks({ ...DEFAULT_SCHEDULE, ...parsed });
   } catch (error) {
     console.error('[Schedule Store] Error loading schedule:', error);
     return DEFAULT_SCHEDULE;
