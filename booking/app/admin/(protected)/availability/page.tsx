@@ -40,7 +40,7 @@ export default function AvailabilityPage() {
     Wednesday: { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
     Thursday: { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
     Friday: { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-    Saturday: { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
+    Saturday: { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
     Sunday: { open: "13:00", close: "20:00", breaks: [], enabled: true },
   });
 
