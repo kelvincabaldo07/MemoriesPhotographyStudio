@@ -23,13 +23,13 @@ export type WeekSchedule = {
 
 /** Default weekly schedule — weekdays have a lunch break 11:30 AM - 1:30 PM */
 export const DEFAULT_SCHEDULE: WeekSchedule = {
-  Monday:    { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-  Tuesday:   { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-  Wednesday: { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-  Thursday:  { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-  Friday:    { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-  Saturday:  { open: "10:00", close: "20:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
-  Sunday:    { open: "13:00", close: "20:00", breaks: [], enabled: true },
+  Monday:    { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+  Tuesday:   { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+  Wednesday: { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+  Thursday:  { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+  Friday:    { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+  Saturday:  { open: "10:00", close: "18:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+  Sunday:    { open: "13:00", close: "18:00", breaks: [], enabled: true },
 };
 
 /** Convert "HH:MM" string to total minutes */
@@ -54,6 +54,32 @@ function normalizeLegacyLunchBreaks(schedule: WeekSchedule): WeekSchedule {
           : breakSlot
       ),
     };
+  }
+
+  return normalized;
+}
+
+function normalizeLegacyClosingHours(schedule: WeekSchedule): WeekSchedule {
+  const normalized: WeekSchedule = { ...schedule };
+
+  const weekdayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  for (const day of weekdayNames) {
+    const dayHours = normalized[day];
+    if (!dayHours) continue;
+
+    if (dayHours.open === '10:00' && dayHours.close === '20:00') {
+      normalized[day] = { ...dayHours, close: '16:00' };
+    }
+  }
+
+  const saturday = normalized.Saturday;
+  if (saturday?.open === '10:00' && saturday.close === '20:00') {
+    normalized.Saturday = { ...saturday, close: '18:00' };
+  }
+
+  const sunday = normalized.Sunday;
+  if (sunday?.open === '13:00' && sunday.close === '20:00') {
+    normalized.Sunday = { ...sunday, close: '18:00' };
   }
 
   return normalized;
@@ -132,7 +158,8 @@ export async function loadSchedule(): Promise<WeekSchedule> {
     if (!textContent) return DEFAULT_SCHEDULE;
 
     const parsed: WeekSchedule = JSON.parse(textContent);
-    return normalizeLegacyLunchBreaks({ ...DEFAULT_SCHEDULE, ...parsed });
+    const mergedSchedule = { ...DEFAULT_SCHEDULE, ...parsed };
+    return normalizeLegacyClosingHours(normalizeLegacyLunchBreaks(mergedSchedule));
   } catch (error) {
     console.error('[Schedule Store] Error loading schedule:', error);
     return DEFAULT_SCHEDULE;
