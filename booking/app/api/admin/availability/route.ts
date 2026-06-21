@@ -1,11 +1,7 @@
-/**
- * Availability API with 3-Way Sync
- * Syncs between: Admin UI ↔ Notion ↔ Google Calendar
- */
-
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { Client } from '@notionhq/client';
+import { loadSchedule, saveSchedule, DEFAULT_SCHEDULE } from '@/lib/schedule-store';
 
 const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID || 'primary';
 const NOTION_AVAILABILITY_DB = process.env.NOTION_AVAILABILITY_DATABASE_ID;
@@ -74,21 +70,14 @@ function getNotionClient() {
  */
 export async function GET(request: NextRequest) {
   try {
-    const defaultSchedule = {
-      Monday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-      Tuesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-      Wednesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-      Thursday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-      Friday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-      Saturday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-      Sunday: { open: "13:00", close: "20:00", breaks: [], enabled: true },
-    };
+    // Load the persisted schedule (falls back to defaults if not saved yet)
+    const schedule = await loadSchedule();
 
-    // If Notion not configured, return defaults
+    // If Notion not configured, return schedule + empty blocked dates
     if (!NOTION_AVAILABILITY_DB || !process.env.NOTION_API_KEY) {
       console.log('[Availability API] Notion not configured, returning defaults');
       return NextResponse.json({
-        schedule: defaultSchedule,
+        schedule,
         blockedDates: [],
         timezone: 'Asia/Manila',
       });
@@ -98,7 +87,7 @@ export async function GET(request: NextRequest) {
     const notion = getNotionClient();
     if (!notion) {
       return NextResponse.json({
-        schedule: defaultSchedule,
+        schedule,
         blockedDates: [],
         timezone: 'Asia/Manila',
       });
@@ -138,7 +127,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      schedule: defaultSchedule,
+      schedule,
       blockedDates,
       timezone: 'Asia/Manila',
     });
@@ -152,7 +141,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST: Save to Notion and sync to Google Calendar (3-way sync)
+ * POST: Save schedule to Notion settings, then sync blocked dates to Google Calendar / Notion
  */
 export async function POST(request: NextRequest) {
   try {
@@ -162,6 +151,11 @@ export async function POST(request: NextRequest) {
     console.log('[Availability API] Starting 3-way sync...');
     console.log('[Availability API] Notion DB ID:', NOTION_AVAILABILITY_DB);
     console.log('[Availability API] Number of blocked dates to sync:', blockedDates.length);
+
+    // Persist the schedule so it survives page reloads
+    if (schedule) {
+      await saveSchedule(schedule);
+    }
 
     const syncResults = {
       notionCreated: 0,

@@ -35,13 +35,13 @@ type WeekSchedule = {
 
 export default function AvailabilityPage() {
   const [schedule, setSchedule] = useState<WeekSchedule>({
-    Monday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-    Tuesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-    Wednesday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-    Thursday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-    Friday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-    Saturday: { open: "08:00", close: "20:00", breaks: [{ id: "1", start: "12:00", end: "13:00" }], enabled: true },
-    Sunday: { open: "13:00", close: "20:00", breaks: [], enabled: true },
+    Monday: { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+    Tuesday: { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+    Wednesday: { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+    Thursday: { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+    Friday: { open: "10:00", close: "16:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+    Saturday: { open: "10:00", close: "18:00", breaks: [{ id: "1", start: "11:30", end: "13:30" }], enabled: true },
+    Sunday: { open: "13:00", close: "18:00", breaks: [], enabled: true },
   });
 
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
