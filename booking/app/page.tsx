@@ -270,6 +270,8 @@ const GROUP_THUMBS: Record<string, string> = {
 };
 
 // Optional add-ons
+const ADDONS_AVAILABLE = false;
+const ADDONS_UNAVAILABLE_MESSAGE = "Add-ons are temporarily unavailable and cannot be edited right now.";
 const ADDONS = [
   { id: "4r", label: "Printed 1 4R photo", price: 30 },
   { id: "photostrip", label: "Printed 2 photo strips", price: 30 },
@@ -713,7 +715,10 @@ export default function App(){
     return allocationValid;
   }, [serviceType, serviceGroup, selectedBackdrops, allocationValid]);
 
-  function toggleAddon(id: string, delta: number){ setAddons(prev=>{ const qty=Math.max(0,(prev[id]||0)+delta); return { ...prev, [id]: qty };}); }
+  function toggleAddon(id: string, delta: number){
+    if (!ADDONS_AVAILABLE) return;
+    setAddons(prev=>{ const qty=Math.max(0,(prev[id]||0)+delta); return { ...prev, [id]: qty };});
+  }
   function moveBackdrop(idx:number,dir:number){ setSelectedBackdrops(prev=>{ const arr=[...prev]; const swap=idx+dir; if(swap<0||swap>=arr.length) return prev; [arr[idx],arr[swap]]=[arr[swap],arr[idx]]; return arr; }); }
   function onBackdropToggle(key:string){ 
     setSelectedBackdrops(prev=>{ 
@@ -1014,12 +1019,13 @@ async function submitBooking(){
               />
             )}
 
-            {step === 5 && serviceType === "Self-Shoot" && (<StepAddons addons={addons} toggle={toggleAddon} />)}
-            {step === 5 && (serviceType === "With Photographer" || serviceType === "Seasonal Sessions") && (
-              <div className="text-center py-8 text-neutral-600">
-                <p className="text-lg">Add-ons are not available for {serviceType} sessions.</p>
-                <p className="text-sm mt-2">Click Next to continue.</p>
-              </div>
+            {step === 5 && (
+              <StepAddons
+                addons={addons}
+                toggle={toggleAddon}
+                unavailable={!ADDONS_AVAILABLE}
+                unavailableMessage={ADDONS_UNAVAILABLE_MESSAGE}
+              />
             )}
             {step === 6 && (
               <StepVideoAndTerms 
@@ -2775,11 +2781,27 @@ function StepBackdrops({ enabled, serviceType, serviceGroup, duration, limit, se
   );
 }
 
-function StepAddons({ addons, toggle }:{ addons:Record<string, number>; toggle:(id:string,delta:number)=>void; }){
+function StepAddons({
+  addons,
+  toggle,
+  unavailable = false,
+  unavailableMessage
+}:{
+  addons:Record<string, number>;
+  toggle:(id:string,delta:number)=>void;
+  unavailable?: boolean;
+  unavailableMessage?: string;
+}){
   return (
     <div>
       <h2 className="text-xl font-semibold">Optional add‑ons</h2>
       <p className="text-neutral-600 mb-3">Enhance your session with prints.</p>
+      {unavailable && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">Currently unavailable</p>
+          <p className="mt-1">{unavailableMessage ?? "Add-ons are temporarily unavailable."}</p>
+        </div>
+      )}
       <div className="space-y-3">
         {ADDONS.map(a=>{ const qty=addons[a.id]||0; return (
           <div key={a.id} className="border rounded-xl p-3 flex items-center justify-between">
@@ -2788,9 +2810,9 @@ function StepAddons({ addons, toggle }:{ addons:Record<string, number>; toggle:(
               <div className="text-sm text-neutral-500">{currency(a.price)} each set</div>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={()=>toggle(a.id,-1)}>-</Button>
+              <Button variant="outline" size="sm" onClick={()=>toggle(a.id,-1)} disabled={unavailable}>-</Button>
               <div className="w-10 text-center">{qty}</div>
-              <Button variant="outline" size="sm" onClick={()=>toggle(a.id,+1)}>+</Button>
+              <Button variant="outline" size="sm" onClick={()=>toggle(a.id,+1)} disabled={unavailable}>+</Button>
             </div>
           </div>
         );})}
@@ -3280,4 +3302,3 @@ if (typeof document !== "undefined") {
   styles.innerHTML = `.animate-accordion{animation:acc 160ms ease-out both}@keyframes acc{from{opacity:.0;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}`;
   document.head.appendChild(styles);
 }
-

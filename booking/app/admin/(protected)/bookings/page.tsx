@@ -67,6 +67,9 @@ interface Booking {
   createdAt: string;
 }
 
+const ADMIN_ADDONS_AVAILABLE = false;
+const ADMIN_ADDONS_UNAVAILABLE_MESSAGE = "Add-ons are temporarily unavailable and cannot be edited right now.";
+
 export default function BookingsPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -1168,6 +1171,10 @@ export default function BookingsPage() {
                     {/* Add-ons */}
                     <div className="mb-4">
                       <label className="text-sm font-semibold text-neutral-700 mb-2 block">Add-ons</label>
+                      <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                        <p className="font-medium">Currently unavailable</p>
+                        <p className="mt-1">{ADMIN_ADDONS_UNAVAILABLE_MESSAGE}</p>
+                      </div>
                       <div className="grid grid-cols-2 gap-3">
                         {[
                           { id: "4r", label: "Printed 1 4R photo", price: 30 },
@@ -1195,7 +1202,7 @@ export default function BookingsPage() {
                                       return { ...prev!, addons: newAddons };
                                     });
                                   }}
-                                  disabled={currentQty === 0}
+                                  disabled={!ADMIN_ADDONS_AVAILABLE || currentQty === 0}
                                   className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30 text-h3"
                                 >
                                   -
@@ -1204,12 +1211,14 @@ export default function BookingsPage() {
                                 <button
                                   type="button"
                                   onClick={() => {
+                                    if (!ADMIN_ADDONS_AVAILABLE) return;
                                     setEditedBooking(prev => {
                                       const newAddons = [...(prev?.addons || []), addon.id];
                                       return { ...prev!, addons: newAddons };
                                     });
                                   }}
-                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 text-h3"
+                                  disabled={!ADMIN_ADDONS_AVAILABLE}
+                                  className="w-8 h-8 rounded-full border bg-white hover:bg-gray-50 disabled:opacity-30 text-h3"
                                 >
                                   +
                                 </button>
