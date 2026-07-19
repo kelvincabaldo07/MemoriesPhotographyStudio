@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
 const STUDIO_TZ = 'Asia/Manila';
-const SHOP_HOURS = { open: 10, close: 16 }; // Default shop hours
+const SHOP_HOURS = { open: 13.5, close: 16 }; // Default shop hours
 
 // Add this type definition:
 type ShopHours = {
@@ -13,11 +13,11 @@ type ShopHours = {
 
 const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
   0: { open: 13, close: 18, lunchBreak: null },
-  1: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  2: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  3: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  4: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
-  5: { open: 10, close: 16, lunchBreak: { start: 12, end: 13 } },
+  1: { open: 13.5, close: 16, lunchBreak: null },
+  2: { open: 13.5, close: 16, lunchBreak: null },
+  3: { open: 13.5, close: 16, lunchBreak: null },
+  4: { open: 13.5, close: 16, lunchBreak: null },
+  5: { open: 13.5, close: 16, lunchBreak: null },
   6: { open: 10, close: 18, lunchBreak: { start: 12, end: 13 } },
 };
 const SLOT_MINUTES = 15;
