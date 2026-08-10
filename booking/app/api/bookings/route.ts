@@ -5,6 +5,7 @@ import { calculateEndTime } from '@/lib/time-utils';
 import { sendBookingConfirmationEmail } from '@/lib/email';
 import { createCalendarEvent } from '@/lib/google-calendar';
 import { randomBytes } from 'crypto';
+import { checkSlotAvailability } from '@/lib/google-calendar';
 
 /**
  * Extract time from Notion date property
@@ -276,7 +277,24 @@ export async function POST(request: NextRequest) {
 
     console.log('📝 Generated booking ID:', bookingId);
 
-    // Get Notion credentials
+    // ── Server-side availability guard ─────────────────────────────────────────
+    // Reject the booking if the date is closed or the time slot is already taken.
+    // This runs on the server so it cannot be bypassed by the client UI.
+    const slotCheck = await checkSlotAvailability({
+      date: bookingData.schedule.date,
+      time: bookingData.schedule.time,
+      duration: bookingData.selections.duration || 45,
+      buffer: bookingData.schedule.buffer || 30,
+    });
+
+    if (!slotCheck.available) {
+      console.warn(`⛔ Booking rejected (slot unavailable): ${slotCheck.reason}`);
+      return NextResponse.json(
+        { success: false, error: slotCheck.reason || 'This time slot is no longer available.' },
+        { status: 409 }
+      );
+    }
+    // ──────────────────────────────────────────────────────────────────────────
     const notionApiKey = process.env.NOTION_API_KEY;
     const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
 

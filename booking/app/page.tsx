@@ -787,8 +787,13 @@ async function submitBooking(){
     if (result.success) {
       setStep(STEPS.length-1); // Go to confirmation
     } else {
-      setModalMessage('Failed to create booking. Please try again.');
+      setModalMessage(result.error || 'Failed to create booking. Please try again.');
       setShowErrorModal(true);
+      // If the slot was taken or the date is closed, send the user back to pick a new time
+      if (response.status === 409) {
+        setTime('');
+        setStep(1); // Schedule step
+      }
     }
   } catch (error) {
     setModalMessage('Network error. Please check your connection.');

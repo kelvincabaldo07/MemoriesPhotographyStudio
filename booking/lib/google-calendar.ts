@@ -51,6 +51,104 @@ function getOAuth2Client() {
  * Create a Google Calendar event for a booking
  * Returns the event ID if successful, null if failed
  */
+const STUDIO_TZ = 'Asia/Manila';
+
+function toMinutesMidnight(hhmm: string): number {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+/**
+ * Check whether a requested date/time slot is still available.
+ * Returns { available: true } when the slot is free, or
+ * { available: false, reason: '...' } when it is blocked/taken.
+ *
+ * Checks:
+ *  1. All-day "[BLOCKED]" / "[Studio Blocked]" / "🚫" events → date is closed
+ *  2. Time-based events that overlap the requested window (start + duration + buffer)
+ */
+export async function checkSlotAvailability(params: {
+  date: string;       // YYYY-MM-DD
+  time: string;       // HH:MM (Manila time)
+  duration: number;   // session minutes
+  buffer: number;     // buffer minutes (default 30)
+}): Promise<{ available: boolean; reason?: string }> {
+  const { date, time, duration, buffer } = params;
+
+  if (!process.env.GOOGLE_REFRESH_TOKEN) {
+    // Calendar not configured – cannot verify; allow booking
+    return { available: true };
+  }
+
+  try {
+    const oauth2Client = getOAuth2Client();
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    const startOfDay = new Date(`${date}T00:00:00+08:00`);
+    const endOfDay   = new Date(`${date}T23:59:59+08:00`);
+
+    const response = await calendar.events.list({
+      calendarId: CALENDAR_ID,
+      timeMin: startOfDay.toISOString(),
+      timeMax: endOfDay.toISOString(),
+      singleEvents: true,
+      orderBy: 'startTime',
+    });
+
+    const events = response.data.items || [];
+
+    // 1. Check for all-day studio-closed blocks
+    const hasAllDayBlock = events.some((event: any) => {
+      const isAllDay  = !!event.start?.date;
+      const isBlocked = event.summary?.includes('[BLOCKED]') ||
+                        event.summary?.includes('[Studio Blocked]') ||
+                        event.summary?.includes('🚫');
+      return isAllDay && isBlocked;
+    });
+
+    if (hasAllDayBlock) {
+      return {
+        available: false,
+        reason: 'The studio is closed on this date. Please choose a different date.',
+      };
+    }
+
+    // 2. Check for time-based overlaps
+    const requestedStart = toMinutesMidnight(time);
+    const requestedEnd   = requestedStart + duration + buffer;
+
+    for (const event of events) {
+      if (!event.start?.dateTime || !event.end?.dateTime) continue;
+
+      const manilaStart = new Date(event.start.dateTime).toLocaleString('en-US', {
+        timeZone: STUDIO_TZ, hour: '2-digit', minute: '2-digit', hour12: false,
+      });
+      const manilaEnd = new Date(event.end.dateTime).toLocaleString('en-US', {
+        timeZone: STUDIO_TZ, hour: '2-digit', minute: '2-digit', hour12: false,
+      });
+
+      const [sh, sm] = manilaStart.split(':').map(Number);
+      const [eh, em] = manilaEnd.split(':').map(Number);
+      const eventStart = sh * 60 + sm;
+      const eventEnd   = eh * 60 + em;
+
+      // Overlap: our window [requestedStart, requestedEnd) vs event [eventStart, eventEnd)
+      if (requestedEnd > eventStart && requestedStart < eventEnd) {
+        return {
+          available: false,
+          reason: 'This time slot is no longer available. Please select a different time.',
+        };
+      }
+    }
+
+    return { available: true };
+  } catch (error) {
+    console.warn('[Calendar] checkSlotAvailability failed (allowing booking):', error);
+    // Fail open: if we cannot reach the calendar, don't block the customer
+    return { available: true };
+  }
+}
+
 /**
  * Create a Google Calendar blocked time event (studio closed / unavailable)
  * Returns the event ID if successful, null if failed
