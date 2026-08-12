@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const metadata = {
   title: 'Terms of Service | Memories Photography Studio',
   description: 'Terms of Service for Memories Photography Studio booking system',
@@ -287,7 +289,7 @@ export default function TermsOfServicePage() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-border">
-          <a href="/" className="text-primary hover:underline">← Back to Home</a>
+          <Link href="/" className="text-primary hover:underline">← Back to Home</Link>
         </div>
       </div>
     </div>

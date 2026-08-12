@@ -212,7 +212,7 @@ export async function sendBookingConfirmationEmail(bookingData: BookingData): Pr
     // Format addons list
     const addonsList = addons && Object.keys(addons).length > 0
       ? Object.entries(addons)
-          .filter(([_, qty]) => qty > 0)
+          .filter(([, qty]) => qty > 0)
           .map(([name, qty]) => `${name} (×${qty})`)
           .join(', ')
       : 'None';

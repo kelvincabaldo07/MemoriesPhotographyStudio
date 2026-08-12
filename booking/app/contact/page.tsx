@@ -115,7 +115,7 @@ export default function ContactPage() {
         </Card>
 
         <footer className="text-xs text-center text-neutral-500 mt-8">
-          © {new Date().getFullYear()} Memories Photography Studio — "Capture With Purpose. Create Change."
+          © {new Date().getFullYear()} Memories Photography Studio — &ldquo;Capture With Purpose. Create Change.&rdquo;
         </footer>
       </div>
 
