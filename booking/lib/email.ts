@@ -6,11 +6,17 @@
 import { Resend } from 'resend';
 import { formatTimeTo12Hour, formatManilaDateTime } from './time-utils';
 
-// Initialize Resend with API key
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@memories-studio.com';
 const FROM_NAME = 'Memories Photography Studio';
+
+function getResendClient(): Resend | null {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY is not configured; email sending is disabled.');
+    return null;
+  }
+
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 interface BookingData {
   bookingId: string;
@@ -49,6 +55,11 @@ interface BookingData {
  */
 export async function sendOTPEmail(email: string, otpCode: string): Promise<boolean> {
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return false;
+    }
+
     const { data, error } = await resend.emails.send({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: [email],
@@ -187,6 +198,11 @@ async function getBccEmails(): Promise<string[]> {
  */
 export async function sendBookingConfirmationEmail(bookingData: BookingData): Promise<boolean> {
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return false;
+    }
+
     const { bookingId, customer, selections, schedule, totals, addons } = bookingData;
     
     // Format date and time
@@ -471,6 +487,11 @@ export async function sendBookingUpdateEmail(data: BookingUpdateData): Promise<b
   if (!data.customer.email) return false;
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return false;
+    }
+
     const { bookingId, customer, service, serviceType, duration, date, time } = data;
     const formattedDateTime = formatManilaDateTime(date, time);
     const formattedTime    = formatTimeTo12Hour(time);
@@ -599,6 +620,11 @@ export async function sendBookingResendConfirmationEmail(data: BookingUpdateData
   if (!data.customer.email) return false;
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return false;
+    }
+
     const { bookingId, customer, service, serviceType, duration, date, time } = data;
     const formattedDateTime = formatManilaDateTime(date, time);
     const formattedTime    = formatTimeTo12Hour(time);
@@ -717,6 +743,11 @@ export async function sendBookingReminderEmail(data: BookingUpdateData): Promise
   if (!data.customer.email) return false;
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return false;
+    }
+
     const { bookingId, customer, service, serviceType, duration, date, time } = data;
     const formattedDateTime = formatManilaDateTime(date, time);
     const formattedTime    = formatTimeTo12Hour(time);
