@@ -144,30 +144,31 @@ export default function AdminBookCustomerPage() {
     const dayOfWeek = date.getDay();
     
     // Default studio hours
-    let startHour = 10;
-    let endHour = 18;
+    let startMinutes = 13.5 * 60;
+    let endMinutes = 18 * 60;
     
     if (dayOfWeek === 0) { // Sunday
-      startHour = 13;
+      startMinutes = 13 * 60;
     } else if (dayOfWeek === 6) { // Saturday
-      endHour = 18;
+      startMinutes = 10 * 60;
+      endMinutes = 18 * 60;
     } else { // Monday-Friday
-      endHour = 16;
+      endMinutes = 16 * 60;
     }
     
     // Admin can override to book any time 00:00-23:45
     if (allowOffHours) {
-      startHour = 0;
-      endHour = 24;
+      startMinutes = 0;
+      endMinutes = 24 * 60;
     }
     
     const slots = [];
-    for (let hour = startHour; hour < endHour; hour++) {
-      for (let minute = 0; minute < 60; minute += SLOT_MINUTES) {
-        const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        const isBooked = bookedSlots.includes(timeStr);
-        slots.push({ time: timeStr, available: !isBooked });
-      }
+    for (let totalMinutes = startMinutes; totalMinutes < endMinutes; totalMinutes += SLOT_MINUTES) {
+      const hour = Math.floor(totalMinutes / 60);
+      const minute = totalMinutes % 60;
+      const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      const isBooked = bookedSlots.includes(timeStr);
+      slots.push({ time: timeStr, available: !isBooked });
     }
     
     return slots;

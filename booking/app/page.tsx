@@ -48,14 +48,14 @@ type ShopHours = {
 // Studio hours by day of week
 const SHOP_HOURS_BY_DAY: Record<number, ShopHours> = {
   0: { open: 13, close: 18, lunchBreak: null }, // Sunday: 1 PM - 6 PM (no lunch break)
-  1: { open: 10, close: 16, lunchBreak: null },  // Monday: 10 AM - 4 PM (no lunch break)
-  2: { open: 10, close: 16, lunchBreak: null },  // Tuesday: 10 AM - 4 PM (no lunch break)
-  3: { open: 10, close: 16, lunchBreak: null },  // Wednesday: 10 AM - 4 PM (no lunch break)
-  4: { open: 10, close: 16, lunchBreak: null },  // Thursday: 10 AM - 4 PM (no lunch break)
-  5: { open: 10, close: 16, lunchBreak: null },  // Friday: 10 AM - 4 PM (no lunch break)
+  1: { open: 13.5, close: 16, lunchBreak: null },  // Monday: 1:30 PM - 4 PM (no lunch break)
+  2: { open: 13.5, close: 16, lunchBreak: null },  // Tuesday: 1:30 PM - 4 PM (no lunch break)
+  3: { open: 13.5, close: 16, lunchBreak: null },  // Wednesday: 1:30 PM - 4 PM (no lunch break)
+  4: { open: 13.5, close: 16, lunchBreak: null },  // Thursday: 1:30 PM - 4 PM (no lunch break)
+  5: { open: 13.5, close: 16, lunchBreak: null },  // Friday: 1:30 PM - 4 PM (no lunch break)
   6: { open: 10, close: 18, lunchBreak: null }, // Saturday: 10 AM - 6 PM (no lunch break)
 };
-const SHOP_HOURS = { open: 10, close: 18 }; // Default for general calculations
+const SHOP_HOURS = { open: 13.5, close: 16 }; // Default for general calculations
 const SLOT_MINUTES = 15; // 15-minute increments for display
 const BUFFER_MINUTES = 30; // 30-min buffer between sessions
 const MIN_SESSION_DURATION = 45; // Minimum booking duration (for slot count calculation)
@@ -2140,8 +2140,8 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
               const hours = SHOP_HOURS_BY_DAY[dayOfWeek];
               const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
               
-              const openTime = hours.open > 12 ? `${hours.open - 12}:00 PM` : `${hours.open}:00 AM`;
-              const closeTime = hours.close > 12 ? `${hours.close - 12}:00 PM` : `${hours.close}:00 PM`;
+              const openTime = to12Hour(toHHMM(hours.open * 60));
+              const closeTime = to12Hour(toHHMM(hours.close * 60));
               
               return `Studio hours for ${dayName}: ${openTime} - ${closeTime}`;
             })()}
@@ -3285,4 +3285,3 @@ if (typeof document !== "undefined") {
   styles.innerHTML = `.animate-accordion{animation:acc 160ms ease-out both}@keyframes acc{from{opacity:.0;transform:translateY(-2px)}to{opacity:1;transform:translateY(0)}}`;
   document.head.appendChild(styles);
 }
-

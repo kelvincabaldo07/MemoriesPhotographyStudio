@@ -61,6 +61,8 @@
   }
 
   :root {
+    --font-open-sans: "Open Sans";
+    --font-montserrat: "Montserrat";
     /* Website colors: charcoal, cream, forest, terracotta, clay */
     --background: 0 0% 100%; /* white */
     --foreground: 0 0% 17%; /* charcoal #2C2C2C */

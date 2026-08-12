@@ -40,7 +40,7 @@ export default function ContactPage() {
                   <a href="tel:+639064694122" className="text-h2 font-medium hover:underline block" style={{ color: BRAND.forest }}>
                     +63 906 469 4122
                   </a>
-                  <p className="text-base-body text-neutral-500 mt-1">Available 8 AM - 8 PM daily</p>
+                  <p className="text-base-body text-neutral-500 mt-1">Mon-Fri 1:30 PM - 4 PM, Sat 10 AM - 6 PM, Sun 1 PM - 6 PM</p>
                 </div>
               </div>
 
@@ -108,7 +108,7 @@ export default function ContactPage() {
 
             <div className="mt-8 p-4 rounded-xl" style={{ backgroundColor: BRAND.cream }}>
               <p className="text-h3 text-neutral-600">
-                💬 We typically respond within a few hours during business hours (8 AM - 8 PM)
+                💬 We typically respond within a few hours during business hours (Mon-Fri 1:30 PM - 4 PM, Sat 10 AM - 6 PM, Sun 1 PM - 6 PM)
               </p>
             </div>
           </CardContent>

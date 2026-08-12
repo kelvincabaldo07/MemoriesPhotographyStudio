@@ -274,7 +274,7 @@ export default function TermsOfServicePage() {
               Email: smile@memories-studio.com<br />
               Phone: +63 906 469 4122<br />
               Address: Green Valley Field Subdivision, Buna Cerca, Indang, Cavite, Philippines<br />
-              Business Hours: Monday-Saturday 8:00 AM - 8:00 PM, Sunday 1:00 PM - 8:00 PM
+              Business Hours: Monday-Friday 1:30 PM - 4:00 PM, Saturday 10:00 AM - 6:00 PM, Sunday 1:00 PM - 6:00 PM
             </p>
           </section>
 
