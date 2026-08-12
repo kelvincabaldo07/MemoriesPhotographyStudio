@@ -77,7 +77,6 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
         .then(() => {
           clearTimeout(timeout);
           setRecaptchaReady(true);
-          console.log("✅ reCAPTCHA loaded successfully");
         })
         .catch((err) => {
           clearTimeout(timeout);
@@ -149,7 +148,6 @@ export default function ManageBooking({ params }: { params: Promise<{ id: string
         
         // In development, show code in console
         if (data.devCode) {
-          console.log(`[DEV] OTP Code: ${data.devCode}`);
         }
       } else {
         alert(data.error || 'Failed to send verification code');

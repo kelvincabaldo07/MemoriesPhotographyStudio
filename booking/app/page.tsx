@@ -597,9 +597,6 @@ export default function App(){
               if (serviceType === "Self-Shoot" && serviceCategory) {
                 groupKey = `${serviceCategory} ${serviceGroup}`;
               }
-              
-              console.log('[Services] Processing:', svc.name, '-> type:', serviceType, 'group:', serviceGroup, 'category:', serviceCategory, 'groupKey:', groupKey);
-              
               // Add group to type if not exists
               if (serviceType && groupKey) {
                 if (!hierarchy.groups[serviceType]) {
@@ -631,7 +628,6 @@ export default function App(){
             setServiceInfo(prev => ({ ...prev, ...info }));
           }
           if (hierarchy.types.length > 0) {
-            console.log('[Services] Updated hierarchy:', hierarchy);
             setServiceHierarchy(hierarchy);
           }
         }
@@ -650,7 +646,6 @@ export default function App(){
     // Reload services when page becomes visible (user switches tabs back)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.log('[Services] Page visible, reloading from Notion...');
         loadServices();
       }
     };
@@ -1442,9 +1437,6 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
   const groups = serviceType === "Self-Shoot" && serviceCategory
     ? allGroups.filter(g => g.startsWith(serviceCategory) || !g.includes('Classic') && !g.includes('Digital')).map(g => g.replace(`${serviceCategory} `, ''))
     : allGroups;
-  
-  console.log('[ServicePicker] Type:', serviceType, 'Category:', serviceCategory, 'All groups:', allGroups, 'Filtered groups:', groups);
-  
   // For Self-Shoot, try category-prefixed group key first, then fall back to non-prefixed
   let serviceGroupKey = serviceGroup;
   let services: readonly string[] = [];
@@ -1456,7 +1448,6 @@ function StepServiceUnified({ serviceType, setServiceType, serviceCategory, setS
       // Try with category prefix first
       const prefixedKey = `${serviceCategory} ${serviceGroup}`;
       services = servicesMap?.[prefixedKey] || servicesMap?.[serviceGroup] || [];
-      console.log('[ServicePicker] Looking for services with key:', prefixedKey, 'or', serviceGroup, '-> found:', services.length);
     } else {
       services = servicesMap?.[serviceGroup] || [];
     }
@@ -1811,8 +1802,6 @@ function StepSchedule({ date, setDate, time, setTime, duration, availableSlots, 
           data.results.forEach(({ date, count }: { date: string; count: number }) => {
             cache[date] = count;
           });
-          console.log('[Calendar] Loaded availability for', Object.keys(cache).length, 'dates');
-          console.log('[Calendar] Blocked dates (count=0):', Object.entries(cache).filter(([_, count]) => count === 0).map(([date]) => date));
           setAvailabilityCache(cache);
           setUsingMockData(data.usingMockData || false);
         }

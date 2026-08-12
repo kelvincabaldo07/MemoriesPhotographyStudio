@@ -39,7 +39,6 @@ export default function MyBookings() {
         .then(() => {
           clearTimeout(timeout);
           setRecaptchaReady(true);
-          console.log("✅ reCAPTCHA loaded successfully");
         })
         .catch((err) => {
           clearTimeout(timeout);
@@ -55,8 +54,6 @@ export default function MyBookings() {
   }, [recaptchaReady]);
 
   async function handleSearch() {
-    console.log("🔍 Search initiated", { bookingId, email: email.substring(0, 3) + "***" });
-    
     setLoading(true);
     setSearched(true);
     setError("");
@@ -68,32 +65,23 @@ export default function MyBookings() {
       if (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
         try {
           recaptchaToken = await executeRecaptcha("search_bookings");
-          console.log("✅ reCAPTCHA token obtained");
         } catch (error) {
           console.warn("⚠️ reCAPTCHA execution failed:", error);
         }
       } else {
-        console.log("ℹ️ reCAPTCHA not configured (development mode)");
       }
 
       // Search by booking ID and email - both must match
       const url = `/api/bookings/${encodeURIComponent(bookingId)}?email=${encodeURIComponent(email)}`;
-      console.log("📡 Fetching:", url);
-      
       const response = await fetch(url, {
         headers: {
           "X-Recaptcha-Token": recaptchaToken,
         },
       });
-      
-      console.log("📥 Response status:", response.status);
       const data = await response.json();
-      console.log("📦 Response data:", { success: data.success, hasBooking: !!data.booking, error: data.error });
-
       if (data.success && data.booking) {
         setBooking(data.booking);
         setError("");
-        console.log("✅ Booking found successfully");
       } else {
         setBooking(null);
         setError(data.error || "Booking not found. Please check your Booking ID and email.");

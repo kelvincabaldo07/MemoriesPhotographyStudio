@@ -218,7 +218,6 @@ export default function BookingsPage() {
   };
 
   const handleReschedule = async (bookingId: string, newDate: string, newTime: string) => {
-    console.log('[Reschedule] Starting:', { bookingId, newDate, newTime });
     try {
       // Find the booking to get its current details
       const booking = bookings.find(b => b.bookingId === bookingId);
@@ -249,7 +248,6 @@ export default function BookingsPage() {
 
       if (response.ok) {
         await fetchBookings();
-        console.log('[Reschedule] Success!');
         alert('Booking rescheduled successfully!');
       } else {
         const errorData = await response.json();
@@ -264,8 +262,6 @@ export default function BookingsPage() {
 
   const saveBookingChanges = async () => {
     if (!editedBooking) return;
-
-    console.log('💾 Saving booking changes:', editedBooking);
     setUpdating(true);
     try {
       // Admin update - send booking ID in URL and updates in body
@@ -757,7 +753,6 @@ export default function BookingsPage() {
                   firstName: booking.firstName || '',
                   lastName: booking.lastName || ''
                 };
-                console.log('📋 Opening booking from list:', bookingCopy);
                 setSelectedBooking(bookingCopy);
                 setEditedBooking(bookingCopy);
                 setIsEditing(false);
@@ -1130,11 +1125,9 @@ export default function BookingsPage() {
                         selectedDate={editedBooking?.date || ""}
                         selectedTime={editedBooking?.time || ""}
                         onDateChange={(date) => {
-                          console.log('📆 Admin onDateChange called:', { date, currentDate: editedBooking?.date });
                           setEditedBooking(prev => ({ ...prev!, date }));
                         }}
                         onTimeChange={(time) => {
-                          console.log('⏰ Admin onTimeChange called:', { time });
                           setEditedBooking(prev => ({ ...prev!, time }));
                         }}
                         duration={editedBooking?.duration || 30}
@@ -1246,13 +1239,6 @@ export default function BookingsPage() {
                             
                             // Debug logging for all backdrops when count >= 3
                             if (currentCount >= 3) {
-                              console.log(`🎨 ${backdrop.name}:`, { 
-                                isSelected, 
-                                currentCount, 
-                                maxBackdrops, 
-                                isDisabled,
-                                backdrops: editedBooking?.backdrops
-                              });
                             }
                             
                             return (
@@ -1260,13 +1246,6 @@ export default function BookingsPage() {
                                 key={backdrop.key}
                                 type="button"
                                 onClick={() => {
-                                  console.log('Backdrop click START:', { 
-                                    backdrop: backdrop.name, 
-                                    isSelected, 
-                                    currentBackdrops: editedBooking?.backdrops,
-                                    currentCount, 
-                                    maxBackdrops 
-                                  });
                                   setEditedBooking(prev => {
                                     const newBackdrops = isSelected
                                       // Remove by matching both key and name (case insensitive)
@@ -1276,7 +1255,6 @@ export default function BookingsPage() {
                                         )
                                       // Add using proper case name to match Notion format
                                       : [...(prev?.backdrops || []), backdrop.name];
-                                    console.log('Backdrop click END:', { newBackdrops, newCount: newBackdrops.length });
                                     return { ...prev!, backdrops: newBackdrops };
                                   });
                                 }}

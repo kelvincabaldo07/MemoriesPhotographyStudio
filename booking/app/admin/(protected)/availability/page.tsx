@@ -67,7 +67,6 @@ export default function AvailabilityPage() {
           if (data.blockedDates) {
             setBlockedDates(data.blockedDates);
           }
-          console.log('Loaded availability from Notion:', data);
         }
       } catch (error) {
         console.error('Failed to load availability:', error);

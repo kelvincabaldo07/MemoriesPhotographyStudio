@@ -107,7 +107,6 @@ export default function SettingsPage() {
 
   const saveSettings = async () => {
     try {
-      console.log('[Settings] Saving booking settings...');
       const response = await fetch('/api/admin/booking-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -116,8 +115,6 @@ export default function SettingsPage() {
       });
 
       const data = await response.json();
-      console.log('[Settings] Save response:', { status: response.status, data });
-
       if (response.ok && data.success) {
         setHasChanges(false);
         if (data.needsSetup) {
@@ -172,17 +169,13 @@ export default function SettingsPage() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        console.log('[Settings] Loading booking settings...');
         const response = await fetch('/api/admin/booking-settings', {
           credentials: 'same-origin',
         });
         const data = await response.json();
-        console.log('[Settings] Load response:', { status: response.status, data });
-        
         if (response.ok && data.success && data.settings) {
           setBookingSettings(data.settings);
           setSettingsDbConfigured(!data.usingDefaults);
-          console.log('[Settings] Settings loaded successfully');
         } else if (response.status === 401) {
           console.error('[Settings] Unauthorized - not logged in or session expired');
         } else {

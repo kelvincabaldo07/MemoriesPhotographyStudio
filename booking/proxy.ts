@@ -6,7 +6,7 @@ import { getToken } from 'next-auth/jwt';
  * Middleware to protect admin routes
  * Enforces authentication on all /admin and /api/admin paths
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Protect all admin routes except login page
